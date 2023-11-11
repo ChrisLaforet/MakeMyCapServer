@@ -15,4 +15,7 @@ public class InventoryLevel
 	
 	[JsonPropertyName("updated_at")]
 	public DateTime UpdatedAt { get; set; }
+	
+	[JsonPropertyName("admin_graphql_api_id")]
+	public string AdminGraphQlApiId { get; set; }
 }
