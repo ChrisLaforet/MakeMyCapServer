@@ -5,6 +5,7 @@ using MakeMyCapServer.Proxies;
 using MakeMyCapServer.Services.Email;
 using MakeMyCapServer.Services.Inventory;
 using MakeMyCapServer.Shopify;
+using Microsoft.EntityFrameworkCore;
 using Product = MakeMyCapServer.Shopify.Dtos.Product;
 
 namespace MakeMyCapServer.Services.Background;
@@ -14,6 +15,7 @@ public sealed class InventoryUpdateService : IInventoryProcessingService
 	public const int DEFAULT_DELAY_TIMEOUT_HOURS = 6;
 
 	private readonly IInventoryService inventoryService;
+	private readonly IProductSkuProxy productSkuProxy;
 	private readonly IServiceProxy serviceProxy;
 	private readonly ILogger<InventoryUpdateService> logger;
 	private readonly IEmailService emailService; 
@@ -22,9 +24,10 @@ public sealed class InventoryUpdateService : IInventoryProcessingService
 	
 	private List<SaleProduct> saleProducts = new List<SaleProduct>();
 
-	public InventoryUpdateService(IInventoryService inventoryService, IServiceProxy serviceProxy, IEmailService emailService, ILogger<InventoryUpdateService> logger)
+	public InventoryUpdateService(IInventoryService inventoryService, IProductSkuProxy productSkuProxy, IServiceProxy serviceProxy, IEmailService emailService, ILogger<InventoryUpdateService> logger)
 	{
 		this.inventoryService = inventoryService;
+		this.productSkuProxy = productSkuProxy;
 		this.serviceProxy = serviceProxy;
 		this.logger = logger;
 		this.emailService = emailService;
@@ -78,6 +81,31 @@ public sealed class InventoryUpdateService : IInventoryProcessingService
 			var products = LoadAllProducts();
 			foreach (var product in products)
 			{
+				foreach (var variant in product.Variants)
+				{
+					var matchedProduct = productSkuProxy.GetProductByVariantId(variant.Id);
+					if (matchedProduct == null && !string.IsNullOrEmpty(variant.Sku))
+					{
+						var skuMatch = productSkuProxy.GetProductBySku(variant.Sku);
+						if (skuMatch != null)
+						{
+							logger.LogError($"Warning: Database already contains SKU {skuMatch.Sku} for Variant Id {skuMatch.VariantId} but it is duplicated in Variant Id {variant.Id}: not adding this record");
+						}
+						else
+						{
+							MakeMyCap.Model.Product record = new MakeMyCap.Model.Product();
+							record.VariantId = variant.Id;
+							record.Sku = variant.Sku;
+							record.ProductId = product.Id;
+							record.InventoryItemId = variant.InventoryItemId;
+							record.Title = $"{product.Title}: {variant.Title}";
+							record.Vendor = product.Vendor;
+							productSkuProxy.AddProduct(record);							
+						}
+
+					}
+					// TODO: Maybe we need to update skus and so on if not correct??
+				}
 				var match = saleProducts.SingleOrDefault(saleProduct => saleProduct.ProductId == product.Id && saleProduct.VariantId == null);
 				if (match == null)
 				{

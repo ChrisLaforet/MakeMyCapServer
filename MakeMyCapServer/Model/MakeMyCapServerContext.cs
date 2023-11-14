@@ -51,7 +51,7 @@ public partial class MakeMyCapServerContext : DbContext
 
             entity.HasIndex(e => e.VariantId, "IX_Product").IsUnique();
 
-            entity.HasIndex(e => e.Sku, "IX_Product_1");
+            entity.HasIndex(e => e.Sku, "IX_Product_1").IsUnique();
 
             entity.Property(e => e.Sku)
                 .HasMaxLength(20)

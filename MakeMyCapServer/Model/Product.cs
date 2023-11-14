@@ -16,4 +16,6 @@ public partial class Product
     public string? Title { get; set; }
 
     public string? Vendor { get; set; }
+    
+    public long InventoryItemId { get; set; }
 }

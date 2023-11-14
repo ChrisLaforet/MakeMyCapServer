@@ -32,6 +32,7 @@ builder.Services.AddScoped<IFulfillmentProcessingService, FulfillmentUpdateServi
 builder.Services.AddScoped<IEmailService, SendgridEmailService>();
 
 builder.Services.AddScoped<IServiceProxy, ServiceProxy>();
+builder.Services.AddScoped<IProductSkuProxy, ProductSkuProxy>();
 
 builder.Services.AddHostedService<InventoryScopedBackgroundService>();
 builder.Services.AddHostedService<FulfillmentScopedBackgroundService>();
