@@ -13,14 +13,24 @@ public class ServiceProxy : IServiceProxy
 		this.logger = logger;
 	}
 	
-	public int GetInventoryCheckHours()
+	public int? GetInventoryCheckHours()
 	{
-		throw new NotImplementedException();
+		var setting = context.Settings.FirstOrDefault();
+		if (setting == null)
+		{
+			return null;
+		}
+		return setting.InventoryCheckHours;
 	}
 
-	public int GetFulfillmentCheckHours()
+	public int? GetFulfillmentCheckHours()
 	{
-		throw new NotImplementedException();
+		var setting = context.Settings.FirstOrDefault();
+		if (setting == null)
+		{
+			return null;
+		}
+		return setting.FulfillmentCheckHours;
 	}
 
 	public ServiceLog CreateServiceLogFor(string serviceName)
@@ -28,6 +38,7 @@ public class ServiceProxy : IServiceProxy
 		var serviceLog = new ServiceLog();
 		serviceLog.ServiceName = serviceName;
 		serviceLog.StartTime = DateTime.Now;
+		context.ServiceLogs.Add(serviceLog);
 		context.SaveChanges();
 		return serviceLog;
 	}

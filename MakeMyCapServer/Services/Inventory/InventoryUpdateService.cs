@@ -11,13 +11,14 @@ namespace MakeMyCapServer.Services.Background;
 
 public sealed class InventoryUpdateService : IInventoryProcessingService 
 {
-	// TODO: pick this up from a database and check for updates to implement changed timeouts
-	public const int DELAY_TIMEOUT_MSEC = 6 * 60 * 60 * 1000;
+	public const int DEFAULT_DELAY_TIMEOUT_HOURS = 6;
 
 	private readonly IInventoryService inventoryService;
 	private readonly IServiceProxy serviceProxy;
 	private readonly ILogger<InventoryUpdateService> logger;
 	private readonly IEmailService emailService; 
+	
+	private int delayTimeoutHours = DEFAULT_DELAY_TIMEOUT_HOURS;
 	
 	private List<SaleProduct> saleProducts = new List<SaleProduct>();
 
@@ -34,15 +35,38 @@ public sealed class InventoryUpdateService : IInventoryProcessingService
 	public async Task DoWorkAsync(CancellationToken stoppingToken)
 	{
 		logger.LogInformation("{ServiceName} working", nameof(InventoryUpdateService));
+		bool firstTime = true;
 		while (!stoppingToken.IsCancellationRequested)
 		{
 			if (!UpdateInventory())
 			{
-				await Task.Delay(DELAY_TIMEOUT_MSEC, stoppingToken);
+				CheckAndUpdateDelay(firstTime);
+				firstTime = false;
+
+				await Task.Delay(delayTimeoutHours * 60 * 60 * 1000, stoppingToken);
 			}
 		}
 	}
 
+	private void CheckAndUpdateDelay(bool firstTime = false)
+	{
+		int? hours = serviceProxy.GetInventoryCheckHours();
+		if (hours == null)
+		{
+			if (firstTime)
+			{
+				logger.LogInformation($"Setting delay time for {nameof(InventoryUpdateService)} to default {DEFAULT_DELAY_TIMEOUT_HOURS} hours between processing tasks");
+			}
+			return;
+		}
+		
+		if (hours != delayTimeoutHours)
+		{
+			logger.LogInformation($"Setting delay time for {nameof(InventoryUpdateService)} to {hours} hours between processing tasks");
+			delayTimeoutHours = (int)hours;
+		}
+	}
+	
 	private bool UpdateInventory()
 	{
 		logger.LogInformation("Checking for inventory changes");
