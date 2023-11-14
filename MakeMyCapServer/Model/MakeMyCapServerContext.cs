@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
-namespace EFGenerator.Model;
+namespace MakeMyCap.Model;
 
 public partial class MakeMyCapServerContext : DbContext
 {
@@ -18,6 +18,10 @@ public partial class MakeMyCapServerContext : DbContext
     public virtual DbSet<Distributor> Distributors { get; set; }
 
     public virtual DbSet<Product> Products { get; set; }
+
+    public virtual DbSet<ServiceLog> ServiceLogs { get; set; }
+
+    public virtual DbSet<Setting> Settings { get; set; }
 
     public virtual DbSet<SkuDistributor> SkuDistributors { get; set; }
 
@@ -60,6 +64,25 @@ public partial class MakeMyCapServerContext : DbContext
                 .IsUnicode(false);
         });
 
+        modelBuilder.Entity<ServiceLog>(entity =>
+        {
+            entity.ToTable("ServiceLog");
+
+            entity.Property(e => e.EndTime).HasColumnType("datetime");
+            entity.Property(e => e.ServiceName)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.StartTime).HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<Setting>(entity =>
+        {
+            entity.HasNoKey();
+
+            entity.Property(e => e.FulfillmentCheckHours).HasDefaultValueSql("((2))");
+            entity.Property(e => e.InventoryCheckHours).HasDefaultValueSql("((8))");
+        });
+
         modelBuilder.Entity<SkuDistributor>(entity =>
         {
             entity.ToTable("SkuDistributor");
@@ -80,4 +103,5 @@ public partial class MakeMyCapServerContext : DbContext
     }
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+    
 }

@@ -1,4 +1,4 @@
-﻿namespace ShopifyInventoryFulfillment.Configuration;
+﻿namespace MakeMyCapServer.Configuration;
 
 public interface IConfigurationLoader
 {

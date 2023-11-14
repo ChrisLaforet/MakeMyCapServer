@@ -1,4 +1,4 @@
-﻿namespace ShopifyInventoryFulfillment.Shopify;
+﻿namespace MakeMyCapServer.Shopify;
 
 public class ShopifyStore
 {

@@ -1,27 +1,30 @@
-﻿using System.Text.RegularExpressions;
-using MakeMyCapServer.Distributors.SandS;
-using ShopifyInventoryFulfillment.Configuration;
-using ShopifyInventoryFulfillment.Lookup;
-using ShopifyInventoryFulfillment.Shopify;
-using ShopifyInventoryFulfillment.Shopify.Dtos;
+﻿using MakeMyCap.Model;
+using MakeMyCapServer.Configuration;
+using MakeMyCapServer.Lookup;
+using MakeMyCapServer.Proxies;
+using MakeMyCapServer.Services.Email;
+using MakeMyCapServer.Services.Inventory;
+using MakeMyCapServer.Shopify;
+using Product = MakeMyCapServer.Shopify.Dtos.Product;
 
-namespace ShopifyInventoryFulfillment.Services;
+namespace MakeMyCapServer.Services.Background;
 
-public sealed class InventoryUpdateService : IScopedProcessingService 
+public sealed class InventoryUpdateService : IInventoryProcessingService 
 {
 	// TODO: pick this up from a database and check for updates to implement changed timeouts
-	public const int DELAY_TIMEOUT_MSEC = 10 * 1000;
-//	public const int DELAY_TIMEOUT_MSEC = 6 * 60 * 60 * 1000;
+	public const int DELAY_TIMEOUT_MSEC = 6 * 60 * 60 * 1000;
 
-	private IInventoryService inventoryService;
+	private readonly IInventoryService inventoryService;
+	private readonly IServiceProxy serviceProxy;
 	private readonly ILogger<InventoryUpdateService> logger;
 	private readonly IEmailService emailService; 
 	
 	private List<SaleProduct> saleProducts = new List<SaleProduct>();
 
-	public InventoryUpdateService(IInventoryService inventoryService, IEmailService emailService, ILogger<InventoryUpdateService> logger)
+	public InventoryUpdateService(IInventoryService inventoryService, IServiceProxy serviceProxy, IEmailService emailService, ILogger<InventoryUpdateService> logger)
 	{
 		this.inventoryService = inventoryService;
+		this.serviceProxy = serviceProxy;
 		this.logger = logger;
 		this.emailService = emailService;
 
@@ -43,8 +46,11 @@ public sealed class InventoryUpdateService : IScopedProcessingService
 	private bool UpdateInventory()
 	{
 		logger.LogInformation("Checking for inventory changes");
+		ServiceLog? serviceLog = null;
 		try
 		{
+			serviceLog = serviceProxy.CreateServiceLogFor(nameof(InventoryUpdateService));
+			
 			var products = LoadAllProducts();
 			foreach (var product in products)
 			{
@@ -63,13 +69,20 @@ public sealed class InventoryUpdateService : IScopedProcessingService
 			{
 				Console.WriteLine($"{saleProduct.Sku} has a level of {saleProduct.InventoryLevel}");
 			}
+
+			serviceProxy.CloseServiceLogFor(serviceLog);
 		}
 		catch (Exception ex)
 		{
-			logger.LogError("Caught exception: " + ex);
+			logger.LogError($"Caught exception: {ex}");
+			if (serviceLog != null)
+			{
+				serviceProxy.CloseServiceLogFor(serviceLog, true);
+			}
 		}
 
-		TestUpdateAdjustments();
+// TODO: CML - fix the updater and make it do what it supposed to do		
+TestUpdateAdjustments();
 		
 		return false;
 	}

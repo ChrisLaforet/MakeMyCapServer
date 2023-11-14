@@ -1,8 +1,8 @@
 ﻿using SendGrid;
 using SendGrid.Helpers.Mail;
-using ShopifyInventoryFulfillment.Configuration;
+using MakeMyCapServer.Configuration;
 
-namespace ShopifyInventoryFulfillment.Services;
+namespace MakeMyCapServer.Services.Email;
 
 public class SendgridEmailService : IEmailService
 {

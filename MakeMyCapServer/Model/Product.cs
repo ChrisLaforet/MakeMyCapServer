@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace EFGenerator.Model;
+namespace MakeMyCap.Model;
 
 public partial class Product
 {

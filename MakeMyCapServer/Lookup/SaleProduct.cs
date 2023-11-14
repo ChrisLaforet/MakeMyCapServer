@@ -1,4 +1,4 @@
-﻿namespace ShopifyInventoryFulfillment.Lookup;
+﻿namespace MakeMyCapServer.Lookup;
 
 public class SaleProduct
 {

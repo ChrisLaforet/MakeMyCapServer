@@ -1,4 +1,4 @@
-﻿namespace ShopifyInventoryFulfillment.Services;
+﻿namespace MakeMyCapServer.Services.Email;
 
 public interface IEmailService
 {

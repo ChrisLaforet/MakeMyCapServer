@@ -3,10 +3,10 @@ using System.Net.Http.Headers;
 using System.Security.Cryptography.Xml;
 using System.Text;
 using System.Text.Json;
-using ShopifyInventoryFulfillment.Configuration;
-using ShopifyInventoryFulfillment.Shopify.Dtos;
+using MakeMyCapServer.Configuration;
+using MakeMyCapServer.Shopify.Dtos;
 
-namespace ShopifyInventoryFulfillment.Shopify;
+namespace MakeMyCapServer.Shopify;
 
 public class InventoryService : IInventoryService
 {
@@ -25,7 +25,7 @@ public class InventoryService : IInventoryService
 		var request = new HttpRequestMessage(HttpMethod.Get, $"{ShopifyStore.BaseUrl}/admin/api/2023-10/inventory_items/{id}.json");
 		request.Headers.Add("X-Shopify-Access-Token", token);
 		request.Headers.Add("Accept", "application/json");
-		request.Headers.Add("User-Agent", "ShopifyInventoryFulfillment/1.0");
+		request.Headers.Add("User-Agent", "MakeMyCapServer/1.0");
 		var task = client.SendAsync(request);
 		
 		var response = task.Result; 
@@ -57,7 +57,7 @@ public class InventoryService : IInventoryService
 		var request = new HttpRequestMessage(HttpMethod.Get, uri);
 		request.Headers.Add("X-Shopify-Access-Token", token);
 		request.Headers.Add("Accept", "application/json");
-		request.Headers.Add("User-Agent", "ShopifyInventoryFulfillment/1.0");
+		request.Headers.Add("User-Agent", "MakeMyCapServer/1.0");
 		var task = client.SendAsync(request);
 		
 		var response = task.Result; 
@@ -83,7 +83,7 @@ public class InventoryService : IInventoryService
 		var request = new HttpRequestMessage(HttpMethod.Post, uri);
 		request.Headers.Add("X-Shopify-Access-Token", token);
 		request.Headers.Add("Accept", "application/json");
-		request.Headers.Add("User-Agent", "ShopifyInventoryFulfillment/1.0");
+		request.Headers.Add("User-Agent", "MakeMyCapServer/1.0");
 
 		var jsonBodyContent = $"{{\"inventory_item_id\":{inventoryItemId},\"location_id\":{locationId},\"available_adjustment\":{adjustment}}}";
 		request.Content = new StringContent(jsonBodyContent,
@@ -118,7 +118,7 @@ public class InventoryService : IInventoryService
 		var request = new HttpRequestMessage(HttpMethod.Get, uri);
 		request.Headers.Add("X-Shopify-Access-Token", token);
 		request.Headers.Add("Accept", "application/json");
-		request.Headers.Add("User-Agent", "ShopifyInventoryFulfillment/1.0");
+		request.Headers.Add("User-Agent", "MakeMyCapServer/1.0");
 		var task = client.SendAsync(request);
 		
 		var response = task.Result; 

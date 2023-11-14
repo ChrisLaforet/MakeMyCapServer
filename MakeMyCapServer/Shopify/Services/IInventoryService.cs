@@ -1,6 +1,6 @@
-﻿using ShopifyInventoryFulfillment.Shopify.Dtos;
+﻿using MakeMyCapServer.Shopify.Dtos;
 
-namespace ShopifyInventoryFulfillment.Shopify;
+namespace MakeMyCapServer.Shopify;
 
 public interface IInventoryService
 {

@@ -1,6 +1,15 @@
-using ShopifyInventoryFulfillment.Configuration;
-using ShopifyInventoryFulfillment.Services;
-using ShopifyInventoryFulfillment.Shopify;
+using MakeMyCap.Model;
+using MakeMyCapServer.Configuration;
+using MakeMyCapServer.Proxies;
+using MakeMyCapServer.Services;
+using MakeMyCapServer.Services.Background;
+using MakeMyCapServer.Services.Email;
+using MakeMyCapServer.Services.Fulfillment;
+using MakeMyCapServer.Services.Inventory;
+using MakeMyCapServer.Shopify;
+using Microsoft.EntityFrameworkCore;
+
+const string DB_CONNECTION_STRING_KEY = "MakeMyCapDatabase";
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,14 +22,19 @@ builder.Services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
 
 builder.Services.Add(new ServiceDescriptor(typeof(IConfigurationLoader), xmlConfigurationLoader));
 
-// // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-// builder.Services.AddEndpointsApiExplorer();
-// builder.Services.AddSwaggerGen();
+// create db contexts for each of the domains
+builder.Services.AddDbContext<MakeMyCapServerContext>(options =>
+					options.UseSqlServer(xmlConfigurationLoader.GetKeyValueFor(DB_CONNECTION_STRING_KEY)));
+
 builder.Services.AddScoped<IInventoryService, InventoryService>();
-builder.Services.AddScoped<IScopedProcessingService, InventoryUpdateService>();
+builder.Services.AddScoped<IInventoryProcessingService, InventoryUpdateService>();
+builder.Services.AddScoped<IFulfillmentProcessingService, FulfillmentUpdateService>();
 builder.Services.AddScoped<IEmailService, SendgridEmailService>();
 
-builder.Services.AddHostedService<ScopedBackgroundService>();
+builder.Services.AddScoped<IServiceProxy, ServiceProxy>();
+
+builder.Services.AddHostedService<InventoryScopedBackgroundService>();
+builder.Services.AddHostedService<FulfillmentScopedBackgroundService>();
 
 builder.Services.AddHttpClient();
 

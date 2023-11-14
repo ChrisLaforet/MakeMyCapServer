@@ -2,8 +2,8 @@
 using System.Text;
 using System.Text.Json;
 using MakeMyCapServer.Distributors.SandS.Dtos;
-using ShopifyInventoryFulfillment.Configuration;
-using ShopifyInventoryFulfillment.Services;
+using MakeMyCapServer.Configuration;
+using MakeMyCapServer.Services;
 
 namespace MakeMyCapServer.Distributors.SandS;
 
@@ -42,7 +42,7 @@ public class SandSInventoryService : IInventoryService
 		var request = new HttpRequestMessage(HttpMethod.Get, url);
 		var authenticationValue = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{accountNumber}:{apiKey}"));
 		client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authenticationValue);
-		request.Headers.Add("User-Agent", "ShopifyInventoryFulfillment/1.0");
+		request.Headers.Add("User-Agent", "MakeMyCapServer/1.0");
 
 		var task = client.SendAsync(request);
 		

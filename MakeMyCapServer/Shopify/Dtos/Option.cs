@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace ShopifyInventoryFulfillment.Shopify.Dtos;
+namespace MakeMyCapServer.Shopify.Dtos;
 
 public class Option
 {
