@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using MakeMyCapServer.Distributors.SandS;
 using ShopifyInventoryFulfillment.Configuration;
 using ShopifyInventoryFulfillment.Lookup;
 using ShopifyInventoryFulfillment.Shopify;
@@ -14,13 +15,17 @@ public sealed class InventoryUpdateService : IScopedProcessingService
 
 	private IInventoryService inventoryService;
 	private readonly ILogger<InventoryUpdateService> logger;
-
+	private readonly IEmailService emailService; 
+	
 	private List<SaleProduct> saleProducts = new List<SaleProduct>();
 
-	public InventoryUpdateService(IInventoryService inventoryService, ILogger<InventoryUpdateService> logger)
+	public InventoryUpdateService(IInventoryService inventoryService, IEmailService emailService, ILogger<InventoryUpdateService> logger)
 	{
 		this.inventoryService = inventoryService;
 		this.logger = logger;
+		this.emailService = emailService;
+
+		//emailService.SendMail("laforet@chrislaforetsoftware.com", "Inventory Update Service Started", "This is to confirm that the inventory service has started up and is running.");
 	}
 
 	public async Task DoWorkAsync(CancellationToken stoppingToken)

@@ -18,8 +18,11 @@ builder.Services.Add(new ServiceDescriptor(typeof(IConfigurationLoader), xmlConf
 // builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IInventoryService, InventoryService>();
 builder.Services.AddScoped<IScopedProcessingService, InventoryUpdateService>();
+builder.Services.AddScoped<IEmailService, SendgridEmailService>();
 
 builder.Services.AddHostedService<ScopedBackgroundService>();
+
+builder.Services.AddHttpClient();
 
 // builder.Services.AddControllers();
 // Add services to the container.
