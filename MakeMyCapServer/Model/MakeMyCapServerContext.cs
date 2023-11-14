@@ -19,6 +19,8 @@ public partial class MakeMyCapServerContext : DbContext
 
     public virtual DbSet<Product> Products { get; set; }
 
+    public virtual DbSet<SanMarSkuMap> SanMarSkuMaps { get; set; }
+
     public virtual DbSet<ServiceLog> ServiceLogs { get; set; }
 
     public virtual DbSet<Setting> Settings { get; set; }
@@ -64,6 +66,26 @@ public partial class MakeMyCapServerContext : DbContext
                 .IsUnicode(false);
         });
 
+        modelBuilder.Entity<SanMarSkuMap>(entity =>
+        {
+            entity.HasKey(e => e.Sku);
+
+            entity.ToTable("SanMarSkuMap");
+
+            entity.Property(e => e.Sku)
+                .HasMaxLength(20)
+                .IsUnicode(false);
+            entity.Property(e => e.Color)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.Size)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.Style)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+        });
+
         modelBuilder.Entity<ServiceLog>(entity =>
         {
             entity.ToTable("ServiceLog");
@@ -103,5 +125,4 @@ public partial class MakeMyCapServerContext : DbContext
     }
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
-    
 }

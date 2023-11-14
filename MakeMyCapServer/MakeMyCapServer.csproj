@@ -18,7 +18,10 @@
 
   <ItemGroup>
     <Folder Include="Distributors\CapAmerica\" />
-    <Folder Include="Distributors\SanMar\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SanMarWebService\SanMarWebService.csproj" />
   </ItemGroup>
 
 </Project>
