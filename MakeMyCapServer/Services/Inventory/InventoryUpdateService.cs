@@ -21,8 +21,6 @@ public sealed class InventoryUpdateService : IInventoryProcessingService
 	private readonly IEmailService emailService; 
 	
 	private int delayTimeoutHours = DEFAULT_DELAY_TIMEOUT_HOURS;
-	
-	private List<SaleProduct> saleProducts = new List<SaleProduct>();
 
 	public InventoryUpdateService(IInventoryService inventoryService, IProductSkuProxy productSkuProxy, IServiceProxy serviceProxy, IEmailService emailService, ILogger<InventoryUpdateService> logger)
 	{
@@ -73,47 +71,28 @@ public sealed class InventoryUpdateService : IInventoryProcessingService
 	private bool UpdateInventory()
 	{
 		logger.LogInformation("Checking for inventory changes");
+		var saleProducts = new List<SaleProduct>();
+
 		ServiceLog? serviceLog = null;
 		try
 		{
 			serviceLog = serviceProxy.CreateServiceLogFor(nameof(InventoryUpdateService));
-			
+
 			var products = LoadAllProducts();
+			UpdateDatabaseWithProducts(products);
 			foreach (var product in products)
 			{
 				foreach (var variant in product.Variants)
 				{
 					var matchedProduct = productSkuProxy.GetProductByVariantId(variant.Id);
-					if (matchedProduct == null && !string.IsNullOrEmpty(variant.Sku))
+					if (matchedProduct == null)
 					{
-						var skuMatch = productSkuProxy.GetProductBySku(variant.Sku);
-						if (skuMatch != null)
-						{
-							logger.LogError($"Warning: Database already contains SKU {skuMatch.Sku} for Variant Id {skuMatch.VariantId} but it is duplicated in Variant Id {variant.Id}: not adding this record");
-						}
-						else
-						{
-							MakeMyCap.Model.Product record = new MakeMyCap.Model.Product();
-							record.VariantId = variant.Id;
-							record.Sku = variant.Sku;
-							record.ProductId = product.Id;
-							record.InventoryItemId = variant.InventoryItemId;
-							record.Title = $"{product.Title}: {variant.Title}";
-							record.Vendor = product.Vendor;
-							productSkuProxy.AddProduct(record);							
-						}
-
+						logger.LogError($"Cannot load a database product for Variant Id {variant.Id} for further processing");
+						continue;
 					}
-					// TODO: Maybe we need to update skus and so on if not correct??
-				}
-				var match = saleProducts.SingleOrDefault(saleProduct => saleProduct.ProductId == product.Id && saleProduct.VariantId == null);
-				if (match == null)
-				{
-					AddProduct(product);
-				}
-				else
-				{
-					GetInventoryLevelFor(match);
+					var saleProduct = new SaleProduct(matchedProduct);
+					saleProducts.Add(saleProduct);
+					GetInventoryLevelFor(saleProduct);
 				}
 			}
 			
@@ -134,7 +113,7 @@ public sealed class InventoryUpdateService : IInventoryProcessingService
 		}
 
 // TODO: CML - fix the updater and make it do what it supposed to do		
-TestUpdateAdjustments();
+TestUpdateAdjustments(saleProducts);
 		
 		return false;
 	}
@@ -158,30 +137,43 @@ TestUpdateAdjustments();
 		return products;
 	}
 
-	private void AddProduct(Product product)
+	private void UpdateDatabaseWithProducts(List<Product> products)
 	{
-		if (product.Variants == null || product.Variants.Count == 0)
+		try
 		{
-			var saleProduct = new SaleProduct();
-			saleProduct.ProductId = product.Id;
-			saleProduct.Title = product.Title;
-			saleProducts.Add(saleProduct);
-			return;
+			foreach (var product in products)
+			{
+				foreach (var variant in product.Variants)
+				{
+					var matchedProduct = productSkuProxy.GetProductByVariantId(variant.Id);
+					if (matchedProduct == null && !string.IsNullOrEmpty(variant.Sku))
+					{
+						var skuMatch = productSkuProxy.GetProductBySku(variant.Sku);
+						if (skuMatch != null)
+						{
+							logger.LogError(
+								$"Warning: Database already contains SKU {skuMatch.Sku} for Variant Id {skuMatch.VariantId} but it is duplicated in Variant Id {variant.Id}: not adding this record");
+						}
+						else
+						{
+							MakeMyCap.Model.Product record = new MakeMyCap.Model.Product();
+							record.VariantId = variant.Id;
+							record.Sku = variant.Sku;
+							record.ProductId = product.Id;
+							record.InventoryItemId = variant.InventoryItemId;
+							record.Title = $"{product.Title}: {variant.Title}";
+							record.Vendor = product.Vendor;
+							productSkuProxy.AddProduct(record);
+						}
+					}
+					// TODO: Maybe we need to update skus and so on if not correct??
+				}
+			}
 		}
-		
-		foreach (var variant in product.Variants)
+		catch (Exception ex)
 		{
-			var saleProduct = new SaleProduct();
-			saleProduct.ProductId = product.Id;
-			saleProduct.Title = product.Title;
-			saleProduct.VariantId = variant.Id;
-			saleProduct.InventoryItemId = variant.InventoryItemId;
-			saleProduct.Sku = variant.Sku;
-			
-			GetInventoryLevelFor(saleProduct);
-			
-			saleProducts.Add(saleProduct);
-		}						
+			logger.LogError($"Caught exception in UpdateDatabaseWithProducts: {ex}");
+		}
 	}
 
 	private void GetInventoryLevelFor(SaleProduct saleProduct)
@@ -196,7 +188,8 @@ TestUpdateAdjustments();
 				var matches = inventoryService.GetInventoryLevels(inventoryItemIds);
 				if (matches != null && matches.Count > 0)
 				{
-					saleProduct.LocationId = matches[0].LocationId;		// this needs to change if multiple locations
+// TODO: CML - are we dealing with only ONE location?					
+					saleProduct.LocationId = matches[0].LocationId;		// NOTE!!  this needs to change if multiple locations
 					saleProduct.InventoryLevel = matches[0].Available;
 					return;
 				}
@@ -210,7 +203,7 @@ TestUpdateAdjustments();
 		saleProduct.InventoryLevel = null;
 	}
 
-	private void TestUpdateAdjustments()
+	private void TestUpdateAdjustments(List<SaleProduct> saleProducts)
 	{
 		int level = new Random().Next() % 300;
 		if (level == 0)
@@ -244,7 +237,7 @@ TestUpdateAdjustments();
 			}
 			catch (Exception ex)
 			{
-				logger.LogError("Caught exception: " + ex);
+				logger.LogError($"Caught exception processing Variant Id {saleProduct.VariantId}: {ex}");
 			}
 		}
 	}

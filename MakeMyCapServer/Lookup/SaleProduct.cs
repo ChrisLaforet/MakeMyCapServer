@@ -1,12 +1,21 @@
-﻿namespace MakeMyCapServer.Lookup;
+﻿using MakeMyCap.Model;
+
+namespace MakeMyCapServer.Lookup;
 
 public class SaleProduct
 {
-    public long ProductId { get; set; }
-    public string Title { get; set; }
-    public long? InventoryItemId { get; set; }
+    public Product Product { get; private set; }
+
+    public SaleProduct(Product product)
+    {
+        this.Product = product;
+    }
+
+    public long ProductId => Product.ProductId;
+    public string Title => Product.Title;
+    public long? InventoryItemId => Product.InventoryItemId;
     public long? LocationId { get; set; }
-    public long? VariantId { get; set; }
-    public string? Sku { get; set; }
+    public long? VariantId => Product.VariantId;
+    public string? Sku => Product.Sku;
     public int? InventoryLevel { get; set; } 
 }
