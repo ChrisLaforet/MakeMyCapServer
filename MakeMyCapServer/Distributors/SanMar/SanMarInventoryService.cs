@@ -11,15 +11,13 @@ public class SanMarInventoryService : IInventoryService
 	public const string USER_NAME = "SanMarUserName";
 	public const string PASSWORD = "SanMarPassword";
 
-	private readonly IConfigurationLoader configurationLoader;
 	private readonly ILogger<SanMarInventoryService> logger;
 	private readonly IProductSkuProxy productSkuProxy;
 	
 	private readonly SanMarServices services;
 	
-	public SandSInventoryService(IConfigurationLoader configurationLoader, IProductSkuProxy productSkuProxy, ILogger<SanMarInventoryService> logger)
+	public SanMarInventoryService(IConfigurationLoader configurationLoader, IProductSkuProxy productSkuProxy, ILogger<SanMarInventoryService> logger)
 	{
-		this.configurationLoader = configurationLoader;
 		this.productSkuProxy = productSkuProxy;
 		this.logger = logger;
 		

@@ -49,9 +49,6 @@ public class SandSInventoryService : IInventoryService
 		var response = task.Result; 
 		if (response.IsSuccessStatusCode)
 		{
-			// var s = response.Content.ReadAsStringAsync().Result;
-			// var content = JsonSerializer.Deserialize<QuantityResponse[]>(s);
-
 			var content = response.Content.ReadFromJsonAsync<QuantityResponse[]>().Result;
 			return ExtractStockInventoryFrom(content, skus);
 		}
