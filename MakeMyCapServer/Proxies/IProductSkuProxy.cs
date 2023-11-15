@@ -9,4 +9,7 @@ public interface IProductSkuProxy
 	Product? GetProductByVariantId(long variantId);
 
 	void AddProduct(Product product);
+
+	List<SanMarSkuMap> GetSanMarSkuMaps();
+	SanMarSkuMap? GetSanMarSkuMapFor(string sku);
 }

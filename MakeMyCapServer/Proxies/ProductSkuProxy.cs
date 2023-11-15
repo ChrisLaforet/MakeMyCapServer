@@ -18,7 +18,7 @@ public class ProductSkuProxy : IProductSkuProxy
 
 	public Product? GetProductBySku(string sku)
 	{
-		return context.Products.FirstOrDefault(product => product.Sku == sku);
+		return context.Products.FirstOrDefault(product => string.Compare(product.Sku, sku, true) == 0);
 	}
 
 	public Product? GetProductByVariantId(long variantId)
@@ -30,5 +30,15 @@ public class ProductSkuProxy : IProductSkuProxy
 	{
 		context.Products.Add(product);
 		context.SaveChanges();
+	}
+
+	public List<SanMarSkuMap> GetSanMarSkuMaps()
+	{
+		return context.SanMarSkuMaps.ToList();
+	}
+
+	public SanMarSkuMap? GetSanMarSkuMapFor(string sku)
+	{
+		return context.SanMarSkuMaps.FirstOrDefault(map => string.Compare(map.Sku, sku, true) == 0);
 	}
 }
