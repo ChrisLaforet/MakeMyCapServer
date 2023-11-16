@@ -1,15 +1,12 @@
 ﻿using MakeMyCapServer.Model;
-using MakeMyCapServer.Lookup;
 using MakeMyCapServer.Proxies;
 using MakeMyCapServer.Services.Email;
-using MakeMyCapServer.Services.Fulfillment;
 
-
-namespace MakeMyCapServer.Services.Background;
+namespace MakeMyCapServer.Services.Fulfillment;
 
 public sealed class FulfillmentUpdateService : IFulfillmentProcessingService 
 {
-	public const int DEFAULT_DELAY_TIMEOUT_HOURS = 2;
+	private const int DEFAULT_DELAY_TIMEOUT_HOURS = 2;
 
 	private readonly IServiceProxy serviceProxy;
 	private readonly ILogger<FulfillmentUpdateService> logger;

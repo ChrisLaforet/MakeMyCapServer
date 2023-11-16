@@ -6,6 +6,7 @@ using MakeMyCapServer.Services.Background;
 using MakeMyCapServer.Services.Email;
 using MakeMyCapServer.Services.Fulfillment;
 using MakeMyCapServer.Services.Inventory;
+using MakeMyCapServer.Services.OrderPlacement;
 using MakeMyCapServer.Shopify;
 using Microsoft.EntityFrameworkCore;
 
@@ -29,6 +30,7 @@ builder.Services.AddDbContext<MakeMyCapServerContext>(options =>
 builder.Services.AddScoped<IInventoryService, InventoryService>();
 builder.Services.AddScoped<IInventoryProcessingService, InventoryUpdateService>();
 builder.Services.AddScoped<IFulfillmentProcessingService, FulfillmentUpdateService>();
+builder.Services.AddScoped<IOrderPlacementProcessingService, OrderPlacementQueueService>();
 builder.Services.AddScoped<IEmailService, SendgridEmailService>();
 
 builder.Services.AddScoped<IServiceProxy, ServiceProxy>();
@@ -36,6 +38,7 @@ builder.Services.AddScoped<IProductSkuProxy, ProductSkuProxy>();
 
 builder.Services.AddHostedService<InventoryScopedBackgroundService>();
 builder.Services.AddHostedService<FulfillmentScopedBackgroundService>();
+builder.Services.AddHostedService<OrderPlacementScopedBackgroundService>();
 
 builder.Services.AddHttpClient();
 

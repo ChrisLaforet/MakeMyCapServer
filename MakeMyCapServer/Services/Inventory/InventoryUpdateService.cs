@@ -1,18 +1,15 @@
-﻿using MakeMyCapServer.Model;
-using MakeMyCapServer.Configuration;
-using MakeMyCapServer.Lookup;
+﻿using MakeMyCapServer.Lookup;
+using MakeMyCapServer.Model;
 using MakeMyCapServer.Proxies;
 using MakeMyCapServer.Services.Email;
-using MakeMyCapServer.Services.Inventory;
 using MakeMyCapServer.Shopify;
-using Microsoft.EntityFrameworkCore;
 using Product = MakeMyCapServer.Shopify.Dtos.Product;
 
-namespace MakeMyCapServer.Services.Background;
+namespace MakeMyCapServer.Services.Inventory;
 
 public sealed class InventoryUpdateService : IInventoryProcessingService 
 {
-	public const int DEFAULT_DELAY_TIMEOUT_HOURS = 6;
+	private const int DEFAULT_DELAY_TIMEOUT_HOURS = 6;
 
 	private readonly IInventoryService inventoryService;
 	private readonly IProductSkuProxy productSkuProxy;
