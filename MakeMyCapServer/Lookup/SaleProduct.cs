@@ -1,4 +1,4 @@
-﻿using MakeMyCap.Model;
+﻿using MakeMyCapServer.Model;
 
 namespace MakeMyCapServer.Lookup;
 

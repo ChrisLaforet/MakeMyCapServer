@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace MakeMyCap.Model;
+namespace MakeMyCapServer.Model;
 
 public partial class ServiceLog
 {

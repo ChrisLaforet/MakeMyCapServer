@@ -1,4 +1,4 @@
-﻿using MakeMyCap.Model;
+﻿using MakeMyCapServer.Model;
 using MakeMyCapServer.Configuration;
 using MakeMyCapServer.Lookup;
 using MakeMyCapServer.Proxies;
@@ -156,7 +156,7 @@ TestUpdateAdjustments(saleProducts);
 						}
 						else
 						{
-							MakeMyCap.Model.Product record = new MakeMyCap.Model.Product();
+							var record = new MakeMyCapServer.Model.Product();
 							record.VariantId = variant.Id;
 							record.Sku = variant.Sku;
 							record.ProductId = product.Id;

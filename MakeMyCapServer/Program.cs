@@ -1,4 +1,4 @@
-using MakeMyCap.Model;
+using MakeMyCapServer.Model;
 using MakeMyCapServer.Configuration;
 using MakeMyCapServer.Proxies;
 using MakeMyCapServer.Services;

@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MakeMyCapServer", "MakeMyCa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanMarWebService", "SanMarWebService\SanMarWebService.csproj", "{B7DAE212-5785-47C3-A431-346C2C03C16A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CapAmericaService", "CapAmericaService\CapAmericaService.csproj", "{1932FEBD-21F1-4DF4-8767-40199AAB0286}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{B7DAE212-5785-47C3-A431-346C2C03C16A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B7DAE212-5785-47C3-A431-346C2C03C16A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B7DAE212-5785-47C3-A431-346C2C03C16A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1932FEBD-21F1-4DF4-8767-40199AAB0286}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1932FEBD-21F1-4DF4-8767-40199AAB0286}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1932FEBD-21F1-4DF4-8767-40199AAB0286}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1932FEBD-21F1-4DF4-8767-40199AAB0286}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

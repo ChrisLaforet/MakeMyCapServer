@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
-namespace MakeMyCap.Model;
+namespace MakeMyCapServer.Model;
 
 public partial class MakeMyCapServerContext : DbContext
 {
@@ -19,11 +19,15 @@ public partial class MakeMyCapServerContext : DbContext
 
     public virtual DbSet<Product> Products { get; set; }
 
+    public virtual DbSet<PurchaseOrder> PurchaseOrders { get; set; }
+
     public virtual DbSet<SanMarSkuMap> SanMarSkuMaps { get; set; }
 
     public virtual DbSet<ServiceLog> ServiceLogs { get; set; }
 
     public virtual DbSet<Setting> Settings { get; set; }
+
+    public virtual DbSet<Shipping> Shippings { get; set; }
 
     public virtual DbSet<SkuDistributor> SkuDistributors { get; set; }
 
@@ -66,6 +70,24 @@ public partial class MakeMyCapServerContext : DbContext
                 .IsUnicode(false);
         });
 
+        modelBuilder.Entity<PurchaseOrder>(entity =>
+        {
+            entity.ToTable("PurchaseOrder");
+
+            entity.Property(e => e.Ponumber)
+                .HasMaxLength(25)
+                .IsUnicode(false)
+                .HasColumnName("PONumber");
+            entity.Property(e => e.Sku)
+                .HasMaxLength(20)
+                .IsUnicode(false);
+
+            entity.HasOne(d => d.Distributor).WithMany(p => p.PurchaseOrders)
+                .HasForeignKey(d => d.DistributorId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PurchaseOrder_Distributor");
+        });
+
         modelBuilder.Entity<SanMarSkuMap>(entity =>
         {
             entity.HasKey(e => e.Sku);
@@ -90,11 +112,9 @@ public partial class MakeMyCapServerContext : DbContext
         {
             entity.ToTable("ServiceLog");
 
-            entity.Property(e => e.EndTime).HasColumnType("datetime");
             entity.Property(e => e.ServiceName)
                 .HasMaxLength(50)
                 .IsUnicode(false);
-            entity.Property(e => e.StartTime).HasColumnType("datetime");
         });
 
         modelBuilder.Entity<Setting>(entity =>
@@ -103,6 +123,40 @@ public partial class MakeMyCapServerContext : DbContext
 
             entity.Property(e => e.FulfillmentCheckHours).HasDefaultValueSql("((2))");
             entity.Property(e => e.InventoryCheckHours).HasDefaultValueSql("((8))");
+            entity.Property(e => e.NextPoSequence).HasColumnName("NextPOSequence");
+        });
+
+        modelBuilder.Entity<Shipping>(entity =>
+        {
+            entity.ToTable("Shipping");
+
+            entity.Property(e => e.Attention)
+                .HasMaxLength(35)
+                .IsUnicode(false);
+            entity.Property(e => e.ShipAddress1)
+                .HasMaxLength(35)
+                .IsUnicode(false);
+            entity.Property(e => e.ShipAddress2)
+                .HasMaxLength(35)
+                .IsUnicode(false);
+            entity.Property(e => e.ShipCity)
+                .HasMaxLength(25)
+                .IsUnicode(false);
+            entity.Property(e => e.ShipEmail)
+                .HasMaxLength(100)
+                .IsUnicode(false);
+            entity.Property(e => e.ShipMethod)
+                .HasMaxLength(15)
+                .IsUnicode(false);
+            entity.Property(e => e.ShipState)
+                .HasMaxLength(2)
+                .IsUnicode(false);
+            entity.Property(e => e.ShipTo)
+                .HasMaxLength(25)
+                .IsUnicode(false);
+            entity.Property(e => e.ShipZip)
+                .HasMaxLength(10)
+                .IsUnicode(false);
         });
 
         modelBuilder.Entity<SkuDistributor>(entity =>

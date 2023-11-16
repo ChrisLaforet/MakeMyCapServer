@@ -1,4 +1,4 @@
-﻿using MakeMyCap.Model;
+﻿using MakeMyCapServer.Model;
 using MakeMyCapServer.Lookup;
 using MakeMyCapServer.Proxies;
 using MakeMyCapServer.Services.Email;
