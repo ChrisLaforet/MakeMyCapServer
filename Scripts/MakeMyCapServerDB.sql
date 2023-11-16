@@ -2,11 +2,6 @@ USE [master]
 GO
 /****** Object:  Database [MakeMyCapServer]    Script Date: 11/16/2023 3:01:49 PM ******/
 CREATE DATABASE [MakeMyCapServer]
- CONTAINMENT = NONE
- ON  PRIMARY 
-( NAME = N'MakeMyCapServer', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL15.MSSQLSERVER01\MSSQL\DATA\MakeMyCapServer.mdf' , SIZE = 8192KB , MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB )
- LOG ON 
-( NAME = N'MakeMyCapServer_log', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL15.MSSQLSERVER01\MSSQL\DATA\MakeMyCapServer_log.ldf' , SIZE = 8192KB , MAXSIZE = 2048GB , FILEGROWTH = 65536KB )
  WITH CATALOG_COLLATION = DATABASE_DEFAULT
 GO
 ALTER DATABASE [MakeMyCapServer] SET COMPATIBILITY_LEVEL = 150

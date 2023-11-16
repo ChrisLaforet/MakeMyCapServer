@@ -35,8 +35,8 @@ public class OrderingProxy : IOrderingProxy
 		return context.PurchaseOrders.ToList();
 	}
 
-	public List<PurchaseOrder> GetIncompletePurchaseOrders()
+	public List<PurchaseOrder> GetPendingPurchaseOrders()
 	{
-		return context.PurchaseOrders.Where(po => po.SuccessDateTime == null).ToList();
+		return context.PurchaseOrders.Where(po => po.SuccessDateTime == null && po.FailureNotificationDateTime == null).ToList();
 	}
 }

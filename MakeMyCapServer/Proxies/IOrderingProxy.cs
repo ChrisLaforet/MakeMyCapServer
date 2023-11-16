@@ -12,6 +12,6 @@ public interface IOrderingProxy
 
 	List<PurchaseOrder> GetPurchaseOrders();
 
-	List<PurchaseOrder> GetIncompletePurchaseOrders();
+	List<PurchaseOrder> GetPendingPurchaseOrders();
 
 }
