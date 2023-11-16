@@ -17,10 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Distributors\CapAmerica\" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <ProjectReference Include="..\CapAmericaService\CapAmericaService.csproj" />
     <ProjectReference Include="..\SanMarWebService\SanMarWebService.csproj" />
   </ItemGroup>
 

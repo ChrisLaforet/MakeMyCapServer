@@ -19,5 +19,23 @@ public partial class PurchaseOrder
 
     public int Quantity { get; set; }
 
+    public string? Style { get; set; }
+
+    public string? Color { get; set; }
+
+    public string? Size { get; set; }
+
+    public DateTime SubmittedDateTime { get; set; }
+
+    public DateTime? LastAttemptDateTime { get; set; }
+
+    public DateTime? SuccessDateTime { get; set; }
+
+    public int Attempts { get; set; }
+
+    public int WarningNotificationCount { get; set; }
+
+    public DateTime? FailureNotificationDateTime { get; set; }
+
     public virtual Distributor Distributor { get; set; } = null!;
 }

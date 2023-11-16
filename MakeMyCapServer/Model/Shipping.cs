@@ -9,9 +9,9 @@ public partial class Shipping
 
     public string? ShipTo { get; set; }
 
-    public string ShipAddress1 { get; set; } = null!;
+    public string Name { get; set; } = null!;
 
-    public string? ShipAddress2 { get; set; }
+    public string ShipAddress { get; set; } = null!;
 
     public string ShipCity { get; set; } = null!;
 
@@ -19,7 +19,7 @@ public partial class Shipping
 
     public string ShipZip { get; set; } = null!;
 
-    public string ShipEmail { get; set; } = null!;
+    public string? ShipEmail { get; set; }
 
     public string ShipMethod { get; set; } = null!;
 

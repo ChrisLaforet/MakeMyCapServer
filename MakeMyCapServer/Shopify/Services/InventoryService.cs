@@ -27,7 +27,7 @@ public class InventoryService : IInventoryService
 		request.Headers.Add("Accept", "application/json");
 		request.Headers.Add("User-Agent", "MakeMyCapServer/1.0");
 		var task = client.SendAsync(request);
-		
+		task.Wait();
 		var response = task.Result; 
 		if (response.IsSuccessStatusCode)
 		{
@@ -53,13 +53,14 @@ public class InventoryService : IInventoryService
 		{
 			var filter = "&inventory_item_ids=" + string.Join(",", inventoryItemIds);
 			uri += filter;
+			uri += filter;
 		}
 		var request = new HttpRequestMessage(HttpMethod.Get, uri);
 		request.Headers.Add("X-Shopify-Access-Token", token);
 		request.Headers.Add("Accept", "application/json");
 		request.Headers.Add("User-Agent", "MakeMyCapServer/1.0");
 		var task = client.SendAsync(request);
-		
+		task.Wait();
 		var response = task.Result; 
 		if (response.IsSuccessStatusCode)
 		{
@@ -91,7 +92,7 @@ public class InventoryService : IInventoryService
 									"application/json");
 			
 		var task = client.SendAsync(request);
-		
+		task.Wait();
 		var response = task.Result; 
 		if (response.IsSuccessStatusCode)
 		{
@@ -119,8 +120,9 @@ public class InventoryService : IInventoryService
 		request.Headers.Add("X-Shopify-Access-Token", token);
 		request.Headers.Add("Accept", "application/json");
 		request.Headers.Add("User-Agent", "MakeMyCapServer/1.0");
-		var task = client.SendAsync(request);
 		
+		var task = client.SendAsync(request);
+		task.Wait();
 		var response = task.Result; 
 		if (response.IsSuccessStatusCode)
 		{

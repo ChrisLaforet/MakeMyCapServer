@@ -43,8 +43,13 @@ public partial class MakeMyCapServerContext : DbContext
 
             entity.HasIndex(e => e.Name, "IX_Distributor").IsUnique();
 
-            entity.Property(e => e.CredentialKey)
-                .HasMaxLength(20)
+            entity.HasIndex(e => e.LookupCode, "IX_Distributor_1").IsUnique();
+
+            entity.Property(e => e.AccountNumber)
+                .HasMaxLength(25)
+                .IsUnicode(false);
+            entity.Property(e => e.LookupCode)
+                .HasMaxLength(5)
                 .IsUnicode(false);
             entity.Property(e => e.Name)
                 .HasMaxLength(50)
@@ -74,12 +79,21 @@ public partial class MakeMyCapServerContext : DbContext
         {
             entity.ToTable("PurchaseOrder");
 
+            entity.Property(e => e.Color)
+                .HasMaxLength(50)
+                .IsUnicode(false);
             entity.Property(e => e.Ponumber)
                 .HasMaxLength(25)
                 .IsUnicode(false)
                 .HasColumnName("PONumber");
+            entity.Property(e => e.Size)
+                .HasMaxLength(50)
+                .IsUnicode(false);
             entity.Property(e => e.Sku)
                 .HasMaxLength(20)
+                .IsUnicode(false);
+            entity.Property(e => e.Style)
+                .HasMaxLength(50)
                 .IsUnicode(false);
 
             entity.HasOne(d => d.Distributor).WithMany(p => p.PurchaseOrders)
@@ -121,9 +135,27 @@ public partial class MakeMyCapServerContext : DbContext
         {
             entity.HasNoKey();
 
+            entity.Property(e => e.CriticalEmailRecipient1)
+                .HasMaxLength(120)
+                .IsUnicode(false);
+            entity.Property(e => e.CriticalEmailRecipient2)
+                .HasMaxLength(120)
+                .IsUnicode(false);
+            entity.Property(e => e.CriticalEmailRecipient3)
+                .HasMaxLength(120)
+                .IsUnicode(false);
             entity.Property(e => e.FulfillmentCheckHours).HasDefaultValueSql("((2))");
             entity.Property(e => e.InventoryCheckHours).HasDefaultValueSql("((8))");
-            entity.Property(e => e.NextPoSequence).HasColumnName("NextPOSequence");
+            entity.Property(e => e.NextPosequence).HasColumnName("NextPOSequence");
+            entity.Property(e => e.StatusEmailRecipient1)
+                .HasMaxLength(120)
+                .IsUnicode(false);
+            entity.Property(e => e.StatusEmailRecipient2)
+                .HasMaxLength(120)
+                .IsUnicode(false);
+            entity.Property(e => e.StatusEmailRecipient3)
+                .HasMaxLength(120)
+                .IsUnicode(false);
         });
 
         modelBuilder.Entity<Shipping>(entity =>
@@ -133,10 +165,10 @@ public partial class MakeMyCapServerContext : DbContext
             entity.Property(e => e.Attention)
                 .HasMaxLength(35)
                 .IsUnicode(false);
-            entity.Property(e => e.ShipAddress1)
+            entity.Property(e => e.Name)
                 .HasMaxLength(35)
                 .IsUnicode(false);
-            entity.Property(e => e.ShipAddress2)
+            entity.Property(e => e.ShipAddress)
                 .HasMaxLength(35)
                 .IsUnicode(false);
             entity.Property(e => e.ShipCity)

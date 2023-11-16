@@ -17,7 +17,7 @@ public class SandSInventoryService : IInventoryService
 	private readonly IConfigurationLoader configurationLoader;
 	private readonly ILogger<SandSInventoryService> logger;
 	
-	public SandSInventoryService( IConfigurationLoader configurationLoader, ILogger<SandSInventoryService> logger)
+	public SandSInventoryService(IConfigurationLoader configurationLoader, ILogger<SandSInventoryService> logger)
 	{
 		this.configurationLoader = configurationLoader;
 		this.logger = logger;
@@ -28,7 +28,6 @@ public class SandSInventoryService : IInventoryService
 		client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json; charset=utf-8");
 		client.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "application/json; charset=utf-8");
 	}
-	
 	
 	public List<InStockInventory> GetInStockInventoryFor(List<string> skus)
 	{

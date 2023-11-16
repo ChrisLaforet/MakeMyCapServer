@@ -7,9 +7,11 @@ public partial class Distributor
 {
     public int Id { get; set; }
 
+    public string LookupCode { get; set; } = null!;
+
     public string Name { get; set; } = null!;
 
-    public string CredentialKey { get; set; } = null!;
+    public string? AccountNumber { get; set; }
 
     public virtual ICollection<PurchaseOrder> PurchaseOrders { get; set; } = new List<PurchaseOrder>();
 
