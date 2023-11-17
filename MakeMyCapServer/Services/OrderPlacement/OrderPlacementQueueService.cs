@@ -1,5 +1,6 @@
 ﻿using System.Security.Cryptography.Pkcs;
 using System.Text;
+using MakeMyCapServer.Lookup;
 using MakeMyCapServer.Model;
 using MakeMyCapServer.Orders;
 using MakeMyCapServer.Proxies;
@@ -17,13 +18,19 @@ public class OrderPlacementQueueService : IOrderPlacementProcessingService
 
 	private readonly IServiceProxy serviceProxy;
 	private readonly IOrderingProxy orderingProxy;
+	private readonly IDistributorServiceLookup distributorServiceLookup;
 	private readonly ILogger<OrderPlacementQueueService> logger;
 	private readonly IEmailQueueService emailQueueService;
 
-	public OrderPlacementQueueService(IServiceProxy serviceProxy, IOrderingProxy orderingProxy, IEmailQueueService emailQueueService, ILogger<OrderPlacementQueueService> logger)
+	public OrderPlacementQueueService(IServiceProxy serviceProxy, 
+									IOrderingProxy orderingProxy, 
+									IDistributorServiceLookup distributorServiceLookup, 
+									IEmailQueueService emailQueueService, 
+									ILogger<OrderPlacementQueueService> logger)
 	{
 		this.serviceProxy = serviceProxy;
 		this.orderingProxy = orderingProxy;
+		this.distributorServiceLookup = distributorServiceLookup;
 		this.logger = logger;
 		this.emailQueueService = emailQueueService;
 	}
@@ -59,7 +66,8 @@ public class OrderPlacementQueueService : IOrderPlacementProcessingService
 				pendingPurchaseOrder.SuccessDateTime = DateTime.Now;
 			}
 
-			pendingPurchaseOrder.Attempts += 1;
+			pendingPurchaseOrder.Attempts++;
+			pendingPurchaseOrder.LastAttemptDateTime = DateTime.Now;
 			orderingProxy.SavePurchaseOrder(pendingPurchaseOrder);
 		}
 
@@ -70,8 +78,8 @@ public class OrderPlacementQueueService : IOrderPlacementProcessingService
 	{
 		try
 		{
-// TODO: CML - finish this transmission logic
-
+			var orderService = distributorServiceLookup.GetOrderServiceFor(purchaseOrder.Distributor.LookupCode);
+			return orderService.PlaceOrder(purchaseOrder);
 		}
 		catch (Exception ex)
 		{
