@@ -6,7 +6,7 @@ using SanMarWebService;
 
 namespace MakeMyCapServer.Distributors.CapAmerica;
 
-public class CapAmericaInventoryService
+public class CapAmericaInventoryService : IInventoryService
 {
 	public const string USERID = "CapAmericaUserId";
 	public const string PASSWORD = "CapAmericaPassword";

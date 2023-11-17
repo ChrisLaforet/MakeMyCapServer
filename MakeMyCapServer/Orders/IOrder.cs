@@ -6,4 +6,6 @@ public interface IOrder
 	string PoNumber { get; }
 	List<IOrderItem> LineItems { get; }
 	long? ShopifyOrderId { get; }
+	
+	string DistributorName { get; }
 }

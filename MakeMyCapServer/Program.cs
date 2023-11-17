@@ -1,5 +1,6 @@
 using MakeMyCapServer.Model;
 using MakeMyCapServer.Configuration;
+using MakeMyCapServer.Lookup;
 using MakeMyCapServer.Proxies;
 using MakeMyCapServer.Services;
 using MakeMyCapServer.Services.Background;
@@ -32,6 +33,8 @@ builder.Services.AddScoped<IInventoryProcessingService, InventoryUpdateService>(
 builder.Services.AddScoped<IFulfillmentProcessingService, FulfillmentUpdateService>();
 builder.Services.AddScoped<IOrderPlacementProcessingService, OrderPlacementQueueService>();
 builder.Services.AddScoped<IEmailService, SendgridEmailService>();
+builder.Services.AddScoped<(IEmailQueue, EmailQueue)>();
+builder.Services.AddScoped<IDistributorServiceLookup, DistributorServiceLookup>();
 
 builder.Services.AddScoped<IServiceProxy, ServiceProxy>();
 builder.Services.AddScoped<IProductSkuProxy, ProductSkuProxy>();

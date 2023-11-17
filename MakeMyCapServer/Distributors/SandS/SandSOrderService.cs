@@ -2,6 +2,7 @@
 using System.Text;
 using System.Text.Json;
 using MakeMyCapServer.Configuration;
+using MakeMyCapServer.Distributors.Exceptions;
 using MakeMyCapServer.Distributors.SandS.Dtos;
 using MakeMyCapServer.Orders;
 using MakeMyCapServer.Proxies;
@@ -79,7 +80,7 @@ public class SandSOrderService : IOrderService
 		if (shipping == null)
 		{
 			logger.LogError("There is no Ship-To addressing in the database!");
-			throw new Exception("There is no Ship-To addressing in the database!");
+			throw new MissingDataException("There is no Ship-To addressing in the database!");
 		}
 
 		var shippingAddress = new ShippingAddress();

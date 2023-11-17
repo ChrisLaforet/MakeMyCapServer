@@ -1,4 +1,7 @@
-﻿using MakeMyCapServer.Model;
+﻿using System.Security.Cryptography.Pkcs;
+using System.Text;
+using MakeMyCapServer.Model;
+using MakeMyCapServer.Orders;
 using MakeMyCapServer.Proxies;
 using MakeMyCapServer.Services.Email;
 
@@ -15,14 +18,14 @@ public class OrderPlacementQueueService : IOrderPlacementProcessingService
 	private readonly IServiceProxy serviceProxy;
 	private readonly IOrderingProxy orderingProxy;
 	private readonly ILogger<OrderPlacementQueueService> logger;
-	private readonly IEmailService emailService;
+	private readonly IEmailQueue emailQueue;
 
-	public OrderPlacementQueueService(IServiceProxy serviceProxy, IOrderingProxy orderingProxy, IEmailService emailService, ILogger<OrderPlacementQueueService> logger)
+	public OrderPlacementQueueService(IServiceProxy serviceProxy, IOrderingProxy orderingProxy, IEmailQueue emailQueue, ILogger<OrderPlacementQueueService> logger)
 	{
 		this.serviceProxy = serviceProxy;
 		this.orderingProxy = orderingProxy;
 		this.logger = logger;
-		this.emailService = emailService;
+		this.emailQueue = emailQueue;
 	}
 	
 	public async Task DoWorkAsync(CancellationToken stoppingToken)
@@ -59,13 +62,16 @@ public class OrderPlacementQueueService : IOrderPlacementProcessingService
 			pendingPurchaseOrder.Attempts += 1;
 			orderingProxy.SavePurchaseOrder(pendingPurchaseOrder);
 		}
+
+		return false;
 	}
 
 	private bool AttemptToTransmitPurchaseOrder(PurchaseOrder purchaseOrder)
 	{
 		try
 		{
-
+// TODO: CML - finish this transmission logic
+throw new NotImplementedException();
 		}
 		catch (Exception ex)
 		{
@@ -78,40 +84,72 @@ public class OrderPlacementQueueService : IOrderPlacementProcessingService
 	private void HandleNotificationsFor(PurchaseOrder purchaseOrder)
 	{
 		var now = DateTime.Now;
+		var difference = now.Subtract(purchaseOrder.CreateDate);
 		if (now.CompareTo(purchaseOrder.CreateDate.AddHours(FAILURE_HOURS)) >= 0)
 		{
 			logger.LogError($"PO {purchaseOrder.Ponumber} in record ID {purchaseOrder.Id} has expired the Failure time after {purchaseOrder.Attempts} attempts to deliver!");
-			TransmitErrorMessage(PurchaseOrder purchaseOrder);
+			TransmitErrorMessage(purchaseOrder, difference.Hours);
 			return;
 		}
 
-		var difference = now.Subtract(purchaseOrder.CreateDate);
 		int expectedAlertCount = difference.Hours / WARNING_HOURS;
 
 		if (expectedAlertCount < purchaseOrder.Attempts)
 		{
 			logger.LogWarning($"PO {purchaseOrder.Ponumber} in record ID {purchaseOrder.Id} has not transmitted after {purchaseOrder.Attempts} attempts to deliver!");
-			TransmitWarningMessage(purchaseOrder);
+			TransmitWarningMessage(purchaseOrder, difference.Hours);
 		}
 	}
 
-	private void TransmitErrorMessage(PurchaseOrder purchaseOrder)
+	private void TransmitErrorMessage(PurchaseOrder purchaseOrder, int hours)
 	{
 		try
 		{
 			var recipients = serviceProxy.GetCriticalEmailRecipients();
-			// prepare body
-			
-			// ship email
-			
-			purchaseOrder.FailureNotificationDateTime = now;
 
+			var subject = $"ERROR: Cannot send PO {purchaseOrder.PoNumber} to {purchaseOrder.Distributor.Name}";
+			
+			var body = new StringBuilder();
+			body.Append($"ERROR: DELIVERY FAILED AFTER RETRYING {hours} HOURS!  Manual intervention is needed!!\r\n\r\n");
+			body.Append($"The following PO cannot be transmitted to {purchaseOrder.Distributor.Name} after trying for {purchaseOrder.Attempts} attempts.\r\n\r\n");
+			body.Append(OrderWriter.FormatOrder(purchaseOrder));
+			body.Append("\r\n");
+			body.Append("The service will not attempt to deliver this any longer.  It requires human intervention to send the order.\r\n\r\n");
+			
+			logger.LogInformation($"Transmitting ERROR message that retrying has stopped for PO {purchaseOrder.Ponumber} in record ID {purchaseOrder.Id} after {purchaseOrder.Attempts} attempts to deliver.");
+			emailQueue.Add(recipients, subject, body);
+			
+			purchaseOrder.FailureNotificationDateTime = DateTime.Now;
 		}
 		catch (Exception ex)
 		{
-			
+			logger.LogCritical($"Error transmitting ERROR message that retrying has stopped for PO {purchaseOrder.Ponumber} in record ID {purchaseOrder.Id} after {purchaseOrder.Attempts} attempts to deliver: {ex}");
 		}
 	}
 	
-	
+	private void TransmitWarningMessage(PurchaseOrder purchaseOrder, int hours)
+	{
+		try
+		{
+			var recipients = serviceProxy.GetCriticalEmailRecipients();
+			
+			var subject = $"Warning: Problems sending PO {purchaseOrder.PoNumber} to {purchaseOrder.Distributor.Name}";
+
+			var body = new StringBuilder();
+			body.Append($"Warning: Deliver failed after retrying {hours} hours!  Is the distributor's service offline??  \r\n\r\n");
+			body.Append($"The following PO has not yet transmitted to {purchaseOrder.Distributor.Name} after trying for {purchaseOrder.Attempts} attempts.\r\n\r\n");
+			body.Append(OrderWriter.FormatOrder(purchaseOrder));
+			body.Append("\r\n");
+			body.Append("The service will continue attempting to deliver this PO.  Perhaps a call/email to the distributor's support is needed?\r\n\r\n");
+			
+			logger.LogInformation($"Transmitting warning message concerning retries for PO {purchaseOrder.Ponumber} in record ID {purchaseOrder.Id} after {purchaseOrder.Attempts} attempts to deliver.");
+			emailQueue.Add(recipients, subject, body);
+			
+			purchaseOrder.FailureNotificationDateTime = DateTime.Now;
+		}
+		catch (Exception ex)
+		{
+			logger.LogError($"Error transmitting WARNING message concerning retries for PO {purchaseOrder.Ponumber} in record ID {purchaseOrder.Id} after {purchaseOrder.Attempts} attempts to deliver: {ex}");
+		}
+	}
 }
