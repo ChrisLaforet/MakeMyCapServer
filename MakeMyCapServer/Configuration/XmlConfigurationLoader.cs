@@ -1,4 +1,5 @@
 ﻿using System.Xml.Linq;
+using MakeMyCapServer.Configuration.Exceptions;
 
 namespace MakeMyCapServer.Configuration;
 
@@ -16,6 +17,6 @@ public class XmlConfigurationLoader : IConfigurationLoader
 		{
 			return element.Value;
 		}
-		throw new KeyNotFoundException();
+		throw new ConfigurationKeyNotFoundException(elementName);
 	}
 }

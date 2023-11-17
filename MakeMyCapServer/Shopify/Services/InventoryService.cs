@@ -10,20 +10,20 @@ namespace MakeMyCapServer.Shopify;
 
 public class InventoryService : IInventoryService
 {
-	private string token;
-	private ILogger<InventoryService> logger;
+	private readonly IShopifyStore shopifyStore;
+	private readonly ILogger<InventoryService> logger;
 	
-	public InventoryService(IConfigurationLoader configurationLoader, ILogger<InventoryService> logger)
+	public InventoryService(IConfigurationLoader configurationLoader, IShopifyStore shopifyStore, ILogger<InventoryService> logger)
 	{
-		this.token = configurationLoader.GetKeyValueFor("ShopifyApiToken");
+		this.shopifyStore = shopifyStore;
 		this.logger = logger;
 	}
 
 	public InventoryItem? GetInventoryItem(long id)
 	{
 		var client = new HttpClient();
-		var request = new HttpRequestMessage(HttpMethod.Get, $"{ShopifyStore.BaseUrl}/admin/api/2023-10/inventory_items/{id}.json");
-		request.Headers.Add("X-Shopify-Access-Token", token);
+		var request = new HttpRequestMessage(HttpMethod.Get, $"{shopifyStore.BaseUrl}/admin/api/2023-10/inventory_items/{id}.json");
+		request.Headers.Add("X-Shopify-Access-Token", shopifyStore.ApiToken);
 		request.Headers.Add("Accept", "application/json");
 		request.Headers.Add("User-Agent", "MakeMyCapServer/1.0");
 		var task = client.SendAsync(request);
@@ -48,7 +48,7 @@ public class InventoryService : IInventoryService
 	public List<InventoryLevel> GetInventoryLevels(List<long> inventoryItemIds = null)
 	{
 		var client = new HttpClient();
-		var uri = $"{ShopifyStore.BaseUrl}/admin/api/2023-10/inventory_levels.json?location_ids={ShopifyStore.Location}&limit=250";
+		var uri = $"{shopifyStore.BaseUrl}/admin/api/2023-10/inventory_levels.json?location_ids={shopifyStore.Location}&limit=250";
 		if (inventoryItemIds != null && inventoryItemIds.Count > 0)
 		{
 			var filter = "&inventory_item_ids=" + string.Join(",", inventoryItemIds);
@@ -56,7 +56,7 @@ public class InventoryService : IInventoryService
 			uri += filter;
 		}
 		var request = new HttpRequestMessage(HttpMethod.Get, uri);
-		request.Headers.Add("X-Shopify-Access-Token", token);
+		request.Headers.Add("X-Shopify-Access-Token", shopifyStore.ApiToken);
 		request.Headers.Add("Accept", "application/json");
 		request.Headers.Add("User-Agent", "MakeMyCapServer/1.0");
 		var task = client.SendAsync(request);
@@ -79,10 +79,10 @@ public class InventoryService : IInventoryService
 	public InventoryLevel? AdjustInventoryLevel(long inventoryItemId, long locationId, int adjustment)
 	{
 		var client = new HttpClient();
-		var uri = $"{ShopifyStore.BaseUrl}/admin/api/2023-10/inventory_levels/adjust.json";
+		var uri = $"{shopifyStore.BaseUrl}/admin/api/2023-10/inventory_levels/adjust.json";
 
 		var request = new HttpRequestMessage(HttpMethod.Post, uri);
-		request.Headers.Add("X-Shopify-Access-Token", token);
+		request.Headers.Add("X-Shopify-Access-Token", shopifyStore.ApiToken);
 		request.Headers.Add("Accept", "application/json");
 		request.Headers.Add("User-Agent", "MakeMyCapServer/1.0");
 
@@ -111,13 +111,13 @@ public class InventoryService : IInventoryService
 	public List<Product> GetProducts(long? sinceId = null)
 	{
 		var client = new HttpClient();
-		var uri = $"{ShopifyStore.BaseUrl}/admin/api/2023-10/products.json?limit=250";
+		var uri = $"{shopifyStore.BaseUrl}/admin/api/2023-10/products.json?limit=250";
 		if (sinceId != null)
 		{
 			uri += $"&since_id={sinceId}";
 		}
 		var request = new HttpRequestMessage(HttpMethod.Get, uri);
-		request.Headers.Add("X-Shopify-Access-Token", token);
+		request.Headers.Add("X-Shopify-Access-Token", shopifyStore.ApiToken);
 		request.Headers.Add("Accept", "application/json");
 		request.Headers.Add("User-Agent", "MakeMyCapServer/1.0");
 		

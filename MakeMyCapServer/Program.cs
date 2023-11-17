@@ -38,6 +38,7 @@ builder.Services.AddScoped<IEmailQueueProcessingService, EmailQueueProcessingSer
 builder.Services.AddScoped<IEmailSender, SendgridEmailSender>();
 builder.Services.AddScoped<IEmailQueueService, EmailQueueService>();
 builder.Services.AddScoped<IDistributorServiceLookup, DistributorServiceLookup>();
+builder.Services.AddScoped<IShopifyStore, ShopifyStore>();
 
 builder.Services.AddScoped<IServiceProxy, ServiceProxy>();
 builder.Services.AddScoped<IProductSkuProxy, ProductSkuProxy>();

@@ -7,8 +7,7 @@ namespace MakeMyCapServer.Distributors.CapAmerica;
 
 public class CapAmericaOrderService : IOrderService
 {
-// TODO: CML - Important!  Update this Email address to CapAmerica Ordering Email		
-	public const string ORDER_EMAIL_ADDRESS = "webmaster@makemycap.com";
+	public const string ORDER_EMAIL_ADDRESS = "mmc.orders@capamerica.com";
 
 	private IEmailQueueService emailQueueService;
 	private ILogger<CapAmericaInventoryService> logger;
