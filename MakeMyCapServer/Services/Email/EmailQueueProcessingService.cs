@@ -6,6 +6,9 @@ namespace MakeMyCapServer.Services.Email;
 
 public class EmailQueueProcessingService : IEmailQueueProcessingService
 {
+	private const int ONE_MINUTE = 2;
+	private const int PROCESSING_TIMEOUT_MSEC = ONE_MINUTE * 60 * 1000;
+	
 	private const int FAILURE_HOURS = 48;
 
 	private readonly IEmailProxy emailProxy;
@@ -18,8 +21,21 @@ public class EmailQueueProcessingService : IEmailQueueProcessingService
 		this.emailSender = emailSender;
 		this.logger = logger;
 	}
-	
+
 	public async Task DoWorkAsync(CancellationToken stoppingToken)
+	{
+		logger.LogInformation("{ServiceName} working", nameof(EmailQueueProcessingService));
+		bool firstTime = true;
+		while (!stoppingToken.IsCancellationRequested)
+		{
+			if (!ProcessEmailQueue())
+			{
+				await Task.Delay(PROCESSING_TIMEOUT_MSEC, stoppingToken);
+			}
+		}
+	}
+
+	private bool ProcessEmailQueue() 
 	{
 		try
 		{
@@ -38,6 +54,8 @@ public class EmailQueueProcessingService : IEmailQueueProcessingService
 		{
 			logger.LogError($"Error processing Email queue: {ex}");
 		}
+
+		return false;
 	}
 
 	private void SendQueuedMessage(EmailQueue queuedMessage)

@@ -15,19 +15,19 @@ public sealed class InventoryUpdateService : IInventoryProcessingService
 	private readonly IProductSkuProxy productSkuProxy;
 	private readonly IServiceProxy serviceProxy;
 	private readonly ILogger<InventoryUpdateService> logger;
-	private readonly IEmailSender emailSender; 
+	private readonly IEmailQueueService emailQueueService; 
 	
 	private int delayTimeoutHours = DEFAULT_DELAY_TIMEOUT_HOURS;
 
-	public InventoryUpdateService(IInventoryService inventoryService, IProductSkuProxy productSkuProxy, IServiceProxy serviceProxy, IEmailSender emailSender, ILogger<InventoryUpdateService> logger)
+	public InventoryUpdateService(IInventoryService inventoryService, IProductSkuProxy productSkuProxy, IServiceProxy serviceProxy, IEmailQueueService emailQueueService, ILogger<InventoryUpdateService> logger)
 	{
 		this.inventoryService = inventoryService;
 		this.productSkuProxy = productSkuProxy;
 		this.serviceProxy = serviceProxy;
 		this.logger = logger;
-		this.emailSender = emailSender;
+		this.emailQueueService = emailQueueService;
 
-		//emailService.SendMail("laforet@chrislaforetsoftware.com", "Inventory Update Service Started", "This is to confirm that the inventory service has started up and is running.");
+//emailQueueService.Add("laforet@chrislaforetsoftware.com", "Inventory Update Service Started", "This is to confirm that the inventory service has started up and is running.");
 	}
 
 	public async Task DoWorkAsync(CancellationToken stoppingToken)

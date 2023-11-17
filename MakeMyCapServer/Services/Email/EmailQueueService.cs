@@ -1,4 +1,5 @@
-﻿using MakeMyCapServer.Proxies;
+﻿using MakeMyCapServer.Configuration;
+using MakeMyCapServer.Proxies;
 
 namespace MakeMyCapServer.Services.Email;
 
