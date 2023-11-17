@@ -29,19 +29,24 @@ builder.Services.AddDbContext<MakeMyCapServerContext>(options =>
 					options.UseSqlServer(xmlConfigurationLoader.GetKeyValueFor(DB_CONNECTION_STRING_KEY)));
 
 builder.Services.AddScoped<IInventoryService, InventoryService>();
+
 builder.Services.AddScoped<IInventoryProcessingService, InventoryUpdateService>();
 builder.Services.AddScoped<IFulfillmentProcessingService, FulfillmentUpdateService>();
 builder.Services.AddScoped<IOrderPlacementProcessingService, OrderPlacementQueueService>();
-builder.Services.AddScoped<IEmailService, SendgridEmailService>();
-builder.Services.AddScoped<(IEmailQueue, EmailQueue)>();
+builder.Services.AddScoped<IEmailQueueProcessingService, EmailQueueProcessingService>();
+
+builder.Services.AddScoped<IEmailSender, SendgridEmailSender>();
+builder.Services.AddScoped<IEmailQueueService, EmailQueueService>();
 builder.Services.AddScoped<IDistributorServiceLookup, DistributorServiceLookup>();
 
 builder.Services.AddScoped<IServiceProxy, ServiceProxy>();
 builder.Services.AddScoped<IProductSkuProxy, ProductSkuProxy>();
+builder.Services.AddScoped<IEmailProxy, EmailProxy>();
 
 builder.Services.AddHostedService<InventoryScopedBackgroundService>();
 builder.Services.AddHostedService<FulfillmentScopedBackgroundService>();
 builder.Services.AddHostedService<OrderPlacementScopedBackgroundService>();
+builder.Services.AddHostedService<EmailSendingScopedBackgroundService>();
 
 builder.Services.AddHttpClient();
 

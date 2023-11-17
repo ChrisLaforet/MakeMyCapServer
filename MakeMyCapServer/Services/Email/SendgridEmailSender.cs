@@ -4,27 +4,25 @@ using MakeMyCapServer.Configuration;
 
 namespace MakeMyCapServer.Services.Email;
 
-public class SendgridEmailService : IEmailService
+public class SendgridEmailSender : IEmailSender
 {
 	public const string SENDGRID_API_KEY = "SendGridWebApiKey";
-	public const string SENDGRID_SENDER = "SendGridSender";
 	
 	private readonly IConfigurationLoader configurationLoader;
-	private readonly ILogger<SendgridEmailService> logger;
+	private readonly ILogger<SendgridEmailSender> logger;
 	
-	public SendgridEmailService(IConfigurationLoader configurationLoader, ILogger<SendgridEmailService> logger)
+	public SendgridEmailSender(IConfigurationLoader configurationLoader, ILogger<SendgridEmailSender> logger)
 	{        
 		this.configurationLoader = configurationLoader;
 		this.logger = logger;
 
 	}
 	
-	public async Task SendMail(string to, string subject, string content, bool isHtml = false)
+	public async Task SendMail(string sender, string to, string subject, string content, bool isHtml = false)
 	{
 		try
 		{
 			var sendgridApiKey = configurationLoader.GetKeyValueFor(SENDGRID_API_KEY);
-			var sender = configurationLoader.GetKeyValueFor(SENDGRID_SENDER);
 			
 			var client = new SendGridClient(sendgridApiKey);
 			var from = new EmailAddress(sender, "Make My Cap");
@@ -41,12 +39,11 @@ public class SendgridEmailService : IEmailService
 		}
 	}
 	
-	public async Task SendMailToMultipleRecipients(List<string> to, string subject, string content, bool isHtml = false)
+	public async Task SendMailToMultipleRecipients(string sender, List<string> to, string subject, string content, bool isHtml = false)
 	{
 		try
 		{
 			var sendgridApiKey = configurationLoader.GetKeyValueFor(SENDGRID_API_KEY);
-			var sender = configurationLoader.GetKeyValueFor(SENDGRID_SENDER);
 			
 			var client = new SendGridClient(sendgridApiKey);
 			var from = new EmailAddress(sender, "Make My Cap");

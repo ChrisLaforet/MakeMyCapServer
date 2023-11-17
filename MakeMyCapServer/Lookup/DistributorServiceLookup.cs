@@ -9,15 +9,15 @@ namespace MakeMyCapServer.Lookup;
 
 public class DistributorServiceLookup : IDistributorServiceLookup
 {
-	private CapAmericaInventoryService capAmericaInventoryService;
-	private SanMarInventoryService sanMarInventoryService;
-	private SandSInventoryService sandSInventoryService;
-	private MakeMyCapInventoryService makeMyCapInventoryService = new MakeMyCapInventoryService();
+	private readonly CapAmericaInventoryService capAmericaInventoryService;
+	private readonly SanMarInventoryService sanMarInventoryService;
+	private readonly SandSInventoryService sandSInventoryService;
+	private readonly MakeMyCapInventoryService makeMyCapInventoryService = new MakeMyCapInventoryService();
 
-	private CapAmericaOrderService capAmericaOrderService;
-	private SanMarOrderService sanMarOrderService;
-	private SandSOrderService sandSOrderService;
-	private MakeMyCapOrderService makeMyCapOrderService;
+	private readonly CapAmericaOrderService capAmericaOrderService;
+	private readonly SanMarOrderService sanMarOrderService;
+	private readonly SandSOrderService sandSOrderService;
+	private readonly MakeMyCapOrderService makeMyCapOrderService;
 	
 	public DistributorServiceLookup(IServiceProvider serviceProvider)
 	{
@@ -40,7 +40,7 @@ public class DistributorServiceLookup : IDistributorServiceLookup
 				return capAmericaInventoryService;
 			
 			case "SS":
-				return sandSOrderService;
+				return sandSInventoryService;
 			
 			case "SM":
 				return sanMarInventoryService;

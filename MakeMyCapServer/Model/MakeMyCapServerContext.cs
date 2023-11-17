@@ -17,6 +17,8 @@ public partial class MakeMyCapServerContext : DbContext
 
     public virtual DbSet<Distributor> Distributors { get; set; }
 
+    public virtual DbSet<EmailQueue> EmailQueues { get; set; }
+
     public virtual DbSet<Product> Products { get; set; }
 
     public virtual DbSet<PurchaseOrder> PurchaseOrders { get; set; }
@@ -53,6 +55,33 @@ public partial class MakeMyCapServerContext : DbContext
                 .IsUnicode(false);
             entity.Property(e => e.Name)
                 .HasMaxLength(50)
+                .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<EmailQueue>(entity =>
+        {
+            entity.ToTable("EmailQueue");
+
+            entity.HasIndex(e => e.SentDateTime, "IX_EmailQueue");
+
+            entity.Property(e => e.Body).IsUnicode(false);
+            entity.Property(e => e.Recipient)
+                .HasMaxLength(120)
+                .IsUnicode(false);
+            entity.Property(e => e.Recipient2)
+                .HasMaxLength(120)
+                .IsUnicode(false);
+            entity.Property(e => e.Recipient3)
+                .HasMaxLength(120)
+                .IsUnicode(false);
+            entity.Property(e => e.Recipient4)
+                .HasMaxLength(120)
+                .IsUnicode(false);
+            entity.Property(e => e.Sender)
+                .HasMaxLength(120)
+                .IsUnicode(false);
+            entity.Property(e => e.Subject)
+                .HasMaxLength(250)
                 .IsUnicode(false);
         });
 

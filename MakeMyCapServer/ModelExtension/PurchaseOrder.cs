@@ -12,7 +12,7 @@ public partial class PurchaseOrder : IOrder
 	{
 		get
 		{
-			var lineItems = new List<OrderItem>();
+			var lineItems = new List<IOrderItem>();
 			lineItems.Add(new OrderItem()
 			{
 				Sku = this.Sku,
@@ -37,14 +37,12 @@ public partial class PurchaseOrder : IOrder
 			return string.Empty;
 		}
 	}
-
-	Distributor?.Name;
 }
 
 
 internal class OrderItem : IOrderItem
 {
-	public string Sku { get; set; };
+	public string Sku { get; set; }
 
 	public int Quantity { get; set; }
 

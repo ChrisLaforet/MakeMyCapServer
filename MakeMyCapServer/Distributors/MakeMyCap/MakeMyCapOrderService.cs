@@ -1,5 +1,4 @@
-﻿public class MakeMyCapOrderService
-using System.Security.Cryptography.Pkcs;
+﻿using MakeMyCapServer.Services.Email;
 using System.Text;
 using MakeMyCapServer.Orders;
 
@@ -11,12 +10,12 @@ public class MakeMyCapOrderService : IOrderService
 // TODO: CML - Important!  Update this Email address to Make My Cap Ordering Email		
 	public const string ORDER_EMAIL_ADDRESS = "webmaster@makemycap.com";
 
-	private IEmailQueue emailQueue;
+	private IEmailQueueService emailQueueService;
 	private ILogger<MakeMyCapOrderService> logger;
 	
-	public MakeMyCapOrderService(IEmailQueue emailQueue, ILogger<MakeMyCapOrderService> logger)
+	public MakeMyCapOrderService(IEmailQueueService emailQueuServicee, ILogger<MakeMyCapOrderService> logger)
 	{
-		this.emailQueue = emailQueue;
+		this.emailQueueService = emailQueueService;
 		this.logger = logger;
 	} 
 	
@@ -30,6 +29,7 @@ public class MakeMyCapOrderService : IOrderService
 		body.Append("\r\n");
 		body.Append("Deliver to Decorated - Annex building, Cap America.\r\n\r\n");
 			
-		emailQueue.Add(ORDER_EMAIL_ADDRESS, subject, body);
+		emailQueueService.Add(ORDER_EMAIL_ADDRESS, subject, body.ToString());
+		return true;
 	}
 }

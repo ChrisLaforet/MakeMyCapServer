@@ -18,14 +18,14 @@ public class OrderPlacementQueueService : IOrderPlacementProcessingService
 	private readonly IServiceProxy serviceProxy;
 	private readonly IOrderingProxy orderingProxy;
 	private readonly ILogger<OrderPlacementQueueService> logger;
-	private readonly IEmailQueue emailQueue;
+	private readonly IEmailQueueService emailQueueService;
 
-	public OrderPlacementQueueService(IServiceProxy serviceProxy, IOrderingProxy orderingProxy, IEmailQueue emailQueue, ILogger<OrderPlacementQueueService> logger)
+	public OrderPlacementQueueService(IServiceProxy serviceProxy, IOrderingProxy orderingProxy, IEmailQueueService emailQueueService, ILogger<OrderPlacementQueueService> logger)
 	{
 		this.serviceProxy = serviceProxy;
 		this.orderingProxy = orderingProxy;
 		this.logger = logger;
-		this.emailQueue = emailQueue;
+		this.emailQueueService = emailQueueService;
 	}
 	
 	public async Task DoWorkAsync(CancellationToken stoppingToken)
@@ -71,14 +71,15 @@ public class OrderPlacementQueueService : IOrderPlacementProcessingService
 		try
 		{
 // TODO: CML - finish this transmission logic
-throw new NotImplementedException();
+
 		}
 		catch (Exception ex)
 		{
 			logger.LogError($"Exception caught while attempting to send PO {purchaseOrder.Ponumber} in record ID {purchaseOrder.Id}: {ex}");
 			HandleNotificationsFor(purchaseOrder);
 		}
-		
+
+		return false;
 	}
 
 	private void HandleNotificationsFor(PurchaseOrder purchaseOrder)
@@ -88,7 +89,7 @@ throw new NotImplementedException();
 		if (now.CompareTo(purchaseOrder.CreateDate.AddHours(FAILURE_HOURS)) >= 0)
 		{
 			logger.LogError($"PO {purchaseOrder.Ponumber} in record ID {purchaseOrder.Id} has expired the Failure time after {purchaseOrder.Attempts} attempts to deliver!");
-			TransmitErrorMessage(purchaseOrder, difference.Hours);
+			TransmitErrorMessage(purchaseOrder, Convert.ToInt32(difference.TotalHours));
 			return;
 		}
 
@@ -97,7 +98,7 @@ throw new NotImplementedException();
 		if (expectedAlertCount < purchaseOrder.Attempts)
 		{
 			logger.LogWarning($"PO {purchaseOrder.Ponumber} in record ID {purchaseOrder.Id} has not transmitted after {purchaseOrder.Attempts} attempts to deliver!");
-			TransmitWarningMessage(purchaseOrder, difference.Hours);
+			TransmitWarningMessage(purchaseOrder, Convert.ToInt32(difference.TotalHours));
 		}
 	}
 
@@ -117,7 +118,7 @@ throw new NotImplementedException();
 			body.Append("The service will not attempt to deliver this any longer.  It requires human intervention to send the order.\r\n\r\n");
 			
 			logger.LogInformation($"Transmitting ERROR message that retrying has stopped for PO {purchaseOrder.Ponumber} in record ID {purchaseOrder.Id} after {purchaseOrder.Attempts} attempts to deliver.");
-			emailQueue.Add(recipients, subject, body);
+			emailQueueService.Add(recipients, subject, body.ToString());
 			
 			purchaseOrder.FailureNotificationDateTime = DateTime.Now;
 		}
@@ -143,7 +144,7 @@ throw new NotImplementedException();
 			body.Append("The service will continue attempting to deliver this PO.  Perhaps a call/email to the distributor's support is needed?\r\n\r\n");
 			
 			logger.LogInformation($"Transmitting warning message concerning retries for PO {purchaseOrder.Ponumber} in record ID {purchaseOrder.Id} after {purchaseOrder.Attempts} attempts to deliver.");
-			emailQueue.Add(recipients, subject, body);
+			emailQueueService.Add(recipients, subject, body.ToString());
 			
 			purchaseOrder.FailureNotificationDateTime = DateTime.Now;
 		}

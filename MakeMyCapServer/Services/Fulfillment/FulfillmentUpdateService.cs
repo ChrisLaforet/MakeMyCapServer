@@ -10,15 +10,15 @@ public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 
 	private readonly IServiceProxy serviceProxy;
 	private readonly ILogger<FulfillmentUpdateService> logger;
-	private readonly IEmailService emailService;
+	private readonly IEmailQueueService emailQueueService;
 
 	private int delayTimeoutHours = DEFAULT_DELAY_TIMEOUT_HOURS;
 
-	public FulfillmentUpdateService(IServiceProxy serviceProxy, IEmailService emailService, ILogger<FulfillmentUpdateService> logger)
+	public FulfillmentUpdateService(IServiceProxy serviceProxy, IEmailQueueService emailQueueService, ILogger<FulfillmentUpdateService> logger)
 	{
 		this.serviceProxy = serviceProxy;
 		this.logger = logger;
-		this.emailService = emailService;
+		this.emailQueueService = emailQueueService;
 	}
 
 	public async Task DoWorkAsync(CancellationToken stoppingToken)
@@ -63,7 +63,7 @@ public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 		try
 		{
 			serviceLog = serviceProxy.CreateServiceLogFor(nameof(FulfillmentUpdateService));
-
+// TODO: CML - Add logic here to get fullfillment orders from Shopify!
 
 			serviceProxy.CloseServiceLogFor(serviceLog);
 		}
