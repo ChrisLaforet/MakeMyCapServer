@@ -18,12 +18,7 @@ public class InventoryService : IInventoryService
 
 	public InventoryItem? GetInventoryItem(long id)
 	{
-		var client = new HttpClient();
-		var request = new HttpRequestMessage(HttpMethod.Get, $"{shopifyStore.BaseUrl}/admin/api/2023-10/inventory_items/{id}.json");
-		request.Headers.Add("X-Shopify-Access-Token", shopifyStore.ApiToken);
-		request.Headers.Add("Accept", "application/json");
-		request.Headers.Add("User-Agent", "MakeMyCapServer/1.0");
-		var task = client.SendAsync(request);
+		var task = HttpCommon.SendRequest(HttpMethod.Get, $"{shopifyStore.BaseUrl}/admin/api/2023-10/inventory_items/{id}.json", shopifyStore);
 		task.Wait();
 		var response = task.Result; 
 		if (response.IsSuccessStatusCode)
@@ -44,19 +39,15 @@ public class InventoryService : IInventoryService
 	
 	public List<InventoryLevel> GetInventoryLevels(List<long> inventoryItemIds = null)
 	{
-		var client = new HttpClient();
 		var uri = $"{shopifyStore.BaseUrl}/admin/api/2023-10/inventory_levels.json?location_ids={shopifyStore.Location}&limit=250";
-		if (inventoryItemIds != null && inventoryItemIds.Count > 0)
+		if (inventoryItemIds.Count > 0)
 		{
 			var filter = "&inventory_item_ids=" + string.Join(",", inventoryItemIds);
 			uri += filter;
 			uri += filter;
 		}
-		var request = new HttpRequestMessage(HttpMethod.Get, uri);
-		request.Headers.Add("X-Shopify-Access-Token", shopifyStore.ApiToken);
-		request.Headers.Add("Accept", "application/json");
-		request.Headers.Add("User-Agent", "MakeMyCapServer/1.0");
-		var task = client.SendAsync(request);
+		
+		var task = HttpCommon.SendRequest(HttpMethod.Get, uri, shopifyStore);
 		task.Wait();
 		var response = task.Result; 
 		if (response.IsSuccessStatusCode)
@@ -75,20 +66,9 @@ public class InventoryService : IInventoryService
 	
 	public InventoryLevel? AdjustInventoryLevel(long inventoryItemId, long locationId, int adjustment)
 	{
-		var client = new HttpClient();
-		var uri = $"{shopifyStore.BaseUrl}/admin/api/2023-10/inventory_levels/adjust.json";
-
-		var request = new HttpRequestMessage(HttpMethod.Post, uri);
-		request.Headers.Add("X-Shopify-Access-Token", shopifyStore.ApiToken);
-		request.Headers.Add("Accept", "application/json");
-		request.Headers.Add("User-Agent", "MakeMyCapServer/1.0");
-
 		var jsonBodyContent = $"{{\"inventory_item_id\":{inventoryItemId},\"location_id\":{locationId},\"available_adjustment\":{adjustment}}}";
-		request.Content = new StringContent(jsonBodyContent,
-									Encoding.UTF8, 
-									"application/json");
-			
-		var task = client.SendAsync(request);
+		
+		var task = HttpCommon.SendRequest(HttpMethod.Post, $"{shopifyStore.BaseUrl}/admin/api/2023-10/inventory_levels/adjust.json", shopifyStore, jsonBodyContent);
 		task.Wait();
 		var response = task.Result; 
 		if (response.IsSuccessStatusCode)
@@ -107,18 +87,13 @@ public class InventoryService : IInventoryService
 
 	public List<Product> GetProducts(long? sinceId = null)
 	{
-		var client = new HttpClient();
 		var uri = $"{shopifyStore.BaseUrl}/admin/api/2023-10/products.json?limit=250";
 		if (sinceId != null)
 		{
 			uri += $"&since_id={sinceId}";
 		}
-		var request = new HttpRequestMessage(HttpMethod.Get, uri);
-		request.Headers.Add("X-Shopify-Access-Token", shopifyStore.ApiToken);
-		request.Headers.Add("Accept", "application/json");
-		request.Headers.Add("User-Agent", "MakeMyCapServer/1.0");
 		
-		var task = client.SendAsync(request);
+		var task = HttpCommon.SendRequest(HttpMethod.Get, uri, shopifyStore);
 		task.Wait();
 		var response = task.Result; 
 		if (response.IsSuccessStatusCode)
@@ -134,16 +109,4 @@ public class InventoryService : IInventoryService
 			throw new HttpRequestException("GetProducts");
 		}
 	}
-	
-	// For Fiddler use with Http
-	// var handler = new HttpClientHandler();
-	// handler.ClientCertificateOptions = ClientCertificateOption.Manual;
-	// handler.ServerCertificateCustomValidationCallback = 
-	// 	(httpRequestMessage, cert, cetChain, policyErrors) =>
-	// 	{
-	// 		return true;
-	// 	};
-	// 	
-	// 	var client = new HttpClient(handler);
-//		var client = new HttpClient();
 }

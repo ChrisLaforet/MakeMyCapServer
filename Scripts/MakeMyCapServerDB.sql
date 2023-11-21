@@ -188,6 +188,7 @@ CREATE TABLE [dbo].[OrderLineItem](
 	[Quantity] [int] NOT NULL,
 	[InventoryItemId] [bigint] NOT NULL,
 	[VariantId] [bigint] NOT NULL,
+	[PONumber] [varchar](25) NULL,
  CONSTRAINT [PK_OrderLineItem] PRIMARY KEY CLUSTERED 
 (
 	[LineItemId] ASC
