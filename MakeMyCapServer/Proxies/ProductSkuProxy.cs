@@ -32,13 +32,19 @@ public class ProductSkuProxy : IProductSkuProxy
 		context.SaveChanges();
 	}
 
-	public List<SanMarSkuMap> GetSanMarSkuMaps()
+	public List<DistributorSkuMap> GetSkuMaps()
 	{
-		return context.SanMarSkuMaps.ToList();
+		return context.DistributorSkuMaps.ToList();
 	}
 
-	public SanMarSkuMap? GetSanMarSkuMapFor(string sku)
+	public List<DistributorSkuMap> GetSkuMapsFor(string distributorCode)
 	{
-		return context.SanMarSkuMaps.FirstOrDefault(map => string.Compare(map.Sku, sku, true) == 0);
+		return context.DistributorSkuMaps.Where(skuMap => string.Compare(skuMap.DistributorCode, distributorCode, true) == 0).ToList();
+	}
+
+	public DistributorSkuMap? GetSkuMapFor(string sku)
+	{
+		return context.DistributorSkuMaps.FirstOrDefault(map => string.Compare(map.Sku, sku, true) == 0);
+		throw new NotImplementedException();
 	}
 }

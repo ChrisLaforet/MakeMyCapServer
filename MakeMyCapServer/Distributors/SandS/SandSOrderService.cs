@@ -21,12 +21,17 @@ public class SandSOrderService : IOrderService
 	
 	private readonly IConfigurationLoader configurationLoader;
 	private readonly IOrderingProxy orderingProxy;
+	private readonly INotificationProxy notificationProxy;
 	private readonly ILogger<SandSOrderService> logger;
 	
-	public SandSOrderService(IConfigurationLoader configurationLoader, IOrderingProxy orderingProxy, ILogger<SandSOrderService> logger)
+	public SandSOrderService(IConfigurationLoader configurationLoader, 
+							IOrderingProxy orderingProxy, 
+							INotificationProxy notificationProxy,
+							ILogger<SandSOrderService> logger)
 	{
 		this.configurationLoader = configurationLoader;
 		this.orderingProxy = orderingProxy;
+		this.notificationProxy = notificationProxy;
 		this.logger = logger;
 	}
 
@@ -89,7 +94,7 @@ public class SandSOrderService : IOrderService
 		shippingAddress.City = shipping.ShipCity;
 		shippingAddress.State = shipping.ShipState;
 		shippingAddress.Zip = shipping.ShipZip;
-		shippingAddress.Attn = $"{shipping.ShipTo}  {order.PoNumber}".Trim();
+		shippingAddress.Attn = $"{shipping.ShipTo}  PO # {order.PoNumber}".Trim();
 
 		var orderDto = new Order();
 		orderDto.ShippingMethod = SHIPPING_CODE;

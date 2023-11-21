@@ -44,6 +44,7 @@ builder.Services.AddScoped<IServiceProxy, ServiceProxy>();
 builder.Services.AddScoped<IProductSkuProxy, ProductSkuProxy>();
 builder.Services.AddScoped<IEmailProxy, EmailProxy>();
 builder.Services.AddScoped<IOrderingProxy, OrderingProxy>();
+builder.Services.AddScoped<INotificationProxy, NotificationProxy>();
 
 builder.Services.AddHostedService<InventoryScopedBackgroundService>();
 builder.Services.AddHostedService<FulfillmentScopedBackgroundService>();

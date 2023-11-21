@@ -17,13 +17,13 @@ public partial class MakeMyCapServerContext : DbContext
 
     public virtual DbSet<Distributor> Distributors { get; set; }
 
+    public virtual DbSet<DistributorSkuMap> DistributorSkuMaps { get; set; }
+
     public virtual DbSet<EmailQueue> EmailQueues { get; set; }
 
     public virtual DbSet<Product> Products { get; set; }
 
     public virtual DbSet<PurchaseOrder> PurchaseOrders { get; set; }
-
-    public virtual DbSet<SanMarSkuMap> SanMarSkuMaps { get; set; }
 
     public virtual DbSet<ServiceLog> ServiceLogs { get; set; }
 
@@ -54,6 +54,45 @@ public partial class MakeMyCapServerContext : DbContext
                 .HasMaxLength(5)
                 .IsUnicode(false);
             entity.Property(e => e.Name)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<DistributorSkuMap>(entity =>
+        {
+            entity.HasKey(e => e.Sku);
+
+            entity.ToTable("DistributorSkuMap");
+
+            entity.HasIndex(e => e.DistributorSku, "IX_DistributorSkuMap");
+
+            entity.HasIndex(e => e.StyleCode, "IX_DistributorSkuMap_1");
+
+            entity.Property(e => e.Sku)
+                .HasMaxLength(30)
+                .IsUnicode(false);
+            entity.Property(e => e.Brand)
+                .HasMaxLength(100)
+                .IsUnicode(false);
+            entity.Property(e => e.Color)
+                .HasMaxLength(100)
+                .IsUnicode(false);
+            entity.Property(e => e.ColorCode)
+                .HasMaxLength(10)
+                .IsUnicode(false);
+            entity.Property(e => e.DistributorCode)
+                .HasMaxLength(5)
+                .IsUnicode(false);
+            entity.Property(e => e.DistributorSku)
+                .HasMaxLength(30)
+                .IsUnicode(false);
+            entity.Property(e => e.PartId)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.SizeCode)
+                .HasMaxLength(20)
+                .IsUnicode(false);
+            entity.Property(e => e.StyleCode)
                 .HasMaxLength(50)
                 .IsUnicode(false);
         });
@@ -129,26 +168,6 @@ public partial class MakeMyCapServerContext : DbContext
                 .HasForeignKey(d => d.DistributorId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_PurchaseOrder_Distributor");
-        });
-
-        modelBuilder.Entity<SanMarSkuMap>(entity =>
-        {
-            entity.HasKey(e => e.Sku);
-
-            entity.ToTable("SanMarSkuMap");
-
-            entity.Property(e => e.Sku)
-                .HasMaxLength(20)
-                .IsUnicode(false);
-            entity.Property(e => e.Color)
-                .HasMaxLength(50)
-                .IsUnicode(false);
-            entity.Property(e => e.Size)
-                .HasMaxLength(50)
-                .IsUnicode(false);
-            entity.Property(e => e.Style)
-                .HasMaxLength(50)
-                .IsUnicode(false);
         });
 
         modelBuilder.Entity<ServiceLog>(entity =>

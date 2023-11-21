@@ -3,6 +3,8 @@ using System.Text;
 using System.Text.Json;
 using MakeMyCapServer.Distributors.SandS.Dtos;
 using MakeMyCapServer.Configuration;
+using MakeMyCapServer.Model;
+using MakeMyCapServer.Proxies;
 using MakeMyCapServer.Services;
 
 namespace MakeMyCapServer.Distributors.SandS;
@@ -12,14 +14,18 @@ public class SandSInventoryService : IInventoryService
 	public const string ACCOUNT_NUMBER = "SandSAccountNumber";
 	public const string API_KEY = "SandSApiKey";
 	
+	public const string S_AND_S_DISTRIBUTOR_CODE = "SS";
+
 	public const string INVENTORY_ENDPOINT = "https://api.ssactivewear.com/v2/inventory/";
 	
 	private readonly IConfigurationLoader configurationLoader;
+	private readonly IProductSkuProxy productSkuProxy;
 	private readonly ILogger<SandSInventoryService> logger;
 	
-	public SandSInventoryService(IConfigurationLoader configurationLoader, ILogger<SandSInventoryService> logger)
+	public SandSInventoryService(IConfigurationLoader configurationLoader, IProductSkuProxy productSkuProxy, ILogger<SandSInventoryService> logger)
 	{
 		this.configurationLoader = configurationLoader;
+		this.productSkuProxy = productSkuProxy;
 		this.logger = logger;
 	}
 
@@ -31,13 +37,17 @@ public class SandSInventoryService : IInventoryService
 	
 	public List<InStockInventory> GetInStockInventoryFor(List<string> skus)
 	{
+		var lookup = productSkuProxy.GetSkuMapsFor(S_AND_S_DISTRIBUTOR_CODE);
+		var maps = MapSkusFrom(skus);
+		
 		var accountNumber = configurationLoader.GetKeyValueFor(ACCOUNT_NUMBER);
 		var apiKey = configurationLoader.GetKeyValueFor(API_KEY);
 		
 		var client = new HttpClient();
 		PrepareHeadersFor(client);
 
-		string url = $"{INVENTORY_ENDPOINT}{string.Join(",", skus.ToArray())}";
+		
+		string url = $"{INVENTORY_ENDPOINT}{string.Join(",", maps.Select(map => map.DistributorSku).ToArray())}";
 		var request = new HttpRequestMessage(HttpMethod.Get, url);
 		var authenticationValue = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{accountNumber}:{apiKey}"));
 		client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authenticationValue);
@@ -49,7 +59,7 @@ public class SandSInventoryService : IInventoryService
 		if (response.IsSuccessStatusCode)
 		{
 			var content = response.Content.ReadFromJsonAsync<QuantityResponse[]>().Result;
-			return ExtractStockInventoryFrom(content, skus);
+			return ExtractStockInventoryFrom(content, maps);
 		}
 		else
 		{
@@ -58,34 +68,54 @@ public class SandSInventoryService : IInventoryService
 		}
 	}
 
-	private List<InStockInventory> ExtractStockInventoryFrom(QuantityResponse[] responses, List<string> skus)
+	private List<DistributorSkuMap> MapSkusFrom(List<string> skus)
+	{
+		var lookup = productSkuProxy.GetSkuMapsFor(S_AND_S_DISTRIBUTOR_CODE);
+		var maps = new List<DistributorSkuMap>();
+		foreach (string sku in skus.Distinct())
+		{
+			var match = lookup.SingleOrDefault(map => string.Compare(map.Sku, sku, true) == 0);
+			if (match == null)
+			{
+				logger.LogInformation($"There is no matching inventory level for sku {sku} in S&S!");
+			}
+			else
+			{
+				maps.Add(match);
+			}
+		}
+		
+		return maps;
+	}
+
+	private List<InStockInventory> ExtractStockInventoryFrom(QuantityResponse[] responses, List<DistributorSkuMap> maps)
 	{
 		var found = new List<string>();
 		var inStock = new List<InStockInventory>();
 		foreach (var response in responses)
 		{
+			var match = maps.SingleOrDefault(map => string.Compare(map.DistributorSku, response.Sku, true) == 0);
+			if (match == null)
+			{
+				logger.LogError($"S&S returned a SKU ({response.Sku}) that does not match one we requested.");
+				continue;
+			}
 			var inStockInventory = new InStockInventory();
-			inStockInventory.OurSku = response.YourSku;
-			inStockInventory.Sku = response.Sku;
+			inStockInventory.DistributorSku = response.Sku;
+			inStockInventory.Sku = match.Sku;
 			long available = 0;
 			foreach (var warehouse in response.Warehouses)
 			{
 				available += warehouse.Quantity;
 			}
 			inStockInventory.Quantity = available;
-			found.Add(response.Sku);
-			if (!string.IsNullOrEmpty(response.YourSku))
-			{
-				found.Add(response.YourSku);
-			}
-			else
-			{
-				inStockInventory.OurSku = response.Sku;
-			}
+			
+			found.Add(match.Sku);
 			inStock.Add(inStockInventory);
 		}
 
-		foreach (var sku in skus)
+		// populate all that were not returned with zero quantity
+		foreach (var sku in maps.Select(map => map.Sku))
 		{
 			if (found.Contains(sku))
 			{

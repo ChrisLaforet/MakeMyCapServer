@@ -10,6 +10,7 @@ public interface IProductSkuProxy
 
 	void AddProduct(Product product);
 
-	List<SanMarSkuMap> GetSanMarSkuMaps();
-	SanMarSkuMap? GetSanMarSkuMapFor(string sku);
+	List<DistributorSkuMap> GetSkuMaps();
+	List<DistributorSkuMap> GetSkuMapsFor(string distributorCode);
+	DistributorSkuMap? GetSkuMapFor(string sku);
 }

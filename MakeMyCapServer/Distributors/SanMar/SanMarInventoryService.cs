@@ -11,6 +11,8 @@ public class SanMarInventoryService : IInventoryService
 	public const string USER_NAME = "SanMarUserName";
 	public const string PASSWORD = "SanMarPassword";
 
+	public const string SANMAR_DISTRIBUTOR_CODE = "SM";
+
 	private readonly ILogger<SanMarInventoryService> logger;
 	private readonly IProductSkuProxy productSkuProxy;
 	
@@ -29,7 +31,7 @@ public class SanMarInventoryService : IInventoryService
 	
 	public List<InStockInventory> GetInStockInventoryFor(List<string> skus)
 	{
-		var lookup = productSkuProxy.GetSanMarSkuMaps();
+		var lookup = productSkuProxy.GetSkuMapsFor(SANMAR_DISTRIBUTOR_CODE);
 
 		var styles = new List<string>();
 		var inventoryLevels = new List<SanMarInventoryLevel>();
@@ -39,18 +41,18 @@ public class SanMarInventoryService : IInventoryService
 			var skuMap = lookup.Find(map => string.Compare(map.Sku, sku, true) == 0);
 			if (skuMap != null)
 			{
-				if (!styles.Contains(skuMap.Style.ToUpper()))
+				if (!styles.Contains(skuMap.StyleCode.ToUpper()))
 				{
-					styles.Add(skuMap.Style.ToUpper());
+					styles.Add(skuMap.StyleCode.ToUpper());
 					
-					var task = services.GetInventoryLevelsFor(skuMap.Style);		// get them all at one time for the style
+					var task = services.GetInventoryLevelsFor(skuMap.StyleCode);		// get them all at one time for the style
 					task.Wait();
 					inventoryLevels.AddRange(task.Result);
 				}
 
-				var match = inventoryLevels.Find(level => string.Compare(level.Style, skuMap.Style, true) == 0 &&
-									                                        string.Compare(level.Color, skuMap.Color, true) == 0 &&
-									                                        string.Compare(level.Size, skuMap.Size, true) == 0);
+				var match = inventoryLevels.Find(level => string.Compare(level.Style, skuMap.StyleCode, true) == 0 &&
+									                                        string.Compare(level.Color, skuMap.ColorCode, true) == 0 &&
+									                                        string.Compare(level.Size, skuMap.SizeCode, true) == 0);
 				if (match == null)
 				{
 					logger.LogInformation($"There is no matching inventory level for sku {sku} in SanMar!");

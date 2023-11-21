@@ -16,23 +16,20 @@ public class OrderPlacementQueueService : IOrderPlacementProcessingService
 	private const int WARNING_HOURS = 2;
 	private const int FAILURE_HOURS = 48;
 
-	private readonly IServiceProxy serviceProxy;
 	private readonly IOrderingProxy orderingProxy;
 	private readonly IDistributorServiceLookup distributorServiceLookup;
+	private readonly INotificationProxy notificationProxy;
 	private readonly ILogger<OrderPlacementQueueService> logger;
-	private readonly IEmailQueueService emailQueueService;
 
-	public OrderPlacementQueueService(IServiceProxy serviceProxy, 
-									IOrderingProxy orderingProxy, 
+	public OrderPlacementQueueService(IOrderingProxy orderingProxy, 
 									IDistributorServiceLookup distributorServiceLookup, 
-									IEmailQueueService emailQueueService, 
+									INotificationProxy notificationProxy, 
 									ILogger<OrderPlacementQueueService> logger)
 	{
-		this.serviceProxy = serviceProxy;
 		this.orderingProxy = orderingProxy;
 		this.distributorServiceLookup = distributorServiceLookup;
 		this.logger = logger;
-		this.emailQueueService = emailQueueService;
+		this.notificationProxy = notificationProxy;
 	}
 	
 	public async Task DoWorkAsync(CancellationToken stoppingToken)
@@ -114,8 +111,6 @@ public class OrderPlacementQueueService : IOrderPlacementProcessingService
 	{
 		try
 		{
-			var recipients = serviceProxy.GetCriticalEmailRecipients();
-
 			var subject = $"ERROR: Cannot send PO {purchaseOrder.PoNumber} to {purchaseOrder.Distributor.Name}";
 			
 			var body = new StringBuilder();
@@ -126,7 +121,7 @@ public class OrderPlacementQueueService : IOrderPlacementProcessingService
 			body.Append("The service will not attempt to deliver this any longer.  It requires human intervention to send the order.\r\n\r\n");
 			
 			logger.LogInformation($"Transmitting ERROR message that retrying has stopped for PO {purchaseOrder.Ponumber} in record ID {purchaseOrder.Id} after {purchaseOrder.Attempts} attempts to deliver.");
-			emailQueueService.Add(recipients, subject, body.ToString());
+			notificationProxy.SendCriticalErrorNotification(subject, body.ToString());
 			
 			purchaseOrder.FailureNotificationDateTime = DateTime.Now;
 		}
@@ -140,8 +135,6 @@ public class OrderPlacementQueueService : IOrderPlacementProcessingService
 	{
 		try
 		{
-			var recipients = serviceProxy.GetCriticalEmailRecipients();
-			
 			var subject = $"Warning: Problems sending PO {purchaseOrder.PoNumber} to {purchaseOrder.Distributor.Name}";
 
 			var body = new StringBuilder();
@@ -152,7 +145,7 @@ public class OrderPlacementQueueService : IOrderPlacementProcessingService
 			body.Append("The service will continue attempting to deliver this PO.  Perhaps a call/email to the distributor's support is needed?\r\n\r\n");
 			
 			logger.LogInformation($"Transmitting warning message concerning retries for PO {purchaseOrder.Ponumber} in record ID {purchaseOrder.Id} after {purchaseOrder.Attempts} attempts to deliver.");
-			emailQueueService.Add(recipients, subject, body.ToString());
+			notificationProxy.SendWarningErrorNotification(subject, body.ToString());
 			
 			purchaseOrder.FailureNotificationDateTime = DateTime.Now;
 		}

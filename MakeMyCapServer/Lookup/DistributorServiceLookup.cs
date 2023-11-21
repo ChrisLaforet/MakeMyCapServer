@@ -4,6 +4,7 @@ using MakeMyCapServer.Distributors.MakeMyCap;
 using MakeMyCapServer.Distributors.SandS;
 using MakeMyCapServer.Distributors.SanMar;
 using MakeMyCapServer.Lookup.Exceptions;
+using LocalSanMarOrderService = MakeMyCapServer.Distributors.SanMar.SanMarOrderService;
 
 namespace MakeMyCapServer.Lookup;
 
@@ -15,7 +16,7 @@ public class DistributorServiceLookup : IDistributorServiceLookup
 	private readonly MakeMyCapInventoryService makeMyCapInventoryService = new MakeMyCapInventoryService();
 
 	private readonly CapAmericaOrderService capAmericaOrderService;
-	private readonly SanMarOrderService sanMarOrderService;
+	private readonly LocalSanMarOrderService sanMarOrderService;
 	private readonly SandSOrderService sandSOrderService;
 	private readonly MakeMyCapOrderService makeMyCapOrderService;
 	
@@ -26,7 +27,7 @@ public class DistributorServiceLookup : IDistributorServiceLookup
 		sandSInventoryService = ActivatorUtilities.CreateInstance<SandSInventoryService>(serviceProvider);
 
 		capAmericaOrderService = ActivatorUtilities.CreateInstance<CapAmericaOrderService>(serviceProvider);
-		sanMarOrderService = ActivatorUtilities.CreateInstance<SanMarOrderService>(serviceProvider);
+		sanMarOrderService = ActivatorUtilities.CreateInstance<LocalSanMarOrderService>(serviceProvider);
 		sandSOrderService = ActivatorUtilities.CreateInstance<SandSOrderService>(serviceProvider);
 		makeMyCapOrderService = ActivatorUtilities.CreateInstance<MakeMyCapOrderService>(serviceProvider);
 	}

@@ -3,7 +3,7 @@
 public class InStockInventory
 {
 	public string Sku { get; set; }
-	public string? OurSku { get; set; }
+	public string? DistributorSku { get; set; }
 	public long? Quantity { get; set; }
 
 	public bool IsNotFound()

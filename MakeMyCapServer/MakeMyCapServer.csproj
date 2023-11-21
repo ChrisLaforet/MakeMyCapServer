@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CapAmericaService\CapAmericaService.csproj" />
+    <ProjectReference Include="..\SanMarOrderWebService\SanMarOrderWebService.csproj" />
     <ProjectReference Include="..\SanMarWebService\SanMarWebService.csproj" />
   </ItemGroup>
 
