@@ -47,7 +47,7 @@ public class SanMarOrderService : IOrderService
 		var request = PrepareOrderRequest(order, shipping);
 		if (request.Details.Count == 0) 
 		{
-			logger.LogError($"No line items remain in PO {order.PoNumber} so there is nothing to transmit.");
+			logger.LogError($"No line items remain in PO {order.PoNumber} so there is nothing to transmit to SanMar.");
 			return true;
 		}
 

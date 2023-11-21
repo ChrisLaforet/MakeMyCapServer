@@ -1,6 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using MakeMyCapServer.Configuration;
 using MakeMyCapServer.Distributors.Exceptions;
 using MakeMyCapServer.Distributors.SandS.Dtos;
@@ -21,16 +22,19 @@ public class SandSOrderService : IOrderService
 	
 	private readonly IConfigurationLoader configurationLoader;
 	private readonly IOrderingProxy orderingProxy;
+	private readonly IProductSkuProxy productSkuProxy;
 	private readonly INotificationProxy notificationProxy;
 	private readonly ILogger<SandSOrderService> logger;
 	
 	public SandSOrderService(IConfigurationLoader configurationLoader, 
-							IOrderingProxy orderingProxy, 
+							IOrderingProxy orderingProxy,
+							IProductSkuProxy productSkuProxy,
 							INotificationProxy notificationProxy,
 							ILogger<SandSOrderService> logger)
 	{
 		this.configurationLoader = configurationLoader;
 		this.orderingProxy = orderingProxy;
+		this.productSkuProxy = productSkuProxy;
 		this.notificationProxy = notificationProxy;
 		this.logger = logger;
 	}
@@ -51,9 +55,16 @@ public class SandSOrderService : IOrderService
 		var authenticationValue = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{accountNumber}:{apiKey}"));
 		client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authenticationValue);
 
+		string jsonBodyContent = null;
 		try
 		{
-			var body = PrepareOrderBodyFrom(order);
+			var orderDto = PrepareOrderFrom(order);
+			if (orderDto.Lines.Count == 0)
+			{
+				logger.LogError($"No line items remain in PO {order.PoNumber} so there is nothing to transmit to S&S.");
+				return true;
+			}
+			jsonBodyContent = JsonSerializer.Serialize(orderDto);
 		}
 		catch (Exception ex)
 		{
@@ -62,7 +73,6 @@ public class SandSOrderService : IOrderService
 		}
 
 		var request = new HttpRequestMessage(HttpMethod.Post, ORDER_ENDPOINT);
-		var jsonBodyContent = PrepareOrderBodyFrom(order);
 		request.Content = new StringContent(jsonBodyContent,
 			Encoding.UTF8, 
 			"application/json");
@@ -79,7 +89,7 @@ public class SandSOrderService : IOrderService
 		return true;
 	}
 
-	public string PrepareOrderBodyFrom(IOrder order)
+	public Order PrepareOrderFrom(IOrder order)
 	{
 		var shipping = orderingProxy.GetShipping();
 		if (shipping == null)
@@ -100,11 +110,47 @@ public class SandSOrderService : IOrderService
 		orderDto.ShippingMethod = SHIPPING_CODE;
 		orderDto.PoNumber = order.PoNumber;
 		orderDto.ShippingAddress = shippingAddress;
+		
+		var lookup = productSkuProxy.GetSkuMapsFor(SandSInventoryService.S_AND_S_DISTRIBUTOR_CODE);
+		var notFoundSkus = new List<IOrderItem>();
 		foreach (var lineItem in order.LineItems)
 		{
-			orderDto.Lines.Add(new Line() { Identifier = lineItem.Sku, Qty = lineItem.Quantity });
+			var map = lookup.SingleOrDefault(map => string.Compare(map.Sku, lineItem.Sku, true) == 0);
+			if (map == null)
+			{
+				logger.LogError($"Unable to map sku {lineItem.Sku} to place order for S&S!");
+				notFoundSkus.Add(lineItem);
+				continue;
+			}
+			
+			orderDto.Lines.Add(new Line() { Identifier = map.DistributorSku, Qty = lineItem.Quantity });
 		}
 
-		return JsonSerializer.Serialize(orderDto);
+		if (notFoundSkus.Count > 0)
+		{
+			NotifyOfMissingSkuMatches(order, notFoundSkus);
+		}
+
+		return orderDto;
+	}
+	
+	private void NotifyOfMissingSkuMatches(IOrder order, List<IOrderItem> notFoundSkus)
+	{
+		var subject = $"Urgent! Order SKUs for S&S cannot be found for sending PO {order.PoNumber}";
+
+		var body = new StringBuilder();
+		body.Append($"The following Line Items for PO {order.PoNumber} cannot be found in our mappings.\r\n");
+		body.Append($"PLEASE ORDER THESE ITEMS MANUALLY NOW.  Once done, the SKU(s) need to be mapped in our mapping table.\r\n\r\n");
+		foreach (var notFoundSku in notFoundSkus)
+		{
+			body.Append($"   Our SKU: {notFoundSku.Sku}  Style: {notFoundSku.Style}  Color: {notFoundSku.Color}  Size: {notFoundSku.Size}  Quantity: {notFoundSku.Quantity}\r\n");
+		}
+
+		body.Append("\r\n");
+		body.Append("Any other items on this PO that were located will be ordered electronically.");
+		body.Append("\r\n\r\n");
+
+		logger.LogInformation($"Transmitting critical message concerning inability to map all SKUs in PO {order.PoNumber}.");
+		notificationProxy.SendCriticalErrorNotification(subject, body.ToString());
 	}
 }
