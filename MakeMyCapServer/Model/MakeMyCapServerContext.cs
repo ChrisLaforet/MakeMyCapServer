@@ -21,6 +21,12 @@ public partial class MakeMyCapServerContext : DbContext
 
     public virtual DbSet<EmailQueue> EmailQueues { get; set; }
 
+    public virtual DbSet<FulfillmentOrder> FulfillmentOrders { get; set; }
+
+    public virtual DbSet<Order> Orders { get; set; }
+
+    public virtual DbSet<OrderLineItem> OrderLineItems { get; set; }
+
     public virtual DbSet<Product> Products { get; set; }
 
     public virtual DbSet<PurchaseOrder> PurchaseOrders { get; set; }
@@ -122,6 +128,52 @@ public partial class MakeMyCapServerContext : DbContext
             entity.Property(e => e.Subject)
                 .HasMaxLength(250)
                 .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<FulfillmentOrder>(entity =>
+        {
+            entity.ToTable("FulfillmentOrder");
+
+            entity.Property(e => e.FulfillmentOrderId).ValueGeneratedNever();
+            entity.Property(e => e.Status)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+
+            entity.HasOne(d => d.Order).WithMany(p => p.FulfillmentOrders)
+                .HasForeignKey(d => d.OrderId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_FulfillmentOrder_Order");
+        });
+
+        modelBuilder.Entity<Order>(entity =>
+        {
+            entity.HasKey(e => e.OrderId).HasName("PK_Order_1");
+
+            entity.ToTable("Order");
+
+            entity.HasIndex(e => e.OrderNumber, "IX_Order");
+
+            entity.Property(e => e.OrderId).ValueGeneratedNever();
+            entity.Property(e => e.CheckoutToken)
+                .HasMaxLength(255)
+                .IsUnicode(false);
+            entity.Property(e => e.OrderNumber)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<OrderLineItem>(entity =>
+        {
+            entity.HasKey(e => e.LineItemId);
+
+            entity.ToTable("OrderLineItem");
+
+            entity.Property(e => e.LineItemId).ValueGeneratedNever();
+
+            entity.HasOne(d => d.FulfillmentOrder).WithMany(p => p.OrderLineItems)
+                .HasForeignKey(d => d.FulfillmentOrderId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_OrderLineItem_FulfillmentOrder");
         });
 
         modelBuilder.Entity<Product>(entity =>

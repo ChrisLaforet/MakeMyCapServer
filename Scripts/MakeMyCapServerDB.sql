@@ -77,7 +77,9 @@ ALTER DATABASE [MakeMyCapServer] SET QUERY_STORE = OFF
 GO
 USE [MakeMyCapServer]
 GO
-/****** Object:  Table [dbo].[Distributor]    Script Date: 11/16/2023 3:01:49 PM ******/
+USE [MakeMyCapServer]
+GO
+/****** Object:  Table [dbo].[Distributor]    Script Date: 11/20/2023 10:11:13 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -93,7 +95,106 @@ CREATE TABLE [dbo].[Distributor](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Product]    Script Date: 11/16/2023 3:01:49 PM ******/
+/****** Object:  Table [dbo].[DistributorSkuMap]    Script Date: 11/20/2023 10:11:13 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[DistributorSkuMap](
+	[Sku] [varchar](30) NOT NULL,
+	[DistributorCode] [varchar](5) NOT NULL,
+	[DistributorSku] [varchar](30) NULL,
+	[Brand] [varchar](100) NULL,
+	[StyleCode] [varchar](50) NOT NULL,
+	[PartId] [varchar](50) NULL,
+	[Color] [varchar](100) NULL,
+	[ColorCode] [varchar](10) NULL,
+	[SizeCode] [varchar](20) NULL,
+ CONSTRAINT [PK_DistributorSkuMap] PRIMARY KEY CLUSTERED 
+(
+	[Sku] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[EmailQueue]    Script Date: 11/20/2023 10:11:13 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[EmailQueue](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Sender] [varchar](120) NOT NULL,
+	[Subject] [varchar](250) NOT NULL,
+	[Body] [varchar](max) NOT NULL,
+	[PostedDateTime] [datetime2](7) NOT NULL,
+	[Recipient] [varchar](120) NOT NULL,
+	[Recipient2] [varchar](120) NULL,
+	[Recipient3] [varchar](120) NULL,
+	[Recipient4] [varchar](120) NULL,
+	[LastAttemptDateTime] [datetime2](7) NULL,
+	[TotalAttempts] [int] NOT NULL,
+	[SentDateTime] [datetime2](7) NULL,
+	[AbandonedDateTime] [datetime2](7) NULL,
+	[BodyIsHtml] [bit] NOT NULL,
+ CONSTRAINT [PK_EmailQueue] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[FulfillmentOrder]    Script Date: 11/21/2023 9:35:26 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[FulfillmentOrder](
+	[FulfillmentOrderId] [bigint] NOT NULL,
+	[OrderId] [bigint] NOT NULL,
+	[Status] [varchar](50) NOT NULL,
+ CONSTRAINT [PK_FulfillmentOrder] PRIMARY KEY CLUSTERED 
+(
+	[FulfillmentOrderId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Order]    Script Date: 11/21/2023 9:35:26 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Order](
+	[OrderId] [bigint] NOT NULL,
+	[OrderNumber] [varchar](50) NOT NULL,
+	[CheckoutId] [bigint] NOT NULL,
+	[CheckoutToken] [varchar](255) NULL,
+	[CreatedDateTime] [datetime2](7) NOT NULL,
+	[ProcessStartDateTime] [datetime2](7) NOT NULL,
+	[Cancelled] [bit] NOT NULL,
+ CONSTRAINT [PK_Order_1] PRIMARY KEY CLUSTERED 
+(
+	[OrderId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[OrderLineItem]    Script Date: 11/21/2023 9:35:26 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[OrderLineItem](
+	[LineItemId] [bigint] NOT NULL,
+	[FulfillmentOrderId] [bigint] NOT NULL,
+	[ShopId] [bigint] NOT NULL,
+	[Quantity] [int] NOT NULL,
+	[InventoryItemId] [bigint] NOT NULL,
+	[VariantId] [bigint] NOT NULL,
+ CONSTRAINT [PK_OrderLineItem] PRIMARY KEY CLUSTERED 
+(
+	[LineItemId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Product]    Script Date: 11/20/2023 10:11:13 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -112,7 +213,7 @@ CREATE TABLE [dbo].[Product](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[PurchaseOrder]    Script Date: 11/16/2023 3:01:49 PM ******/
+/****** Object:  Table [dbo].[PurchaseOrder]    Script Date: 11/20/2023 10:11:13 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -140,23 +241,7 @@ CREATE TABLE [dbo].[PurchaseOrder](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[SanMarSkuMap]    Script Date: 11/16/2023 3:01:49 PM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [dbo].[SanMarSkuMap](
-	[Sku] [varchar](20) NOT NULL,
-	[Style] [varchar](50) NOT NULL,
-	[Color] [varchar](50) NOT NULL,
-	[Size] [varchar](50) NOT NULL,
- CONSTRAINT [PK_SanMarSkuMap] PRIMARY KEY CLUSTERED 
-(
-	[Sku] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-) ON [PRIMARY]
-GO
-/****** Object:  Table [dbo].[ServiceLog]    Script Date: 11/16/2023 3:01:49 PM ******/
+/****** Object:  Table [dbo].[ServiceLog]    Script Date: 11/20/2023 10:11:13 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -173,7 +258,7 @@ CREATE TABLE [dbo].[ServiceLog](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Settings]    Script Date: 11/16/2023 3:01:49 PM ******/
+/****** Object:  Table [dbo].[Settings]    Script Date: 11/20/2023 10:11:13 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -190,7 +275,7 @@ CREATE TABLE [dbo].[Settings](
 	[CriticalEmailRecipient3] [varchar](120) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Shipping]    Script Date: 11/16/2023 3:01:49 PM ******/
+/****** Object:  Table [dbo].[Shipping]    Script Date: 11/20/2023 10:11:13 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -212,7 +297,7 @@ CREATE TABLE [dbo].[Shipping](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[SkuDistributor]    Script Date: 11/16/2023 3:01:49 PM ******/
+/****** Object:  Table [dbo].[SkuDistributor]    Script Date: 11/20/2023 10:11:13 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -235,43 +320,19 @@ INSERT [dbo].[Distributor] ([Id], [LookupCode], [Name], [AccountNumber]) VALUES 
 GO
 INSERT [dbo].[Distributor] ([Id], [LookupCode], [Name], [AccountNumber]) VALUES (3, N'SM', N'SanMar', N'277332')
 GO
-SET IDENTITY_INSERT [dbo].[Distributor] OFF
-GO
-SET IDENTITY_INSERT [dbo].[Product] ON 
-GO
-INSERT [dbo].[Product] ([Id], [VariantId], [ProductId], [Sku], [Title], [Vendor], [InventoryItemId]) VALUES (20, 47336645656878, 8852182663470, N'sku-hosted-1', N'The 3p Fulfilled Snowboard: Default Title', N'Chris Learning Center', 49384697430318)
-GO
-INSERT [dbo].[Product] ([Id], [VariantId], [ProductId], [Sku], [Title], [Vendor], [InventoryItemId]) VALUES (21, 47336645165358, 8852182401326, N'sku-untracked-1', N'The Inventory Not Tracked Snowboard: Default Title', N'Chris Learning Center', 49384696938798)
-GO
-INSERT [dbo].[Product] ([Id], [VariantId], [ProductId], [Sku], [Title], [Vendor], [InventoryItemId]) VALUES (22, 47336645624110, 8852182630702, N'sku-managed-1', N'The Multi-managed Snowboard: Default Title', N'Multi-managed Vendor', 49384697397550)
-GO
-INSERT [dbo].[Product] ([Id], [VariantId], [ProductId], [Sku], [Title], [Vendor], [InventoryItemId]) VALUES (23, 47340689555758, 8852692042030, N'12345678WB4', N'White snapback cap with black bill: XL', N'Chris Learning Center', 49388744376622)
-GO
-INSERT [dbo].[Product] ([Id], [VariantId], [ProductId], [Sku], [Title], [Vendor], [InventoryItemId]) VALUES (24, 47340689588526, 8852692042030, N'12345678WB5', N'White snapback cap with black bill: XXL', N'Chris Learning Center', 49388744409390)
-GO
-INSERT [dbo].[Product] ([Id], [VariantId], [ProductId], [Sku], [Title], [Vendor], [InventoryItemId]) VALUES (25, 47340689621294, 8852692042030, N'12345678WB3', N'White snapback cap with black bill: L', N'Chris Learning Center', 49388744442158)
-GO
-INSERT [dbo].[Product] ([Id], [VariantId], [ProductId], [Sku], [Title], [Vendor], [InventoryItemId]) VALUES (26, 47340689654062, 8852692042030, N'12345678WB2', N'White snapback cap with black bill: M', N'Chris Learning Center', 49388744474926)
-GO
-INSERT [dbo].[Product] ([Id], [VariantId], [ProductId], [Sku], [Title], [Vendor], [InventoryItemId]) VALUES (27, 47340689686830, 8852692042030, N'12345678WB1', N'White snapback cap with black bill: S', N'Chris Learning Center', 49388744507694)
-GO
-SET IDENTITY_INSERT [dbo].[Product] OFF
-GO
-SET IDENTITY_INSERT [dbo].[ServiceLog] ON 
-GO
-SET IDENTITY_INSERT [dbo].[ServiceLog] OFF
+INSERT [dbo].[Distributor] ([Id], [LookupCode], [Name], [AccountNumber]) VALUES (4, N'MMC', N'Make My Cap', NULL)
 GO
 INSERT [dbo].[Settings] ([InventoryCheckHours], [FulfillmentCheckHours], [NextPOSequence], [StatusEmailRecipient1], [StatusEmailRecipient2], [StatusEmailRecipient3], [CriticalEmailRecipient1], [CriticalEmailRecipient2], [CriticalEmailRecipient3]) VALUES (8, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL)
 GO
 SET IDENTITY_INSERT [dbo].[Shipping] ON 
 GO
-INSERT [dbo].[Shipping] ([Id], [ShipTo], [Name], [ShipAddress], [ShipCity], [ShipState], [ShipZip], [ShipEmail], [ShipMethod], [Attention]) VALUES (2, N'Cap America Annex', N'CapAmerica', N'200 South Chamber Dr', N'Fredrickstown', N'MO', N'63645', N'webmaster', N'FedEx', NULL)
+INSERT [dbo].[Shipping] ([Id], [ShipTo], [Name], [ShipAddress], [ShipCity], [ShipState], [ShipZip], [ShipEmail], [ShipMethod], [Attention]) VALUES (2, N'Cap America Annex', N'CapAmerica', N'1 Cap America Drive', N'Fredrickstown', N'MO', N'63645', N'webmaster', N'FedEx', NULL)
 GO
 SET IDENTITY_INSERT [dbo].[Shipping] OFF
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IX_Distributor]    Script Date: 11/16/2023 3:01:49 PM ******/
+/****** Object:  Index [IX_Distributor]    Script Date: 11/20/2023 10:11:13 PM ******/
 ALTER TABLE [dbo].[Distributor] ADD  CONSTRAINT [IX_Distributor] UNIQUE NONCLUSTERED 
 (
 	[Name] ASC
@@ -279,13 +340,35 @@ ALTER TABLE [dbo].[Distributor] ADD  CONSTRAINT [IX_Distributor] UNIQUE NONCLUST
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IX_Distributor_1]    Script Date: 11/16/2023 3:01:49 PM ******/
+/****** Object:  Index [IX_Distributor_1]    Script Date: 11/20/2023 10:11:13 PM ******/
 CREATE UNIQUE NONCLUSTERED INDEX [IX_Distributor_1] ON [dbo].[Distributor]
 (
 	[LookupCode] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 GO
-/****** Object:  Index [IX_Product]    Script Date: 11/16/2023 3:01:49 PM ******/
+SET ANSI_PADDING ON
+GO
+/****** Object:  Index [IX_DistributorSkuMap]    Script Date: 11/20/2023 10:11:13 PM ******/
+CREATE NONCLUSTERED INDEX [IX_DistributorSkuMap] ON [dbo].[DistributorSkuMap]
+(
+	[DistributorSku] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+SET ANSI_PADDING ON
+GO
+/****** Object:  Index [IX_DistributorSkuMap_1]    Script Date: 11/20/2023 10:11:13 PM ******/
+CREATE NONCLUSTERED INDEX [IX_DistributorSkuMap_1] ON [dbo].[DistributorSkuMap]
+(
+	[StyleCode] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+/****** Object:  Index [IX_EmailQueue]    Script Date: 11/20/2023 10:11:13 PM ******/
+CREATE NONCLUSTERED INDEX [IX_EmailQueue] ON [dbo].[EmailQueue]
+(
+	[SentDateTime] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+/****** Object:  Index [IX_Product]    Script Date: 11/20/2023 10:11:13 PM ******/
 ALTER TABLE [dbo].[Product] ADD  CONSTRAINT [IX_Product] UNIQUE NONCLUSTERED 
 (
 	[VariantId] ASC
@@ -293,7 +376,7 @@ ALTER TABLE [dbo].[Product] ADD  CONSTRAINT [IX_Product] UNIQUE NONCLUSTERED
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IX_Product_1]    Script Date: 11/16/2023 3:01:49 PM ******/
+/****** Object:  Index [IX_Product_1]    Script Date: 11/20/2023 10:11:13 PM ******/
 CREATE UNIQUE NONCLUSTERED INDEX [IX_Product_1] ON [dbo].[Product]
 (
 	[Sku] ASC
@@ -301,11 +384,15 @@ CREATE UNIQUE NONCLUSTERED INDEX [IX_Product_1] ON [dbo].[Product]
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IX_SkuDistributor]    Script Date: 11/16/2023 3:01:49 PM ******/
+/****** Object:  Index [IX_SkuDistributor]    Script Date: 11/20/2023 10:11:13 PM ******/
 CREATE UNIQUE NONCLUSTERED INDEX [IX_SkuDistributor] ON [dbo].[SkuDistributor]
 (
 	[Sku] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[EmailQueue] ADD  CONSTRAINT [DF_EmailQueue_TotalAttempts]  DEFAULT ((0)) FOR [TotalAttempts]
+GO
+ALTER TABLE [dbo].[EmailQueue] ADD  CONSTRAINT [DF_EmailQueue_BodyIsHtml]  DEFAULT ((0)) FOR [BodyIsHtml]
 GO
 ALTER TABLE [dbo].[PurchaseOrder] ADD  CONSTRAINT [DF_PurchaseOrder_Attempts]  DEFAULT ((0)) FOR [Attempts]
 GO
@@ -314,6 +401,16 @@ GO
 ALTER TABLE [dbo].[Settings] ADD  CONSTRAINT [DF_Settings_InventoryCheckHours]  DEFAULT ((8)) FOR [InventoryCheckHours]
 GO
 ALTER TABLE [dbo].[Settings] ADD  CONSTRAINT [DF_Settings_FulfillmentCheckHours]  DEFAULT ((2)) FOR [FulfillmentCheckHours]
+GO
+ALTER TABLE [dbo].[FulfillmentOrder]  WITH CHECK ADD  CONSTRAINT [FK_FulfillmentOrder_Order] FOREIGN KEY([OrderId])
+REFERENCES [dbo].[Order] ([OrderId])
+GO
+ALTER TABLE [dbo].[FulfillmentOrder] CHECK CONSTRAINT [FK_FulfillmentOrder_Order]
+GO
+ALTER TABLE [dbo].[OrderLineItem]  WITH CHECK ADD  CONSTRAINT [FK_OrderLineItem_FulfillmentOrder] FOREIGN KEY([FulfillmentOrderId])
+REFERENCES [dbo].[FulfillmentOrder] ([FulfillmentOrderId])
+GO
+ALTER TABLE [dbo].[OrderLineItem] CHECK CONSTRAINT [FK_OrderLineItem_FulfillmentOrder]
 GO
 ALTER TABLE [dbo].[PurchaseOrder]  WITH CHECK ADD  CONSTRAINT [FK_PurchaseOrder_Distributor] FOREIGN KEY([DistributorId])
 REFERENCES [dbo].[Distributor] ([Id])
