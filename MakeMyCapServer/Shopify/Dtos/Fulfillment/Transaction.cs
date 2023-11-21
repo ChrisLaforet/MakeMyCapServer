@@ -5,7 +5,7 @@ namespace MakeMyCapServer.Shopify.Dtos.Fulfillment;
 public class Transaction
 {
 	[JsonPropertyName("id")]
-	public int Id { get; set; }
+	public long Id { get; set; }
 
 	[JsonPropertyName("admin_graphql_api_id")]
 	public string AdminGraphqlApiId { get; set; }
@@ -41,10 +41,10 @@ public class Transaction
 	public string Message { get; set; }
 
 	[JsonPropertyName("order_id")]
-	public int OrderId { get; set; }
+	public long OrderId { get; set; }
 
 	[JsonPropertyName("parent_id")]
-	public int ParentId { get; set; }
+	public long ParentId { get; set; }
 
 	[JsonPropertyName("payment_id")]
 	public string PaymentId { get; set; }

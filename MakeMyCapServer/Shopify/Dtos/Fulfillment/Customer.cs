@@ -5,7 +5,7 @@ namespace MakeMyCapServer.Shopify.Dtos.Fulfillment;
     public class Customer
     {
         [JsonPropertyName("id")]
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         [JsonPropertyName("email")]
         public string Email { get; set; }

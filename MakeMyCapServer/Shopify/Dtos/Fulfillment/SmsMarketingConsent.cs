@@ -11,7 +11,7 @@ public class SmsMarketingConsent
 	public string OptInLevel { get; set; }
 
 	[JsonPropertyName("consent_updated_at")]
-	public DateTime ConsentUpdatedAt { get; set; }
+	public DateTime? ConsentUpdatedAt { get; set; }
 
 	[JsonPropertyName("consent_collected_from")]
 	public string ConsentCollectedFrom { get; set; }

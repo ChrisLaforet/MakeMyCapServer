@@ -5,7 +5,7 @@ namespace MakeMyCapServer.Shopify.Dtos.Fulfillment;
 public class ShippingLine
 {
 	[JsonPropertyName("id")]
-	public int Id { get; set; }
+	public long Id { get; set; }
 
 	[JsonPropertyName("carrier_identifier")]
 	public object CarrierIdentifier { get; set; }

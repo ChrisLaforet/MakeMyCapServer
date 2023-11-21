@@ -5,7 +5,7 @@ namespace MakeMyCapServer.Shopify.Dtos.Fulfillment;
 public class Fulfillment
 {
 	[JsonPropertyName("id")]
-	public int Id { get; set; }
+	public long Id { get; set; }
 
 	[JsonPropertyName("admin_graphql_api_id")]
 	public string AdminGraphqlApiId { get; set; }
@@ -14,13 +14,13 @@ public class Fulfillment
 	public DateTime CreatedAt { get; set; }
 
 	[JsonPropertyName("location_id")]
-	public int LocationId { get; set; }
+	public long LocationId { get; set; }
 
 	[JsonPropertyName("name")]
 	public string Name { get; set; }
 
 	[JsonPropertyName("order_id")]
-	public int OrderId { get; set; }
+	public long OrderId { get; set; }
 
 	[JsonPropertyName("origin_address")]
 	public Address OriginAddress { get; set; }

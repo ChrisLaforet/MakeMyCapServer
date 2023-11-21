@@ -11,5 +11,5 @@ public class EmailMarketingConsent
 	public object OptInLevel { get; set; }
 
 	[JsonPropertyName("consent_updated_at")]
-	public DateTime ConsentUpdatedAt { get; set; }
+	public DateTime? ConsentUpdatedAt { get; set; }
 }

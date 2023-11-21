@@ -6,6 +6,7 @@ using MakeMyCapServer.Services.Email;
 using MakeMyCapServer.Services.Fulfillment;
 using MakeMyCapServer.Services.Inventory;
 using MakeMyCapServer.Services.OrderPlacement;
+using MakeMyCapServer.Shopify;
 using MakeMyCapServer.Shopify.Services;
 using MakeMyCapServer.Shopify.Store;
 using Microsoft.EntityFrameworkCore;
@@ -28,6 +29,7 @@ builder.Services.AddDbContext<MakeMyCapServerContext>(options =>
 					options.UseSqlServer(xmlConfigurationLoader.GetKeyValueFor(DB_CONNECTION_STRING_KEY)));
 
 builder.Services.AddScoped<IInventoryService, InventoryService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 
 builder.Services.AddScoped<IInventoryProcessingService, InventoryUpdateService>();
 builder.Services.AddScoped<IFulfillmentProcessingService, FulfillmentUpdateService>();

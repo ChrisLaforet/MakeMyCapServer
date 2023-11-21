@@ -2,6 +2,7 @@
 using MakeMyCapServer.Model;
 using MakeMyCapServer.Proxies;
 using MakeMyCapServer.Services.Email;
+using MakeMyCapServer.Shopify;
 using MakeMyCapServer.Shopify.Services;
 using Product = MakeMyCapServer.Shopify.Dtos.Inventory.Product;
 
@@ -19,7 +20,12 @@ public sealed class InventoryUpdateService : IInventoryProcessingService
 	
 	private int delayTimeoutHours = DEFAULT_DELAY_TIMEOUT_HOURS;
 
-	public InventoryUpdateService(IInventoryService inventoryService, IProductSkuProxy productSkuProxy, IServiceProxy serviceProxy, IEmailQueueService emailQueueService, ILogger<InventoryUpdateService> logger)
+	public InventoryUpdateService(IInventoryService inventoryService, 
+		IOrderService orderService,
+								IProductSkuProxy productSkuProxy, 
+								IServiceProxy serviceProxy, 
+								IEmailQueueService emailQueueService, 
+								ILogger<InventoryUpdateService> logger)
 	{
 		this.inventoryService = inventoryService;
 		this.productSkuProxy = productSkuProxy;
@@ -27,6 +33,8 @@ public sealed class InventoryUpdateService : IInventoryProcessingService
 		this.logger = logger;
 		this.emailQueueService = emailQueueService;
 
+// var order = orderService.GetOrder(5603854614826);
+// Console.WriteLine("Got list");
 //emailQueueService.Add("laforet@chrislaforetsoftware.com", "Inventory Update Service Started", "This is to confirm that the inventory service has started up and is running.");
 	}
 

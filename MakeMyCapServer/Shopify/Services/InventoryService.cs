@@ -10,7 +10,7 @@ public class InventoryService : IInventoryService
 	private readonly IShopifyStore shopifyStore;
 	private readonly ILogger<InventoryService> logger;
 	
-	public InventoryService(IConfigurationLoader configurationLoader, IShopifyStore shopifyStore, ILogger<InventoryService> logger)
+	public InventoryService(IShopifyStore shopifyStore, ILogger<InventoryService> logger)
 	{
 		this.shopifyStore = shopifyStore;
 		this.logger = logger;

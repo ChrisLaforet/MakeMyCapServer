@@ -5,7 +5,7 @@ namespace MakeMyCapServer.Shopify.Dtos.Fulfillment;
     public class Order
     {
         [JsonPropertyName("id")]
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         [JsonPropertyName("admin_graphql_api_id")]
         public string AdminGraphqlApiId { get; set; }
@@ -29,7 +29,7 @@ namespace MakeMyCapServer.Shopify.Dtos.Fulfillment;
         public string CartToken { get; set; }
 
         [JsonPropertyName("checkout_id")]
-        public int CheckoutId { get; set; }
+        public long CheckoutId { get; set; }
 
         [JsonPropertyName("checkout_token")]
         public string CheckoutToken { get; set; }

@@ -5,10 +5,10 @@ namespace MakeMyCapServer.Shopify.Dtos.Fulfillment;
 public class Address
 {
 	[JsonPropertyName("id")]
-	public int Id { get; set; }
+	public long Id { get; set; }
 
 	[JsonPropertyName("customer_id")]
-	public int CustomerId { get; set; }
+	public long CustomerId { get; set; }
 
 	[JsonPropertyName("first_name")]
 	public string FirstName { get; set; }
