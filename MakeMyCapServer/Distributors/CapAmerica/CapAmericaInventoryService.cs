@@ -11,6 +11,8 @@ public class CapAmericaInventoryService : IInventoryService
 	public const string USERID = "CapAmericaUserId";
 	public const string PASSWORD = "CapAmericaPassword";
 
+	public const string CAPAMERICA_DISTRIBUTOR_CODE = "CA";
+
 	private readonly ILogger<CapAmericaInventoryService> logger;
 	private readonly IProductSkuProxy productSkuProxy;
 	
