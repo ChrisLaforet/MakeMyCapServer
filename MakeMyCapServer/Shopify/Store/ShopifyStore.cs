@@ -1,7 +1,7 @@
 ﻿using MakeMyCapServer.Configuration;
 using MakeMyCapServer.Configuration.Exceptions;
 
-namespace MakeMyCapServer.Shopify;
+namespace MakeMyCapServer.Shopify.Store;
 
 public class ShopifyStore : IShopifyStore
 {

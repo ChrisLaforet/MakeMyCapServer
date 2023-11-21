@@ -2,13 +2,12 @@ using MakeMyCapServer.Model;
 using MakeMyCapServer.Configuration;
 using MakeMyCapServer.Lookup;
 using MakeMyCapServer.Proxies;
-using MakeMyCapServer.Services;
-using MakeMyCapServer.Services.Background;
 using MakeMyCapServer.Services.Email;
 using MakeMyCapServer.Services.Fulfillment;
 using MakeMyCapServer.Services.Inventory;
 using MakeMyCapServer.Services.OrderPlacement;
-using MakeMyCapServer.Shopify;
+using MakeMyCapServer.Shopify.Services;
+using MakeMyCapServer.Shopify.Store;
 using Microsoft.EntityFrameworkCore;
 
 const string DB_CONNECTION_STRING_KEY = "MakeMyCapDatabase";

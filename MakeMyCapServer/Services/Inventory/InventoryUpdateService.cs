@@ -2,8 +2,8 @@
 using MakeMyCapServer.Model;
 using MakeMyCapServer.Proxies;
 using MakeMyCapServer.Services.Email;
-using MakeMyCapServer.Shopify;
-using Product = MakeMyCapServer.Shopify.Dtos.Product;
+using MakeMyCapServer.Shopify.Services;
+using Product = MakeMyCapServer.Shopify.Dtos.Inventory.Product;
 
 namespace MakeMyCapServer.Services.Inventory;
 

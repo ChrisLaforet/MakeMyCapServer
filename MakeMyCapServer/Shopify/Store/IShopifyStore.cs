@@ -1,4 +1,4 @@
-﻿namespace MakeMyCapServer.Shopify;
+﻿namespace MakeMyCapServer.Shopify.Store;
 
 public interface IShopifyStore
 {

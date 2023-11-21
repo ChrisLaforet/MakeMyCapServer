@@ -1,12 +1,9 @@
-﻿using System.Net;
-using System.Net.Http.Headers;
-using System.Security.Cryptography.Xml;
-using System.Text;
-using System.Text.Json;
+﻿using System.Text;
 using MakeMyCapServer.Configuration;
-using MakeMyCapServer.Shopify.Dtos;
+using MakeMyCapServer.Shopify.Store;
+using MakeMyCapServer.Shopify.Dtos.Inventory;
 
-namespace MakeMyCapServer.Shopify;
+namespace MakeMyCapServer.Shopify.Services;
 
 public class InventoryService : IInventoryService
 {

@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace MakeMyCapServer.Shopify.Dtos;
+namespace MakeMyCapServer.Shopify.Dtos.Inventory;
 
 public class InventoryLevel
 {
