@@ -62,7 +62,6 @@ builder.Services.AddHttpClient();
 
 builder.Services.AddSingleton<ShopifyWebhookService>();
 
-// builder.Services.AddControllers();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
@@ -90,15 +89,6 @@ app.MapControllerRoute(
 	name: "default",
 	pattern: "{controller=Home}/{action=Index}/{id?}");
 
-// app.MapPost("/shopify/orderCreated", async context =>
-// {
-// 	var requestBody = await context.Request.ReadFromJsonAsync<MakeMyCapServer.Shopify.Dtos.Fulfillment.Order>();
-// 	Console.WriteLine("Got traffic");
-// 	context.Response.StatusCode = 200;
-// 	await context.Response.WriteAsync("Ack");
-//
-// });
-
-app.MapPost("/shopify/orderCreated", async (ShopifyWebhookService ws, HttpContext context) => await ws.AcceptOrderCreateNotification(context));
+app.MapPost("/shopify/orderCreated", async (ShopifyWebhookService ws, HttpContext context) => await ws.AcceptOrderCreatedNotification(context));
 
 app.Run();

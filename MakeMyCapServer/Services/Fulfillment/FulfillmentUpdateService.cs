@@ -3,6 +3,7 @@ using MakeMyCapServer.Distributors;
 using MakeMyCapServer.Lookup;
 using MakeMyCapServer.Model;
 using MakeMyCapServer.Proxies;
+using MakeMyCapServer.Services.Background;
 using MakeMyCapServer.Services.Email;
 using MakeMyCapServer.Shopify.Dtos.Fulfillment;
 using ShopifyOrder = MakeMyCapServer.Shopify.Dtos.Fulfillment.Order;
@@ -12,7 +13,7 @@ using IOrderService = MakeMyCapServer.Shopify.Services.IOrderService;
 
 namespace MakeMyCapServer.Services.Fulfillment;
 
-public sealed class FulfillmentUpdateService : IFulfillmentProcessingService 
+public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 {
 	private const int DEFAULT_DELAY_TIMEOUT_HOURS = 2;
 
@@ -24,6 +25,9 @@ public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 	private readonly ILogger<FulfillmentUpdateService> logger;
 	private readonly IDistributorServiceLookup distributorServiceLookup;
 	private readonly IOrderGenerator orderGenerator;
+
+	// https://learn.microsoft.com/en-us/dotnet/standard/threading/how-to-listen-for-multiple-cancellation-requests
+	private CancellationTokenSource immediateProcessingRequestedTokenSource = new CancellationTokenSource();
 
 	private int delayTimeoutHours = DEFAULT_DELAY_TIMEOUT_HOURS;
 
@@ -44,11 +48,30 @@ public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 		this.distributorServiceLookup = distributorServiceLookup;
 		this.logger = logger;
 		this.notificationProxy = notificationProxy;
+
+		//immediateProcessingRequestedToken = immediateProcessingRequestedTokenSource.Token;
+	}
+
+	public void ResumeProcessingNow()
+	{
+		try
+		{
+			logger.LogInformation("Attempting to resume immediate processing of Orders and Fulfillment...");
+			if (!immediateProcessingRequestedTokenSource.IsCancellationRequested)
+			{
+				immediateProcessingRequestedTokenSource.Cancel();
+			}
+		}
+		catch (Exception ex)
+		{
+			logger.LogError($"Caught exception trying to resume processing: {ex}");
+		}
 	}
 
 	public async Task DoWorkAsync(CancellationToken stoppingToken)
 	{
 		logger.LogInformation("{ServiceName} working", nameof(FulfillmentUpdateService));
+		
 		bool firstTime = true;
 		while (!stoppingToken.IsCancellationRequested)
 		{
@@ -56,9 +79,35 @@ public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 			{
 				CheckAndUpdateDelay(firstTime);
 				firstTime = false;
+				
+				if (!stoppingToken.IsCancellationRequested && immediateProcessingRequestedTokenSource.IsCancellationRequested)
+				{
+					immediateProcessingRequestedTokenSource = new CancellationTokenSource();
+				}
 
-				await Task.Delay(delayTimeoutHours * 60 * 60 * 1000, stoppingToken);
+// TODO: CML - REMOVE THIS COMMENT WHEN FINISHED TESTING CANCELLATION				
+				// UpdateFulfillment();
+				
+				using (CancellationTokenSource multiplexedTokens = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken, immediateProcessingRequestedTokenSource.Token))
+				{
+					try
+					{
+Console.WriteLine("SLEEP");						
+						await Task.Delay(delayTimeoutHours * 60 * 60 * 1000, immediateProcessingRequestedTokenSource.Token);
+//await Task.Delay(delayTimeoutHours * 60 * 60 * 1000, multiplexedTokens.Token);
+					}
+					catch (OperationCanceledException)
+					{
+						// do nothing at the moment
+					}
+				}
+Console.WriteLine("HELLO");
 			}
+		}
+
+		if (!immediateProcessingRequestedTokenSource.IsCancellationRequested)
+		{
+			immediateProcessingRequestedTokenSource.Cancel();
 		}
 	}
 

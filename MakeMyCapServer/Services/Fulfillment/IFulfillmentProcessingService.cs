@@ -2,6 +2,6 @@
 
 namespace MakeMyCapServer.Services.Fulfillment;
 
-public interface IFulfillmentProcessingService : IScopedProcessingService
+public interface IFulfillmentProcessingService : IScopedProcessingService, IInterruptableService
 {
 }
