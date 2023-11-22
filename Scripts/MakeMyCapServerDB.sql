@@ -297,21 +297,7 @@ CREATE TABLE [dbo].[Shipping](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[SkuDistributor]    Script Date: 11/22/2023 8:55:08 AM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [dbo].[SkuDistributor](
-	[Id] [int] IDENTITY(1,1) NOT NULL,
-	[Sku] [varchar](20) NOT NULL,
-	[DistributorId] [int] NOT NULL,
- CONSTRAINT [PK_SkuDistributor] PRIMARY KEY CLUSTERED 
-(
-	[Id] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-) ON [PRIMARY]
-GO
+
 SET IDENTITY_INSERT [dbo].[Distributor] ON 
 GO
 INSERT [dbo].[Distributor] ([Id], [LookupCode], [Name], [AccountNumber]) VALUES (1, N'CA', N'CapAmerica', NULL)
@@ -1230,12 +1216,6 @@ CREATE UNIQUE NONCLUSTERED INDEX [IX_Product_1] ON [dbo].[Product]
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IX_SkuDistributor]    Script Date: 11/22/2023 8:55:08 AM ******/
-CREATE UNIQUE NONCLUSTERED INDEX [IX_SkuDistributor] ON [dbo].[SkuDistributor]
-(
-	[Sku] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-GO
 ALTER TABLE [dbo].[EmailQueue] ADD  CONSTRAINT [DF_EmailQueue_TotalAttempts]  DEFAULT ((0)) FOR [TotalAttempts]
 GO
 ALTER TABLE [dbo].[EmailQueue] ADD  CONSTRAINT [DF_EmailQueue_BodyIsHtml]  DEFAULT ((0)) FOR [BodyIsHtml]
@@ -1263,11 +1243,7 @@ REFERENCES [dbo].[Distributor] ([Id])
 GO
 ALTER TABLE [dbo].[PurchaseOrder] CHECK CONSTRAINT [FK_PurchaseOrder_Distributor]
 GO
-ALTER TABLE [dbo].[SkuDistributor]  WITH CHECK ADD  CONSTRAINT [FK_SkuDistributor_Distributor] FOREIGN KEY([DistributorId])
-REFERENCES [dbo].[Distributor] ([Id])
-GO
-ALTER TABLE [dbo].[SkuDistributor] CHECK CONSTRAINT [FK_SkuDistributor_Distributor]
-GO
+
 USE [master]
 GO
 ALTER DATABASE [MakeMyCapServer] SET  READ_WRITE 

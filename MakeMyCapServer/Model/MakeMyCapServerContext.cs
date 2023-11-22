@@ -37,8 +37,6 @@ public partial class MakeMyCapServerContext : DbContext
 
     public virtual DbSet<Shipping> Shippings { get; set; }
 
-    public virtual DbSet<SkuDistributor> SkuDistributors { get; set; }
-
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
     }
@@ -299,22 +297,6 @@ public partial class MakeMyCapServerContext : DbContext
             entity.Property(e => e.ShipZip)
                 .HasMaxLength(10)
                 .IsUnicode(false);
-        });
-
-        modelBuilder.Entity<SkuDistributor>(entity =>
-        {
-            entity.ToTable("SkuDistributor");
-
-            entity.HasIndex(e => e.Sku, "IX_SkuDistributor").IsUnique();
-
-            entity.Property(e => e.Sku)
-                .HasMaxLength(20)
-                .IsUnicode(false);
-
-            entity.HasOne(d => d.Distributor).WithMany(p => p.SkuDistributors)
-                .HasForeignKey(d => d.DistributorId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_SkuDistributor_Distributor");
         });
 
         OnModelCreatingPartial(modelBuilder);

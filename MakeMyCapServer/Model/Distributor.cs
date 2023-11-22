@@ -14,6 +14,4 @@ public partial class Distributor
     public string? AccountNumber { get; set; }
 
     public virtual ICollection<PurchaseOrder> PurchaseOrders { get; set; } = new List<PurchaseOrder>();
-
-    public virtual ICollection<SkuDistributor> SkuDistributors { get; set; } = new List<SkuDistributor>();
 }
