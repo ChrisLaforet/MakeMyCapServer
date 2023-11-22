@@ -13,11 +13,13 @@ public class EmailQueueProcessingService : IEmailQueueProcessingService
 
 	private readonly IEmailProxy emailProxy;
 	private readonly IEmailSender emailSender;
+	private readonly IServiceProxy serviceProxy;
 	private readonly ILogger<EmailQueueProcessingService> logger;
 	
-	public EmailQueueProcessingService(IEmailProxy emailProxy, IEmailSender emailSender, ILogger<EmailQueueProcessingService> logger)
+	public EmailQueueProcessingService(IEmailProxy emailProxy, IServiceProxy serviceProxy, IEmailSender emailSender, ILogger<EmailQueueProcessingService> logger)
 	{
 		this.emailProxy = emailProxy;
+		this.serviceProxy = serviceProxy;
 		this.emailSender = emailSender;
 		this.logger = logger;
 	}
@@ -25,6 +27,7 @@ public class EmailQueueProcessingService : IEmailQueueProcessingService
 	public async Task DoWorkAsync(CancellationToken stoppingToken)
 	{
 		logger.LogInformation("{ServiceName} working", nameof(EmailQueueProcessingService));
+
 		bool firstTime = true;
 		while (!stoppingToken.IsCancellationRequested)
 		{
@@ -35,10 +38,13 @@ public class EmailQueueProcessingService : IEmailQueueProcessingService
 		}
 	}
 
-	private bool ProcessEmailQueue() 
+	private bool ProcessEmailQueue()
 	{
+		ServiceLog? serviceLog = null;
 		try
 		{
+			serviceLog = serviceProxy.CreateServiceLogFor(nameof(EmailQueueProcessingService));
+
 			var queuedMessages = emailProxy.GetPendingQueuedMessages();
 			if (queuedMessages.Count > 0)
 			{
@@ -53,6 +59,10 @@ public class EmailQueueProcessingService : IEmailQueueProcessingService
 		catch (Exception ex)
 		{
 			logger.LogError($"Error processing Email queue: {ex}");
+			if (serviceLog != null)
+			{
+				serviceProxy.CloseServiceLogFor(serviceLog);
+			}
 		}
 
 		return false;

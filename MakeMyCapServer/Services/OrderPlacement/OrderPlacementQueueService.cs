@@ -19,15 +19,18 @@ public class OrderPlacementQueueService : IOrderPlacementProcessingService
 	private readonly IOrderingProxy orderingProxy;
 	private readonly IDistributorServiceLookup distributorServiceLookup;
 	private readonly INotificationProxy notificationProxy;
+	private readonly IServiceProxy serviceProxy;
 	private readonly ILogger<OrderPlacementQueueService> logger;
 
 	public OrderPlacementQueueService(IOrderingProxy orderingProxy, 
 									IDistributorServiceLookup distributorServiceLookup, 
-									INotificationProxy notificationProxy, 
+									INotificationProxy notificationProxy,
+									IServiceProxy serviceProxy,
 									ILogger<OrderPlacementQueueService> logger)
 	{
 		this.orderingProxy = orderingProxy;
 		this.distributorServiceLookup = distributorServiceLookup;
+		this.serviceProxy = serviceProxy;
 		this.logger = logger;
 		this.notificationProxy = notificationProxy;
 	}
@@ -35,6 +38,7 @@ public class OrderPlacementQueueService : IOrderPlacementProcessingService
 	public async Task DoWorkAsync(CancellationToken stoppingToken)
 	{
 		logger.LogInformation("{ServiceName} working", nameof(OrderPlacementQueueService));
+		
 		bool firstTime = true;
 		while (!stoppingToken.IsCancellationRequested)
 		{
@@ -47,12 +51,15 @@ public class OrderPlacementQueueService : IOrderPlacementProcessingService
 
 	private bool ProcessOrderQueue()
 	{
+		var serviceLog = serviceProxy.CreateServiceLogFor(nameof(OrderPlacementQueueService));
+
 		logger.LogInformation("Checking for queued orders that need sending");
 
 		var pendingPurchaseOrders = orderingProxy.GetPendingPurchaseOrders();
 		if (pendingPurchaseOrders.Count == 0)
 		{
 			logger.LogInformation("Nothing to do.");
+			serviceProxy.CloseServiceLogFor(serviceLog);
 			return false;
 		}
 
@@ -68,6 +75,7 @@ public class OrderPlacementQueueService : IOrderPlacementProcessingService
 			orderingProxy.SavePurchaseOrder(pendingPurchaseOrder);
 		}
 
+		serviceProxy.CloseServiceLogFor(serviceLog);
 		return false;
 	}
 

@@ -36,6 +36,7 @@ public sealed class InventoryUpdateService : IInventoryProcessingService
 	public async Task DoWorkAsync(CancellationToken stoppingToken)
 	{
 		logger.LogInformation("{ServiceName} working", nameof(InventoryUpdateService));
+
 		bool firstTime = true;
 		while (!stoppingToken.IsCancellationRequested)
 		{

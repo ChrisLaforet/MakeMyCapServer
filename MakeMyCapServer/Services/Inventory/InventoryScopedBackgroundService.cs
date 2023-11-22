@@ -1,4 +1,6 @@
-﻿using MakeMyCapServer.Services.Background;
+﻿using MakeMyCapServer.Model;
+using MakeMyCapServer.Proxies;
+using MakeMyCapServer.Services.Background;
 
 namespace MakeMyCapServer.Services.Inventory;
 
@@ -6,7 +8,7 @@ public class InventoryScopedBackgroundService : BackgroundService
 {
 	private readonly IServiceProvider serviceProvider;
 	private readonly ILogger<InventoryScopedBackgroundService> logger;
-
+	
 	public InventoryScopedBackgroundService(IServiceProvider serviceProvider, ILogger<InventoryScopedBackgroundService> logger)
 	{
 		this.serviceProvider = serviceProvider;

@@ -10,6 +10,7 @@
 using System;
 using System.Reflection;
 
+[assembly: Microsoft.Extensions.Configuration.UserSecrets.UserSecretsIdAttribute("39dfc2e1-f30d-4710-b7cd-c6c55c99b48a")]
 [assembly: System.Reflection.AssemblyCompanyAttribute("MakeMyCapServer")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]

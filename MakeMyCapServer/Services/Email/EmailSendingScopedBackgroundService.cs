@@ -1,4 +1,6 @@
-﻿using MakeMyCapServer.Services.Background;
+﻿using MakeMyCapServer.Model;
+using MakeMyCapServer.Proxies;
+using MakeMyCapServer.Services.Background;
 using MakeMyCapServer.Services.Email;
 
 namespace MakeMyCapServer.Services.Inventory;
@@ -6,8 +8,9 @@ namespace MakeMyCapServer.Services.Inventory;
 public class EmailSendingScopedBackgroundService : BackgroundService
 {
 	private readonly IServiceProvider serviceProvider;
+	private readonly IServiceProxy serviceProxy;
 	private readonly ILogger<EmailSendingScopedBackgroundService> logger;
-
+	
 	public EmailSendingScopedBackgroundService(IServiceProvider serviceProvider, ILogger<EmailSendingScopedBackgroundService> logger)
 	{
 		this.serviceProvider = serviceProvider;

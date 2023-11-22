@@ -1,4 +1,6 @@
-﻿using MakeMyCapServer.Services.Background;
+﻿using MakeMyCapServer.Model;
+using MakeMyCapServer.Proxies;
+using MakeMyCapServer.Services.Background;
 
 namespace MakeMyCapServer.Services.Fulfillment;
 
@@ -7,6 +9,7 @@ public class FulfillmentScopedBackgroundService : BackgroundService, IInterrupta
 	private readonly IServiceProvider serviceProvider;
 	private readonly ILogger<FulfillmentScopedBackgroundService> logger;
 
+	
 	public FulfillmentScopedBackgroundService(IServiceProvider serviceProvider, ILogger<FulfillmentScopedBackgroundService> logger)
 	{
 		this.serviceProvider = serviceProvider;

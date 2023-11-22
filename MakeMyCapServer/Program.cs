@@ -29,8 +29,7 @@ builder.Services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
 builder.Services.Add(new ServiceDescriptor(typeof(IConfigurationLoader), xmlConfigurationLoader));
 
 // create db contexts for each of the domains
-builder.Services.AddDbContext<MakeMyCapServerContext>(options =>
-					options.UseSqlServer(xmlConfigurationLoader.GetKeyValueFor(DB_CONNECTION_STRING_KEY)));
+builder.Services.AddDbContext<MakeMyCapServerContext>(options => options.UseSqlServer(xmlConfigurationLoader.GetKeyValueFor(DB_CONNECTION_STRING_KEY)));
 
 builder.Services.AddScoped<IInventoryService, InventoryService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
