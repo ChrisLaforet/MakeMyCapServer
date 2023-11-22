@@ -14,10 +14,10 @@ namespace MakeMyCapServer.Shopify.Dtos.Fulfillment;
         public bool AcceptsMarketing { get; set; }
 
         [JsonPropertyName("created_at")]
-        public DateTime CreatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
 
         [JsonPropertyName("updated_at")]
-        public DateTime UpdatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
 
         [JsonPropertyName("first_name")]
         public string FirstName { get; set; }
@@ -56,7 +56,7 @@ namespace MakeMyCapServer.Shopify.Dtos.Fulfillment;
         public string Currency { get; set; }
 
         [JsonPropertyName("accepts_marketing_updated_at")]
-        public DateTime AcceptsMarketingUpdatedAt { get; set; }
+        public DateTime? AcceptsMarketingUpdatedAt { get; set; }
 
         [JsonPropertyName("marketing_opt_in_level")]
         public object MarketingOptInLevel { get; set; }

@@ -12,6 +12,8 @@ public partial class PurchaseOrder
     public int DistributorId { get; set; }
 
     public string Ponumber { get; set; } = null!;
+    
+    public int? PoNumberSequence { get; set; }
 
     public long? ShopifyOrderId { get; set; }
 

@@ -169,7 +169,6 @@ CREATE TABLE [dbo].[Order](
 	[CheckoutToken] [varchar](255) NULL,
 	[CreatedDateTime] [datetime2](7) NOT NULL,
 	[ProcessStartDateTime] [datetime2](7) NOT NULL,
-	[Cancelled] [bit] NOT NULL,
  CONSTRAINT [PK_Order_1] PRIMARY KEY CLUSTERED 
 (
 	[OrderId] ASC
@@ -184,9 +183,10 @@ GO
 CREATE TABLE [dbo].[OrderLineItem](
 	[LineItemId] [bigint] NOT NULL,
 	[FulfillmentOrderId] [bigint] NOT NULL,
-	[ShopId] [bigint] NOT NULL,
 	[Quantity] [int] NOT NULL,
-	[InventoryItemId] [bigint] NOT NULL,
+	[Sku] [varchar](50) NOT NULL,
+	[Name] [varchar](1000) NOT NULL,
+	[ProductId] [bigint] NOT NULL,
 	[VariantId] [bigint] NOT NULL,
 	[PONumber] [varchar](25) NULL,
  CONSTRAINT [PK_OrderLineItem] PRIMARY KEY CLUSTERED 

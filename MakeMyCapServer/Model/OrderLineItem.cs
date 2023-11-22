@@ -6,13 +6,17 @@ public partial class OrderLineItem
 
     public long FulfillmentOrderId { get; set; }
 
-    public long ShopId { get; set; }
-
     public int Quantity { get; set; }
 
-    public long InventoryItemId { get; set; }
+    public string Sku { get; set; } = null!;
+
+    public string Name { get; set; } = null!;
+
+    public long ProductId { get; set; }
 
     public long VariantId { get; set; }
+
+    public string? Ponumber { get; set; }
 
     public virtual FulfillmentOrder FulfillmentOrder { get; set; } = null!;
 }

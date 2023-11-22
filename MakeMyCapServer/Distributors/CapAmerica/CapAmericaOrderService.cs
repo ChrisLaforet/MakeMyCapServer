@@ -36,7 +36,7 @@ public class CapAmericaOrderService : IOrderService
 			logger.LogError($"No line items remain in PO {order.PoNumber} so there is nothing to transmit to CapAmerica.");
 			return true;
 		}
-		var subject = $"MakeMyCap PO {order.PoNumber}";
+		var subject = $"MMC Purchase Order - PO {order.PoNumber}";
 		var body = new StringBuilder();
 		body.Append("Customer: Make My Cap\r\n");
 		body.Append(orderBody);

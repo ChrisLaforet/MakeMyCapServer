@@ -1,4 +1,5 @@
 ﻿using MakeMyCapServer.Model;
+using MakeMyCapServer.Proxies.Exceptions;
 
 namespace MakeMyCapServer.Proxies;
 
@@ -106,5 +107,33 @@ public class ServiceProxy : IServiceProxy
 			// do not propagate this error because it may break the background task runner
 			logger.LogError($"Error closing service logs for {serviceLog.Id} for service {serviceLog.ServiceName}: {ex}");
 		}
+	}
+
+	public int GetNextPoNumberSequence()
+	{
+		var setting = context.Settings.FirstOrDefault();
+		if (setting == null)
+		{
+			throw new SettingsNotConfiguredException();
+		}
+
+		if (setting.NextPosequence == null || setting.NextPosequence <= 0)
+		{
+			setting.NextPosequence = 1;
+			context.SaveChanges();
+		}
+		return (int)setting.NextPosequence;
+	}
+
+	public void UpdateNextPoNumberSequence(int nextPoNumberSequence)
+	{
+		var setting = context.Settings.FirstOrDefault();
+		if (setting == null)
+		{
+			throw new SettingsNotConfiguredException();
+		}
+
+		setting.NextPosequence = nextPoNumberSequence;
+		context.SaveChanges();
 	}
 }

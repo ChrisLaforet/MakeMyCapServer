@@ -13,4 +13,7 @@ public interface IServiceProxy
 
 	ServiceLog CreateServiceLogFor(string serviceName);
 	void CloseServiceLogFor(ServiceLog serviceLog, bool failed = false);
+
+	int GetNextPoNumberSequence();
+	void UpdateNextPoNumberSequence(int nextPoNumberSequence);
 }

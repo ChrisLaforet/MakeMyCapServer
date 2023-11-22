@@ -11,6 +11,10 @@ namespace MakeMyCapServer.Shopify.Dtos.Fulfillment;
         [JsonPropertyName("admin_graphql_api_id")]
         public string AdminGraphqlApiId { get; set; }
 
+// CML - will this work?  It is the difference between webhook (has it) and order lookup        
+        [JsonPropertyName("attributed_staffs")]
+        public object? AttributedStaffs { get; set; }
+        
         [JsonPropertyName("fulfillable_quantity")]
         public int FulfillableQuantity { get; set; }
 

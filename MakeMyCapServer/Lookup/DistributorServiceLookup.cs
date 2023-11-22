@@ -19,7 +19,7 @@ public class DistributorServiceLookup : IDistributorServiceLookup
 	private readonly LocalSanMarOrderService sanMarOrderService;
 	private readonly SandSOrderService sandSOrderService;
 	private readonly MakeMyCapOrderService makeMyCapOrderService;
-	
+
 	public DistributorServiceLookup(IServiceProvider serviceProvider)
 	{
 		capAmericaInventoryService = ActivatorUtilities.CreateInstance<CapAmericaInventoryService>(serviceProvider);

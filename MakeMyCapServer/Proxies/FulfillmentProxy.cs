@@ -16,6 +16,11 @@ public class FulfillmentProxy : IFulfillmentProxy
 		return context.Orders.Find(orderId);
 	}
 
+	public bool DoesOrderExist(long orderId)
+	{
+		return context.Orders.Any(order => order.OrderId == orderId);
+	}
+
 	public void SaveOrder(Order order)
 	{
 		if (!context.Orders.Contains(order))

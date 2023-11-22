@@ -169,6 +169,16 @@ public partial class MakeMyCapServerContext : DbContext
             entity.ToTable("OrderLineItem");
 
             entity.Property(e => e.LineItemId).ValueGeneratedNever();
+            entity.Property(e => e.Name)
+                .HasMaxLength(1000)
+                .IsUnicode(false);
+            entity.Property(e => e.Ponumber)
+                .HasMaxLength(25)
+                .IsUnicode(false)
+                .HasColumnName("PONumber");
+            entity.Property(e => e.Sku)
+                .HasMaxLength(50)
+                .IsUnicode(false);
 
             entity.HasOne(d => d.FulfillmentOrder).WithMany(p => p.OrderLineItems)
                 .HasForeignKey(d => d.FulfillmentOrderId)

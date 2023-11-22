@@ -26,7 +26,6 @@ public class MakeMyCapOrderService : IOrderService
 		body.Append($"The following order has been sent to {order.DistributorName}\r\n\r\n");
 		body.Append(OrderWriter.FormatOrder(order));
 		body.Append("\r\n");
-		body.Append("Deliver to Decorated - Annex building, Cap America.\r\n\r\n");
 			
 		emailQueueService.Add(ORDER_EMAIL_ADDRESS, subject, body.ToString());
 		return true;

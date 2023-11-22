@@ -14,4 +14,5 @@ public interface IOrderingProxy
 
 	List<PurchaseOrder> GetPendingPurchaseOrders();
 
+	int GetMaxPoNumberSequence();
 }

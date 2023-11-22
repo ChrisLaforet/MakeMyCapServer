@@ -29,7 +29,7 @@ namespace MakeMyCapServer.Shopify.Dtos.Fulfillment;
         public string CartToken { get; set; }
 
         [JsonPropertyName("checkout_id")]
-        public long CheckoutId { get; set; }
+        public long? CheckoutId { get; set; }
 
         [JsonPropertyName("checkout_token")]
         public string CheckoutToken { get; set; }
@@ -155,7 +155,7 @@ namespace MakeMyCapServer.Shopify.Dtos.Fulfillment;
         public string PresentmentCurrency { get; set; }
 
         [JsonPropertyName("processed_at")]
-        public DateTime ProcessedAt { get; set; }
+        public DateTime? ProcessedAt { get; set; }
 
         [JsonPropertyName("reference")]
         public string Reference { get; set; }

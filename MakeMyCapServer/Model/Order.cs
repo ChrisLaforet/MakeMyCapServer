@@ -14,7 +14,5 @@ public partial class Order
 
     public DateTime ProcessStartDateTime { get; set; }
 
-    public bool Cancelled { get; set; }
-
     public virtual ICollection<FulfillmentOrder> FulfillmentOrders { get; set; } = new List<FulfillmentOrder>();
 }

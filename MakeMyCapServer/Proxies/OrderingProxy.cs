@@ -39,4 +39,12 @@ public class OrderingProxy : IOrderingProxy
 	{
 		return context.PurchaseOrders.Where(po => po.SuccessDateTime == null && po.FailureNotificationDateTime == null).ToList();
 	}
+
+	public int GetMaxPoNumberSequence()
+	{
+		var max = context.PurchaseOrders.Where(po => po.PoNumberSequence != null)
+			.Select(po => po.PoNumberSequence)
+			.Max(val => val == null ? 0 : val);
+		return max == null ? 0 : (int)max;
+	}
 }

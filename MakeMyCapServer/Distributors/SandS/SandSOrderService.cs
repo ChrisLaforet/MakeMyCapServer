@@ -1,7 +1,6 @@
 ﻿using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using System.Text.RegularExpressions;
 using MakeMyCapServer.Configuration;
 using MakeMyCapServer.Distributors.Exceptions;
 using MakeMyCapServer.Distributors.SandS.Dtos;
@@ -14,7 +13,8 @@ public class SandSOrderService : IOrderService
 {
 	public const string ORDER_ENDPOINT = "https://api.ssactivewear.com/v2/orders/";
 
-	public const string SHIPPING_CODE = "14";
+	public const string SHIPPING_CODE = "1";
+	// 1 = S&S decides - preferred by CapAmerica
 	// 14 = FedEx Ground
 	// 27 = FedEx Next Day Standard
 	// 26 = FedEx Next Day Priority

@@ -1,15 +1,19 @@
 using MakeMyCapServer.Model;
 using MakeMyCapServer.Configuration;
+using MakeMyCapServer.Distributors;
+using MakeMyCapServer.Distributors.PurchaseOrder;
 using MakeMyCapServer.Lookup;
 using MakeMyCapServer.Proxies;
 using MakeMyCapServer.Services.Email;
 using MakeMyCapServer.Services.Fulfillment;
 using MakeMyCapServer.Services.Inventory;
 using MakeMyCapServer.Services.OrderPlacement;
-using MakeMyCapServer.Shopify;
 using MakeMyCapServer.Shopify.Services;
 using MakeMyCapServer.Shopify.Store;
+using MakeMyCapServer.Webhooks;
 using Microsoft.EntityFrameworkCore;
+using IInventoryService = MakeMyCapServer.Shopify.Services.IInventoryService;
+using IOrderService = MakeMyCapServer.Shopify.Services.IOrderService;
 
 const string DB_CONNECTION_STRING_KEY = "MakeMyCapDatabase";
 
@@ -30,6 +34,7 @@ builder.Services.AddDbContext<MakeMyCapServerContext>(options =>
 
 builder.Services.AddScoped<IInventoryService, InventoryService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IOrderGenerator, PurchaseOrderCreator>();
 
 builder.Services.AddScoped<IInventoryProcessingService, InventoryUpdateService>();
 builder.Services.AddScoped<IFulfillmentProcessingService, FulfillmentUpdateService>();
@@ -48,12 +53,15 @@ builder.Services.AddScoped<IOrderingProxy, OrderingProxy>();
 builder.Services.AddScoped<IFulfillmentProxy, FulfillmentProxy>();
 builder.Services.AddScoped<INotificationProxy, NotificationProxy>();
 
-builder.Services.AddHostedService<InventoryScopedBackgroundService>();
-builder.Services.AddHostedService<FulfillmentScopedBackgroundService>();
-builder.Services.AddHostedService<OrderPlacementScopedBackgroundService>();
-builder.Services.AddHostedService<EmailSendingScopedBackgroundService>();
+// TODO: CML - temporarily stopping services
+// builder.Services.AddHostedService<InventoryScopedBackgroundService>();
+// builder.Services.AddHostedService<FulfillmentScopedBackgroundService>();
+// builder.Services.AddHostedService<OrderPlacementScopedBackgroundService>();
+// builder.Services.AddHostedService<EmailSendingScopedBackgroundService>();
 
 builder.Services.AddHttpClient();
+
+builder.Services.AddSingleton<ShopifyWebhookService>();
 
 // builder.Services.AddControllers();
 // Add services to the container.
@@ -82,5 +90,16 @@ app.UseAuthorization();
 app.MapControllerRoute(
 	name: "default",
 	pattern: "{controller=Home}/{action=Index}/{id?}");
+
+// app.MapPost("/shopify/orderCreated", async context =>
+// {
+// 	var requestBody = await context.Request.ReadFromJsonAsync<MakeMyCapServer.Shopify.Dtos.Fulfillment.Order>();
+// 	Console.WriteLine("Got traffic");
+// 	context.Response.StatusCode = 200;
+// 	await context.Response.WriteAsync("Ack");
+//
+// });
+
+app.MapPost("/shopify/orderCreated", async (ShopifyWebhookService ws, HttpContext context) => await ws.AcceptOrderCreateNotification(context));
 
 app.Run();
