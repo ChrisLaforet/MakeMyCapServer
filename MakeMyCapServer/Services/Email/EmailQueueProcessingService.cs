@@ -55,6 +55,8 @@ public class EmailQueueProcessingService : IEmailQueueProcessingService
 					emailProxy.SaveQueuedMessage(queuedMessage);
 				}
 			}
+
+			serviceProxy.CloseServiceLogFor(serviceLog);
 		}
 		catch (Exception ex)
 		{
