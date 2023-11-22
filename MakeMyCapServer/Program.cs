@@ -53,11 +53,10 @@ builder.Services.AddScoped<IOrderingProxy, OrderingProxy>();
 builder.Services.AddScoped<IFulfillmentProxy, FulfillmentProxy>();
 builder.Services.AddScoped<INotificationProxy, NotificationProxy>();
 
-// TODO: CML - temporarily stopping services
-// builder.Services.AddHostedService<InventoryScopedBackgroundService>();
-// builder.Services.AddHostedService<FulfillmentScopedBackgroundService>();
-// builder.Services.AddHostedService<OrderPlacementScopedBackgroundService>();
-// builder.Services.AddHostedService<EmailSendingScopedBackgroundService>();
+builder.Services.AddHostedService<InventoryScopedBackgroundService>();
+builder.Services.AddHostedService<FulfillmentScopedBackgroundService>();
+builder.Services.AddHostedService<OrderPlacementScopedBackgroundService>();
+builder.Services.AddHostedService<EmailSendingScopedBackgroundService>();
 
 builder.Services.AddHttpClient();
 
