@@ -18,7 +18,7 @@ public class OrderingProxy : IOrderingProxy
 
 	public Distributor? GetDistributorByCode(string code)
 	{
-		return context.Distributors.FirstOrDefault(distributor => string.Compare(distributor.LookupCode, code, true) == 0);
+		return context.Distributors.FirstOrDefault(distributor => distributor.LookupCode.ToUpper() == code.ToUpper());
 	}
 
 	public void SavePurchaseOrder(PurchaseOrder purchaseOrder)

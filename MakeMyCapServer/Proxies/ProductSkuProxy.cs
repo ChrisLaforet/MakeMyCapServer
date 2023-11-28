@@ -18,7 +18,7 @@ public class ProductSkuProxy : IProductSkuProxy
 
 	public Product? GetProductBySku(string sku)
 	{
-		return context.Products.FirstOrDefault(product => string.Compare(product.Sku, sku, true) == 0);
+		return context.Products.FirstOrDefault(product => product.Sku.ToUpper() == sku.ToUpper());
 	}
 
 	public Product? GetProductByVariantId(long variantId)
@@ -39,12 +39,11 @@ public class ProductSkuProxy : IProductSkuProxy
 
 	public List<DistributorSkuMap> GetSkuMapsFor(string distributorCode)
 	{
-		return context.DistributorSkuMaps.Where(skuMap => string.Compare(skuMap.DistributorCode, distributorCode, true) == 0).ToList();
+		return context.DistributorSkuMaps.Where(skuMap => skuMap.DistributorCode.ToUpper() == distributorCode.ToUpper()).ToList();
 	}
 
 	public DistributorSkuMap? GetSkuMapFor(string sku)
 	{
-		return context.DistributorSkuMaps.FirstOrDefault(map => string.Compare(map.Sku, sku, true) == 0);
-		throw new NotImplementedException();
+		return context.DistributorSkuMaps.FirstOrDefault(map => map.Sku.ToUpper() == sku.ToUpper());
 	}
 }
