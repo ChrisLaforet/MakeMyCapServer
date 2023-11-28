@@ -21,7 +21,7 @@ public class SanMarServices
 		
 		using (var client = new SanMarInventory.SanMarWebServiceDelegateClient())
 		{
-			var response = await client.getInventoryQtyForStyleColorSizeAsync(customerNumber, userName, password, style, color != null ? color : string.Empty, size != null ? size : string.Empty);
+			var response = await client.getInventoryQtyForStyleColorSizeAsync(customerNumber, userName, password, style, color, size);
 			if (response.@return.errorOccurred)
 			{
 				throw new SanMarException($"Error while connecting to SanMar: {response.@return.message}");
