@@ -62,8 +62,7 @@ public class SanMarInventoryService : IInventoryService
 
 				var match = inventoryLevels.Find(level => string.Compare(SanitizeStringValue(level.Style), SanitizeStringValue(skuMap.StyleCode), true) == 0 &&
 				                                          string.Compare(SanitizeStringValue(level.Color), SanitizeStringValue(skuMap.Color), true) == 0 &&
-				                                          (string.Compare(SanitizeStringValue(level.Size), SanitizeStringValue(skuMap.SizeCode), true) == 0 || 
-				                                           (string.Compare(SanitizeStringValue(level.Size), ONE_SIZE_FITS_ALL_CODE, true) == 0 && string.IsNullOrEmpty(skuMap.SizeCode))));
+				                                          IsSizeEquivalent(level, skuMap));
 				if (match == null)
 				{
 					logger.LogInformation($"There is no matching inventory level for sku {sku} in SanMar!");
@@ -81,8 +80,16 @@ public class SanMarInventoryService : IInventoryService
 
 		return responses;
 	}
+
+	private bool IsSizeEquivalent(SanMarInventoryLevel level, DistributorSkuMap skuMap)
+	{
+		var sanitizedLevel = SanitizeStringValue(level.Size).ToUpper();
+		var sanitizedSku = SanitizeStringValue(skuMap.SizeCode).ToUpper();
+		return sanitizedLevel == sanitizedSku || 
+		       (sanitizedLevel == ONE_SIZE_FITS_ALL_CODE && string.IsNullOrEmpty(sanitizedSku));
+	}
 	
-	private string SanitizeStringValue(string value)
+	private string SanitizeStringValue(string? value)
 	{
 		if (value == null)
 		{
