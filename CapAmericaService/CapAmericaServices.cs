@@ -17,21 +17,25 @@ public class CapAmericaServices
 		{
 			var request = new GetInventoryLevelsRequest(userId, password, productId);
 			var response = await client.getInventoryLevelsAsync(request);
-			Console.WriteLine(response);
+//Console.WriteLine(response);
 			if (response != null && response.GetInventoryLevelsResponse != null)
 			{
-				if (CheckRecordsWereFound(response.GetInventoryLevelsResponse.ServiceMessageArray))
+				if (!CheckRecordsWereFound(response.GetInventoryLevelsResponse.ServiceMessageArray))
 				{
 					return ExtractInventoryLevelsFrom(response.GetInventoryLevelsResponse.Inventory);
 				}
 			}
 		}
-
-	return new List<CapAmericaInventoryLevel>();
+		
+		return new List<CapAmericaInventoryLevel>();
 	}
 
 	private bool CheckRecordsWereFound(ServiceMessage[] messages)
 	{
+		if (messages == null)
+		{
+			return false;
+		}
 		foreach (var message in messages)
 		{
 			if (message.description != null && string.Compare(message.description, "No Record Found", true) == 0) {

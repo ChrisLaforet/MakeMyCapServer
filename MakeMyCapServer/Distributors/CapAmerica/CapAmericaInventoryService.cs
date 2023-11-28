@@ -1,6 +1,8 @@
-﻿using CapAmericaInventory;
+﻿using System.Text;
+using CapAmericaInventory;
 using MakeMyCapServer.Configuration;
 using MakeMyCapServer.Distributors.SanMar;
+using MakeMyCapServer.Model;
 using MakeMyCapServer.Proxies;
 using SanMarWebService;
 
@@ -30,26 +32,62 @@ public class CapAmericaInventoryService : IInventoryService
 
 	public List<InStockInventory> GetInStockInventoryFor(List<string> skus)
 	{
-// TODO: CML - is CapAmerica's ProductId = SKU??  If not we need a mapper like SanMar
-	
+		var lookup = productSkuProxy.GetSkuMapsFor(CAPAMERICA_DISTRIBUTOR_CODE);
+
 		var responses = new List<InStockInventory>();
 		foreach (var sku in skus)
 		{
-			var task = services.GetInventoryLevelsFor(sku);
-			task.Wait();
-			var inventoryLevels = task.Result;
-			int quantity = 0;
-			foreach (var inventoryLevel in inventoryLevels)
+			var skuMap = lookup.Find(map => string.Compare(map.Sku, sku, true) == 0);
+			if (skuMap != null)
 			{
-				quantity += inventoryLevel.Quantity;
+				var task = services.GetInventoryLevelsFor(skuMap.StyleCode);
+				task.Wait();
+				var inventoryLevels = task.Result;
+				if (inventoryLevels.Count > 0)
+				{
+					var quantity = FindMatchingPartIdIn(inventoryLevels, skuMap);
+
+					var response = new InStockInventory();
+					response.Sku = sku;
+					response.Quantity = quantity;
+					responses.Add(response);
+				}
 			}
-			
-			var response = new InStockInventory();
-			response.Sku = sku;
-			response.Quantity = quantity;
-			responses.Add(response);
+			else
+			{
+				logger.LogError($"Unable to map sku {sku} for CapAmerica!");
+			}
 		}
 
 		return responses;
 	}
+
+	private int FindMatchingPartIdIn(List<CapAmericaInventoryLevel> inventoryLevels, DistributorSkuMap skuMap)
+	{
+		var mappedPartId = SanitizePartId(skuMap.PartId);
+		int quantity = 0;
+		foreach (var inventoryLevel in inventoryLevels)
+		{
+			if (string.Compare(mappedPartId, SanitizePartId(inventoryLevel.PartId), true) == 0)
+			{
+				quantity += inventoryLevel.Quantity;
+			}
+		}
+
+		return quantity;
+	}
+
+	private string SanitizePartId(string value)
+	{
+		var sanitized = new StringBuilder();
+		foreach (char ch in value)
+		{
+			if (char.IsLetterOrDigit(ch) || ch == '-' || ch == '/')
+			{
+				sanitized.Append(ch);
+			}
+		}
+		return sanitized.ToString();
+	}
+	
 }
