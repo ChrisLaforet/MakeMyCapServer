@@ -51,7 +51,6 @@ public class CapAmericaServices
 		var levels = new List<CapAmericaInventoryLevel>();
 		             
 		var productId = inventory.productId;
-		Console.WriteLine("ProductId =" + productId);
 		foreach (var partInventory in inventory.PartInventoryArray)
 		{
 			var level = new CapAmericaInventoryLevel();

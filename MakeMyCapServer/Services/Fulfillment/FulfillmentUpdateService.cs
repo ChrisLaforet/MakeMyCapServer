@@ -137,7 +137,7 @@ public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 	{
 		foreach (var shopifyOrder in orderService.GetOpenOrders())
 		{
-			if (!fulfillmentProxy.DoesOrderExist(shopifyOrder.Id))
+			if (fulfillmentProxy.DoesOrderExist(shopifyOrder.Id))
 			{
 				continue;
 			}
