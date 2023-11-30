@@ -61,10 +61,10 @@ public class DistributorServiceLookup : IDistributorServiceLookup
 			case "CA":
 				return capAmericaOrderService;
 			
-			case "SS":
+			case "SM":
 				return sanMarOrderService;
 			
-			case "SM":
+			case "SS":
 				return sandSOrderService;
 			
 			case "MMC":

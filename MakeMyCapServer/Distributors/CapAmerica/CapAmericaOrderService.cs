@@ -44,6 +44,7 @@ public class CapAmericaOrderService : IOrderService
 		body.Append("Deliver to Decorated - Annex building, Cap America.\r\n\r\n");
 			
 		emailQueueService.Add(ORDER_EMAIL_ADDRESS, subject, body.ToString());
+		order.SuccessDateTime = DateTime.Now;
 		return true;
 	}
 
@@ -121,7 +122,7 @@ public class CapAmericaOrderService : IOrderService
 		body.Append($"PLEASE ORDER THESE ITEMS MANUALLY NOW.  Once done, the SKU(s) need to be mapped in our mapping table.\r\n\r\n");
 		foreach (var notFoundSku in notFoundSkus)
 		{
-			body.Append($"   Our SKU: {notFoundSku.Sku}  Style: {notFoundSku.Style}  Color: {notFoundSku.Color}  Size: {notFoundSku.Size}  Quantity: {notFoundSku.Quantity}\r\n");
+			body.Append($"   Our SKU: {notFoundSku.Sku}\r\n  Style: {notFoundSku.Style}\r\n  Color: {notFoundSku.Color}\r\n  Size: {notFoundSku.Size}\r\n  Quantity: {notFoundSku.Quantity}\r\n");
 		}
 
 		body.Append("\r\n");

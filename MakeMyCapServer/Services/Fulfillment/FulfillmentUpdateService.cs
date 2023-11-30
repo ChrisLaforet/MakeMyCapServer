@@ -113,6 +113,11 @@ public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 
 	private bool UpdateFulfillment()
 	{
+// TODO: CML - PREVENTING ORDERS needs to be fixed		
+if (1 != 0) {		
+	logger.LogCritical("PREVENTING ORDERS FROM BEING CREATED UNTIL ORDER PLACEMENT TESTS ARE COMPLETE!");
+	return false;
+}
 		logger.LogInformation("Checking for fulfillment orders that need processing");
 		ServiceLog? serviceLog = null;
 		try

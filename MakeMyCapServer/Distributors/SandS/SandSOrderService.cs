@@ -13,6 +13,8 @@ public class SandSOrderService : IOrderService
 {
 	public const string ORDER_ENDPOINT = "https://api.ssactivewear.com/v2/orders/";
 
+	public const bool IS_TEST_MODE = true;
+	
 	public const string SHIPPING_CODE = "1";
 	// 1 = S&S decides - preferred by CapAmerica
 	// 14 = FedEx Ground
@@ -49,7 +51,12 @@ public class SandSOrderService : IOrderService
 	{
 		var accountNumber = configurationLoader.GetKeyValueFor(SandSInventoryService.ACCOUNT_NUMBER);
 		var apiKey = configurationLoader.GetKeyValueFor(SandSInventoryService.API_KEY);
-		
+
+		if (IS_TEST_MODE)
+		{
+			logger.LogCritical("S&S is running in a TEST mode");
+		}
+
 		var client = new HttpClient();
 		PrepareHeadersFor(client);
 		var authenticationValue = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{accountNumber}:{apiKey}"));
@@ -110,6 +117,8 @@ public class SandSOrderService : IOrderService
 		orderDto.ShippingMethod = SHIPPING_CODE;
 		orderDto.PoNumber = order.PoNumber;
 		orderDto.ShippingAddress = shippingAddress;
+
+		orderDto.TestOrder = IS_TEST_MODE;
 		
 		var lookup = productSkuProxy.GetSkuMapsFor(SandSInventoryService.S_AND_S_DISTRIBUTOR_CODE);
 		var notFoundSkus = new List<IOrderItem>();
@@ -143,7 +152,7 @@ public class SandSOrderService : IOrderService
 		body.Append($"PLEASE ORDER THESE ITEMS MANUALLY NOW.  Once done, the SKU(s) need to be mapped in our mapping table.\r\n\r\n");
 		foreach (var notFoundSku in notFoundSkus)
 		{
-			body.Append($"   Our SKU: {notFoundSku.Sku}  Style: {notFoundSku.Style}  Color: {notFoundSku.Color}  Size: {notFoundSku.Size}  Quantity: {notFoundSku.Quantity}\r\n");
+			body.Append($"   Our SKU: {notFoundSku.Sku}\r\n  Style: {notFoundSku.Style}\r\n  Color: {notFoundSku.Color}\r\n  Size: {notFoundSku.Size}\r\n  Quantity: {notFoundSku.Quantity}\r\n");
 		}
 
 		body.Append("\r\n");

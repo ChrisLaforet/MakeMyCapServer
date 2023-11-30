@@ -8,4 +8,5 @@ public interface IOrder
 	long? ShopifyOrderId { get; }
 	
 	string DistributorName { get; }
+	DateTime? SuccessDateTime { get; set; }
 }

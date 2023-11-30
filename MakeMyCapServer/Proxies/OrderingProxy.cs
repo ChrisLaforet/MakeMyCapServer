@@ -1,4 +1,5 @@
 ﻿using MakeMyCapServer.Model;
+using Microsoft.EntityFrameworkCore;
 
 namespace MakeMyCapServer.Proxies;
 
@@ -32,12 +33,17 @@ public class OrderingProxy : IOrderingProxy
 
 	public List<PurchaseOrder> GetPurchaseOrders()
 	{
-		return context.PurchaseOrders.ToList();
+		return context.PurchaseOrders
+			.Include(po => po.Distributor)
+			.ToList();
 	}
 
 	public List<PurchaseOrder> GetPendingPurchaseOrders()
 	{
-		return context.PurchaseOrders.Where(po => po.SuccessDateTime == null && po.FailureNotificationDateTime == null).ToList();
+		return context.PurchaseOrders
+			.Include(po => po.Distributor)
+			.Where(po => po.SuccessDateTime == null && po.FailureNotificationDateTime == null)
+			.ToList();
 	}
 
 	public int GetMaxPoNumberSequence()

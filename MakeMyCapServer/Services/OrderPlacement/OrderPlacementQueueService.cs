@@ -51,11 +51,6 @@ public class OrderPlacementQueueService : IOrderPlacementProcessingService
 
 	private bool ProcessOrderQueue()
 	{
-// TODO: CML - PREVENTING ORDERS needs to be fixed		
-if (1 != 0) {		
-logger.LogCritical("PREVENTING ORDERS FROM BEING SENT UNTIL READY");
-return false;
-}
 		var serviceLog = serviceProxy.CreateServiceLogFor(nameof(OrderPlacementQueueService));
 
 		logger.LogInformation("Checking for queued orders that need sending");

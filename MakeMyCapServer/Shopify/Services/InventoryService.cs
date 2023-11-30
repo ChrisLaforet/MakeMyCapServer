@@ -82,6 +82,7 @@ public class InventoryService : IInventoryService
 		{
 			logger.LogError($"Error in AdjustInventoryLevel: {(int)response.StatusCode} ({response.ReasonPhrase})");
 //			throw new HttpRequestException("AdjustInventoryLevel");
+			return null;
 		}
 	}
 

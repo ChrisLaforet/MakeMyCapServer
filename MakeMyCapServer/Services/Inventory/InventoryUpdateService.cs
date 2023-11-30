@@ -3,7 +3,6 @@ using MakeMyCapServer.Lookup;
 using MakeMyCapServer.Model;
 using MakeMyCapServer.Proxies;
 using MakeMyCapServer.Services.Email;
-using MakeMyCapServer.Shopify;
 using IInventoryService = MakeMyCapServer.Shopify.Services.IInventoryService;
 using Product = MakeMyCapServer.Shopify.Dtos.Inventory.Product;
 
@@ -75,6 +74,11 @@ public sealed class InventoryUpdateService : IInventoryProcessingService
 	
 	private bool UpdateInventory()
 	{
+// TODO: CML - PREVENTING INVENTORY UPDATE needs to be fixed		
+if (1 != 0) {		
+	logger.LogCritical("PREVENTING INVENTORY UPDATE UNTIL ORDER PLACEMENT TESTS ARE COMPLETE!");
+	return false;
+}
 		logger.LogInformation("Checking for inventory changes");
 
 		ServiceLog? serviceLog = null;
@@ -123,9 +127,6 @@ public sealed class InventoryUpdateService : IInventoryProcessingService
 				serviceProxy.CloseServiceLogFor(serviceLog, true);
 			}
 		}
-
-// TODO: CML - fix the updater and make it do what it supposed to do		
-//TestUpdateAdjustments(saleProducts);
 		
 		return false;
 	}
@@ -290,46 +291,6 @@ public sealed class InventoryUpdateService : IInventoryProcessingService
 				{
 					variant.InventoryLevel = response.Available;
 				}
-			}
-		}
-	}
-	
-	
-	private void TestUpdateAdjustments(List<SaleProduct> saleProducts)
-	{
-		int level = new Random().Next() % 300;
-		if (level == 0)
-		{
-			level = 400;
-		}
-		
-		Console.WriteLine("Setting level of " + level);
-
-		foreach (var saleProduct in saleProducts.Where(saleProduct => saleProduct.InventoryItemId != null && 
-		                                                              saleProduct.LocationId != null && saleProduct.LocationId != 0 &&
-		                                                              !string.IsNullOrEmpty(saleProduct.Sku)).ToList())
-		{
-			int adjustment;
-			if (saleProduct.InventoryLevel == null)
-			{
-				adjustment = level;
-			}
-			else
-			{
-				adjustment = level - (int)saleProduct.InventoryLevel;
-			}
-			
-			try
-			{
-				var response = inventoryService.AdjustInventoryLevel((long)saleProduct.InventoryItemId, (long)saleProduct.LocationId, adjustment);
-				if (response != null)
-				{
-					saleProduct.InventoryLevel = response.Available;
-				}
-			}
-			catch (Exception ex)
-			{
-				logger.LogError($"Caught exception processing Variant Id {saleProduct.VariantId}: {ex}");
 			}
 		}
 	}
