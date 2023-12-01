@@ -37,6 +37,10 @@ public class CapAmericaInventoryService : IInventoryService
 		var responses = new List<InStockInventory>();
 		foreach (var sku in skus)
 		{
+// if (sku == "CAI85130001" || sku == "CAI85130002" || sku == "CAI85130003")
+// {
+// 	Console.WriteLine("Hello");
+// }			
 			var skuMap = lookup.Find(map => string.Compare(map.Sku, sku, true) == 0);
 			if (skuMap != null)
 			{

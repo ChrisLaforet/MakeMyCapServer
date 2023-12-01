@@ -74,7 +74,7 @@ public sealed class InventoryUpdateService : IInventoryProcessingService
 	
 	private bool UpdateInventory()
 	{
-// TODO: CML - PREVENTING INVENTORY UPDATE needs to be fixed		
+//TODO: CML - PREVENTING INVENTORY UPDATE needs to be fixed		
 if (1 != 0) {		
 	logger.LogCritical("PREVENTING INVENTORY UPDATE UNTIL ORDER PLACEMENT TESTS ARE COMPLETE!");
 	return false;

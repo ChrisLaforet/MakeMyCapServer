@@ -11,6 +11,9 @@ namespace MakeMyCapServer.Distributors.SandS;
 
 public class SandSOrderService : IOrderService
 {
+	public const string PAYMENT_PROFILE_ID = "SandSPaymentProfileId";
+	public const string PAYMENT_PROFILE_EMAIL = "SandSPaymentProfileEmail";
+	
 	public const string ORDER_ENDPOINT = "https://api.ssactivewear.com/v2/orders/";
 
 	public const bool IS_TEST_MODE = true;
@@ -113,10 +116,18 @@ public class SandSOrderService : IOrderService
 		shippingAddress.Zip = shipping.ShipZip;
 		shippingAddress.Attn = $"{shipping.ShipTo}  PO # {order.PoNumber}".Trim();
 
+		var profileEmail = configurationLoader.GetKeyValueFor(PAYMENT_PROFILE_EMAIL);
+		var profileId = long.Parse(configurationLoader.GetKeyValueFor(PAYMENT_PROFILE_ID));
+
+		var paymentProfile = new PaymentProfile();
+		paymentProfile.Email = profileEmail;
+		paymentProfile.ProfileId = profileId;
+		
 		var orderDto = new Order();
 		orderDto.ShippingMethod = SHIPPING_CODE;
 		orderDto.PoNumber = order.PoNumber;
 		orderDto.ShippingAddress = shippingAddress;
+		orderDto.PaymentProfile = paymentProfile;
 
 		orderDto.TestOrder = IS_TEST_MODE;
 		

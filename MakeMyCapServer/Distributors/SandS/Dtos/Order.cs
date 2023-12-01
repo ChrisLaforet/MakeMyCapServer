@@ -22,6 +22,9 @@ public class Order
 	[JsonPropertyName("autoselectWarehouse")]
 	public bool AutoselectWarehouse { get; set; } = true;
 
+	[JsonPropertyName("paymentProfile")]
+	public PaymentProfile PaymentProfile { get; set; }
+	
 	[JsonPropertyName("lines")] 
 	public List<Line> Lines { get; set; } = new List<Line>();
 }

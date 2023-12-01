@@ -1061,7 +1061,9 @@ namespace SanMarOrderService
         {
             if ((endpointConfiguration == EndpointConfiguration.SanMarPOServiceImplPort))
             {
-                return new System.ServiceModel.EndpointAddress("https://ws.sanmar.com:8080/SanMarWebService/SanMarPOServicePort");
+                // EDEV for testing only
+                return new System.ServiceModel.EndpointAddress("https://edev-ws.sanmar.com:8080/SanMarWebService/SanMarPOServicePort");
+                //return new System.ServiceModel.EndpointAddress("https://ws.sanmar.com:8080/SanMarWebService/SanMarPOServicePort");
             }
             throw new System.InvalidOperationException(string.Format("Could not find endpoint with name \'{0}\'.", endpointConfiguration));
         }
