@@ -1,8 +1,5 @@
-﻿using System.Text;
-using MakeMyCapServer.Orders;
-using MakeMyCapServer.Proxies.Exceptions;
+﻿using MakeMyCapServer.Proxies.Exceptions;
 using MakeMyCapServer.Services.Email;
-using MakeMyCapServer.Services.OrderPlacement;
 
 namespace MakeMyCapServer.Proxies;
 

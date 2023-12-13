@@ -7,6 +7,7 @@ using MakeMyCapServer.Proxies;
 using MakeMyCapServer.Services.Email;
 using MakeMyCapServer.Services.Fulfillment;
 using MakeMyCapServer.Services.Inventory;
+using MakeMyCapServer.Services.Notification;
 using MakeMyCapServer.Services.OrderPlacement;
 using MakeMyCapServer.Shopify.Services;
 using MakeMyCapServer.Shopify.Store;
@@ -51,6 +52,8 @@ builder.Services.AddScoped<IEmailProxy, EmailProxy>();
 builder.Services.AddScoped<IOrderingProxy, OrderingProxy>();
 builder.Services.AddScoped<IFulfillmentProxy, FulfillmentProxy>();
 builder.Services.AddScoped<INotificationProxy, NotificationProxy>();
+
+builder.Services.AddScoped<IStatusNotificationService, StatusNotificationService>();
 
 builder.Services.AddHostedService<InventoryScopedBackgroundService>();
 builder.Services.AddHostedService<FulfillmentScopedBackgroundService>();

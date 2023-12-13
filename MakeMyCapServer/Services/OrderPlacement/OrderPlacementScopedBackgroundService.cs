@@ -1,5 +1,5 @@
 ﻿using MakeMyCapServer.Model;
-using MakeMyCapServer.Proxies;
+using MakeMyCapServer.Services.Notification;
 
 namespace MakeMyCapServer.Services.OrderPlacement;
 
@@ -28,8 +28,13 @@ public class OrderPlacementScopedBackgroundService : BackgroundService
 		
 		using (IServiceScope scope = serviceProvider.CreateScope())
 		{
+			IStatusNotificationService statusNotificationService = scope.ServiceProvider.GetRequiredService<IStatusNotificationService>();
+			statusNotificationService.SendServiceStartupStatus(nameof(OrderPlacementScopedBackgroundService));
+			
 			IOrderPlacementProcessingService scopedProcessingService = scope.ServiceProvider.GetRequiredService<IOrderPlacementProcessingService>();
 			await scopedProcessingService.DoWorkAsync(stoppingToken);
+
+			statusNotificationService.SendServiceShutdownStatus(nameof(OrderPlacementScopedBackgroundService));
 		}
 	}
 

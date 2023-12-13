@@ -1,6 +1,5 @@
-﻿using MakeMyCapServer.Model;
-using MakeMyCapServer.Proxies;
-using MakeMyCapServer.Services.Background;
+﻿using MakeMyCapServer.Services.Email;
+using MakeMyCapServer.Services.Notification;
 
 namespace MakeMyCapServer.Services.Inventory;
 
@@ -27,8 +26,13 @@ public class InventoryScopedBackgroundService : BackgroundService
 
 		using (IServiceScope scope = serviceProvider.CreateScope())
 		{
+			IStatusNotificationService statusNotificationService = scope.ServiceProvider.GetRequiredService<IStatusNotificationService>();
+			statusNotificationService.SendServiceStartupStatus(nameof(InventoryScopedBackgroundService));
+
 			IInventoryProcessingService scopedProcessingService = scope.ServiceProvider.GetRequiredService<IInventoryProcessingService>();
 			await scopedProcessingService.DoWorkAsync(stoppingToken);
+
+			statusNotificationService.SendServiceShutdownStatus(nameof(InventoryScopedBackgroundService));
 		}
 	}
 
