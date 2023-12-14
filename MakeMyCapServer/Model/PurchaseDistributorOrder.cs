@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace MakeMyCapServer.Model;
 
-public partial class PurchaseOrder
+public partial class PurchaseDistributorOrder
 {
     public int Id { get; set; }
 

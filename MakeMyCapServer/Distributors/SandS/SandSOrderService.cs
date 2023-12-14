@@ -50,7 +50,7 @@ public class SandSOrderService : IOrderService
 		client.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "application/json; charset=utf-8");
 	}
 
-	public bool PlaceOrder(IOrder order)
+	public bool PlaceOrder(DistributorOrders orders)
 	{
 		var accountNumber = configurationLoader.GetKeyValueFor(SandSInventoryService.ACCOUNT_NUMBER);
 		var apiKey = configurationLoader.GetKeyValueFor(SandSInventoryService.API_KEY);
@@ -68,10 +68,10 @@ public class SandSOrderService : IOrderService
 		string jsonBodyContent = null;
 		try
 		{
-			var orderDto = PrepareOrderFrom(order);
+			var orderDto = PrepareOrderFrom(orders);
 			if (orderDto.Lines.Count == 0)
 			{
-				logger.LogError($"No line items remain in PO {order.PoNumber} so there is nothing to transmit to S&S.");
+				logger.LogError($"No line items remain in PO {orders.PoNumber} so there is nothing to transmit to S&S.");
 				return true;
 			}
 			jsonBodyContent = JsonSerializer.Serialize(orderDto);
@@ -99,7 +99,7 @@ public class SandSOrderService : IOrderService
 		return true;
 	}
 
-	public Order PrepareOrderFrom(IOrder order)
+	public Order PrepareOrderFrom(DistributorOrders orders)
 	{
 		var shipping = orderingProxy.GetShipping();
 		if (shipping == null)
@@ -114,7 +114,7 @@ public class SandSOrderService : IOrderService
 		shippingAddress.City = shipping.ShipCity;
 		shippingAddress.State = shipping.ShipState;
 		shippingAddress.Zip = shipping.ShipZip;
-		shippingAddress.Attn = $"{shipping.ShipTo}  PO # {order.PoNumber}".Trim();
+		shippingAddress.Attn = $"{shipping.ShipTo}  PO # {orders.PoNumber}".Trim();
 
 		var profileEmail = configurationLoader.GetKeyValueFor(PAYMENT_PROFILE_EMAIL);
 		var profileId = long.Parse(configurationLoader.GetKeyValueFor(PAYMENT_PROFILE_ID));
@@ -125,41 +125,41 @@ public class SandSOrderService : IOrderService
 		
 		var orderDto = new Order();
 		orderDto.ShippingMethod = SHIPPING_CODE;
-		orderDto.PoNumber = order.PoNumber;
+		orderDto.PoNumber = orders.PoNumber;
 		orderDto.ShippingAddress = shippingAddress;
 		orderDto.PaymentProfile = paymentProfile;
 
 		orderDto.TestOrder = IS_TEST_MODE;
 		
 		var lookup = productSkuProxy.GetSkuMapsFor(SandSInventoryService.S_AND_S_DISTRIBUTOR_CODE);
-		var notFoundSkus = new List<IOrderItem>();
-		foreach (var lineItem in order.LineItems)
+		var notFoundSkus = new List<IDistributorOrder>();
+		foreach (var order in orders.PurchaseOrders)
 		{
-			var map = lookup.SingleOrDefault(map => string.Compare(map.Sku, lineItem.Sku, true) == 0);
+			var map = lookup.SingleOrDefault(map => string.Compare(map.Sku, order.Sku, true) == 0);
 			if (map == null)
 			{
-				logger.LogError($"Unable to map sku {lineItem.Sku} to place order for S&S!");
-				notFoundSkus.Add(lineItem);
+				logger.LogError($"Unable to map sku {order.Sku} to place order for S&S!");
+				notFoundSkus.Add(order);
 				continue;
 			}
 			
-			orderDto.Lines.Add(new Line() { Identifier = map.DistributorSku, Qty = lineItem.Quantity });
+			orderDto.Lines.Add(new Line() { Identifier = map.DistributorSku, Qty = order.Quantity });
 		}
 
 		if (notFoundSkus.Count > 0)
 		{
-			NotifyOfMissingSkuMatches(order, notFoundSkus);
+			NotifyOfMissingSkuMatches(notFoundSkus);
 		}
 
 		return orderDto;
 	}
 	
-	private void NotifyOfMissingSkuMatches(IOrder order, List<IOrderItem> notFoundSkus)
+	private void NotifyOfMissingSkuMatches(List<IDistributorOrder> notFoundSkus)
 	{
-		var subject = $"Urgent! Order SKUs for S&S cannot be found for sending PO {order.PoNumber}";
+		var subject = $"Urgent! Order SKUs for S&S cannot be found for sending PO {notFoundSkus[0].PoNumber}";
 
 		var body = new StringBuilder();
-		body.Append($"The following Line Items for PO {order.PoNumber} cannot be found in our mappings.\r\n");
+		body.Append($"The following Line Items for PO {notFoundSkus[0].PoNumber} cannot be found in our mappings.\r\n");
 		body.Append($"PLEASE ORDER THESE ITEMS MANUALLY NOW.  Once done, the SKU(s) need to be mapped in our mapping table.\r\n\r\n");
 		foreach (var notFoundSku in notFoundSkus)
 		{
@@ -170,7 +170,7 @@ public class SandSOrderService : IOrderService
 		body.Append("Any other items on this PO that were located will be ordered electronically.");
 		body.Append("\r\n\r\n");
 
-		logger.LogInformation($"Transmitting critical message concerning inability to map all SKUs in PO {order.PoNumber}.");
+		logger.LogInformation($"Transmitting critical message concerning inability to map all SKUs in PO {notFoundSkus[0].PoNumber}.");
 		notificationProxy.SendCriticalErrorNotification(subject, body.ToString());
 	}
 }

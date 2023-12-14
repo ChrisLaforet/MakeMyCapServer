@@ -22,23 +22,23 @@ public class OrderingProxy : IOrderingProxy
 		return context.Distributors.FirstOrDefault(distributor => distributor.LookupCode.ToUpper() == code.ToUpper());
 	}
 
-	public void SavePurchaseOrder(PurchaseOrder purchaseOrder)
+	public void SavePurchaseOrder(PurchaseDistributorOrder purchaseDistributorOrder)
 	{
-		if (purchaseOrder.Id <= 0)
+		if (purchaseDistributorOrder.Id <= 0)
 		{
-			context.PurchaseOrders.Add(purchaseOrder);
+			context.PurchaseOrders.Add(purchaseDistributorOrder);
 		}
 		context.SaveChanges();
 	}
 
-	public List<PurchaseOrder> GetPurchaseOrders()
+	public List<PurchaseDistributorOrder> GetPurchaseOrders()
 	{
 		return context.PurchaseOrders
 			.Include(po => po.Distributor)
 			.ToList();
 	}
 
-	public List<PurchaseOrder> GetPendingPurchaseOrders()
+	public List<PurchaseDistributorOrder> GetPendingPurchaseOrders()
 	{
 		return context.PurchaseOrders
 			.Include(po => po.Distributor)

@@ -12,19 +12,19 @@ public class MakeMyCapOrderService : IOrderService
 	private IEmailQueueService emailQueueService;
 	private ILogger<MakeMyCapOrderService> logger;
 	
-	public MakeMyCapOrderService(IEmailQueueService emailQueuServicee, ILogger<MakeMyCapOrderService> logger)
+	public MakeMyCapOrderService(IEmailQueueService emailQueueService, ILogger<MakeMyCapOrderService> logger)
 	{
 		this.emailQueueService = emailQueueService;
 		this.logger = logger;
 	} 
 	
-	public bool PlaceOrder(IOrder order)
+	public bool PlaceOrder(DistributorOrders orders)
 	{
 // TODO: CML - determine what additional formatting is needed here		
-		var subject = $"Notification of sent PO {order.PoNumber}";
+		var subject = $"Notification of sent PO {orders.PoNumber}";
 		var body = new StringBuilder();
-		body.Append($"The following order has been sent to {order.DistributorName}\r\n\r\n");
-		body.Append(OrderWriter.FormatOrder(order));
+		body.Append($"The following order has been sent to {orders.DistributorName}\r\n\r\n");
+		body.Append(OrderWriter.FormatOrder(orders));
 		body.Append("\r\n");
 			
 		emailQueueService.Add(ORDER_EMAIL_ADDRESS, subject, body.ToString());

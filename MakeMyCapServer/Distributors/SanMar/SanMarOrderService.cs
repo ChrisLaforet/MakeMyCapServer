@@ -10,7 +10,12 @@ namespace MakeMyCapServer.Distributors.SanMar;
 
 public class SanMarOrderService : IOrderService
 {
+	public const string CUSTOMER_NUMBER = "SanMarOrderCustomerNumber";
+	public const string USER_NAME = "SanMarOrderUserName";
+	public const string PASSWORD = "SanMarOrderPassword";
+
 	private const char COMMA = ',';
+	private const string OSFA = "OSFA";
 	private const string SHIPPING_CODE = "FEDEX GROUND";
 	
 	private readonly SanMarOrderServices services;
@@ -30,13 +35,13 @@ public class SanMarOrderService : IOrderService
 		this.notificationProxy = notificationProxy;
 		this.logger = logger;
 		
-		var customerNumber = configurationLoader.GetKeyValueFor(SanMarInventoryService.CUSTOMER_NUMBER);
-		var userName = configurationLoader.GetKeyValueFor(SanMarInventoryService.USER_NAME);
-		var password = configurationLoader.GetKeyValueFor(SanMarInventoryService.PASSWORD);
+		var customerNumber = configurationLoader.GetKeyValueFor(CUSTOMER_NUMBER);
+		var userName = configurationLoader.GetKeyValueFor(USER_NAME);
+		var password = configurationLoader.GetKeyValueFor(PASSWORD);
 		services = new SanMarOrderServices(customerNumber, userName, password);
 	}
 	
-	public bool PlaceOrder(IOrder order)
+	public bool PlaceOrder(DistributorOrders orders)
 	{
 		var shipping = orderingProxy.GetShipping();
 		if (shipping == null)
@@ -44,10 +49,10 @@ public class SanMarOrderService : IOrderService
 			throw new MissingDataException("Cannot order from SanMar - Shipping information is not configured.");
 		}
 		
-		var request = PrepareOrderRequest(order, shipping);
+		var request = PrepareOrderRequest(orders, shipping);
 		if (request.Details.Count == 0) 
 		{
-			logger.LogError($"No line items remain in PO {order.PoNumber} so there is nothing to transmit to SanMar.");
+			logger.LogError($"No line items remain in PO {orders.PoNumber} so there is nothing to transmit to SanMar.");
 			return true;
 		}
 
@@ -57,16 +62,16 @@ public class SanMarOrderService : IOrderService
 
 		if (!response.Success)
 		{
-			logger.LogInformation($"Error transmitting order for PO {order.PoNumber} with reason: {response.Message}");
+			logger.LogInformation($"Error transmitting order for PO {orders.PoNumber} with reason: {response.Message}");
 		}
 		return response.Success;
 	}
 
-	private SanMarOrderRequest PrepareOrderRequest(IOrder order, Shipping shipping)
+	private SanMarOrderRequest PrepareOrderRequest(DistributorOrders orders, Shipping shipping)
 	{
 		var request = new SanMarOrderRequest();
-		request.Attention = SanitizeString($"PO # ({order.PoNumber})");
-		request.PoNumber = SanitizeString(order.PoNumber);
+		request.Attention = SanitizeString($"PO # ({orders.PoNumber})");
+		request.PoNumber = SanitizeString(orders.PoNumber);
 		request.ShipMethod = SanitizeString(SHIPPING_CODE);
 		request.ShipTo = SanitizeString(shipping.ShipTo);
 		request.Address1 = SanitizeString(shipping.ShipAddress);
@@ -81,19 +86,19 @@ public class SanMarOrderService : IOrderService
 		var lookup = productSkuProxy.GetSkuMapsFor(SanMarInventoryService.SANMAR_DISTRIBUTOR_CODE);
 
 		var details = new List<SanMarOrderDetail>();
-		var notFoundSkus = new List<IOrderItem>();
-		foreach (var lineItem in order.LineItems)
+		var notFoundSkus = new List<IDistributorOrder>();
+		foreach (var order in orders.PurchaseOrders)
 		{
-			var map = lookup.SingleOrDefault(map => string.Compare(map.Sku, lineItem.Sku, true) == 0);
+			var map = lookup.SingleOrDefault(map => string.Compare(map.Sku, order.Sku, true) == 0);
 			if (map == null)
 			{
-				logger.LogError($"Unable to map sku {lineItem.Sku} to place order for SanMar!");
-				notFoundSkus.Add(lineItem);
+				logger.LogError($"Unable to map sku {order.Sku} to place order for SanMar!");
+				notFoundSkus.Add(order);
 				continue;
 			}
 
 			var detail = new SanMarOrderDetail();
-			detail.Quantity = lineItem.Quantity;
+			detail.Quantity = order.Quantity;
 			detail.Style = map.StyleCode;
 			if (!string.IsNullOrEmpty(map.Color))
 			{
@@ -104,6 +109,10 @@ public class SanMarOrderService : IOrderService
 			{
 				detail.Size = map.SizeCode;
 			}
+			else
+			{
+				detail.Size = OSFA;
+			}
 
 			details.Add(detail);
 		}
@@ -111,18 +120,25 @@ public class SanMarOrderService : IOrderService
 		
 		if (notFoundSkus.Count > 0)
 		{
-			NotifyOfMissingSkuMatches(order, notFoundSkus);
+			NotifyOfMissingSkuMatches(notFoundSkus);
 		}
-
+		
 		return request;
 	}
 
-	private void NotifyOfMissingSkuMatches(IOrder order, List<IOrderItem> notFoundSkus)
+	// handy code to show what a webservice payload will look like
+	// var serxml = new System.Xml.Serialization.XmlSerializer(request.GetType());
+	// var ms = new MemoryStream();
+	// serxml.Serialize(ms, request);
+	// string xml = Encoding.UTF8.GetString(ms.ToArray());
+
+	
+	private void NotifyOfMissingSkuMatches(List<IDistributorOrder> notFoundSkus)
 	{
-		var subject = $"Urgent! Order SKUs for SanMar cannot be found for sending PO {order.PoNumber}";
+		var subject = $"Urgent! Order SKUs for SanMar cannot be found for sending PO {notFoundSkus[0].PoNumber}";
 
 		var body = new StringBuilder();
-		body.Append($"The following Line Items for PO {order.PoNumber} cannot be found in our mappings.\r\n");
+		body.Append($"The following Line Items for PO {notFoundSkus[0].PoNumber} cannot be found in our mappings.\r\n");
 		body.Append($"PLEASE ORDER THESE ITEMS MANUALLY NOW.  Once done, the SKU(s) need to be mapped in our mapping table.\r\n\r\n");
 		foreach (var notFoundSku in notFoundSkus)
 		{
@@ -133,7 +149,7 @@ public class SanMarOrderService : IOrderService
 		body.Append("Any other items on this PO that were located will be ordered electronically.");
 		body.Append("\r\n\r\n");
 
-		logger.LogInformation($"Transmitting critical message concerning inability to map all SKUs in PO {order.PoNumber}.");
+		logger.LogInformation($"Transmitting critical message concerning inability to map all SKUs in PO {notFoundSkus[0].PoNumber}.");
 		notificationProxy.SendCriticalErrorNotification(subject, body.ToString());
 	}
 
@@ -164,5 +180,4 @@ public class SanMarOrderService : IOrderService
 
 		return value.Trim();
 	}
-
 }

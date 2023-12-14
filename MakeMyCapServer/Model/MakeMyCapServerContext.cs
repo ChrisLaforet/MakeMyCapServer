@@ -29,7 +29,7 @@ public partial class MakeMyCapServerContext : DbContext
 
     public virtual DbSet<Product> Products { get; set; }
 
-    public virtual DbSet<PurchaseOrder> PurchaseOrders { get; set; }
+    public virtual DbSet<PurchaseDistributorOrder> PurchaseOrders { get; set; }
 
     public virtual DbSet<ServiceLog> ServiceLogs { get; set; }
 
@@ -203,7 +203,7 @@ public partial class MakeMyCapServerContext : DbContext
                 .IsUnicode(false);
         });
 
-        modelBuilder.Entity<PurchaseOrder>(entity =>
+        modelBuilder.Entity<PurchaseDistributorOrder>(entity =>
         {
             entity.ToTable("PurchaseOrder");
 

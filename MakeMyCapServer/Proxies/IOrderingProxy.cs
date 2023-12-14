@@ -8,11 +8,11 @@ public interface IOrderingProxy
 
 	Distributor? GetDistributorByCode(string code);
 
-	void SavePurchaseOrder(PurchaseOrder purchaseOrder);
+	void SavePurchaseOrder(PurchaseDistributorOrder purchaseDistributorOrder);
 
-	List<PurchaseOrder> GetPurchaseOrders();
+	List<PurchaseDistributorOrder> GetPurchaseOrders();
 
-	List<PurchaseOrder> GetPendingPurchaseOrders();
+	List<PurchaseDistributorOrder> GetPendingPurchaseOrders();
 
 	int GetMaxPoNumberSequence();
 }

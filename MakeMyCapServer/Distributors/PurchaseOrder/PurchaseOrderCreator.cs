@@ -39,7 +39,7 @@ public class PurchaseOrderCreator : IOrderGenerator
 		}
 	}
 
-	private int GeneratePONumber()
+	public int GetNextPOSequence()
 	{
 		mutex.WaitOne();
 		serviceProxy.UpdateNextPoNumberSequence(++nextPoNumberSequence);
@@ -49,8 +49,7 @@ public class PurchaseOrderCreator : IOrderGenerator
 		return poNumberSequence;
 	}
 	
-	
-	public Model.PurchaseOrder? GenerateOrderFor(DistributorSkuMap skuMap, long shopifyOrderId, int quantity)
+	public Model.PurchaseDistributorOrder? GenerateOrderFor(DistributorSkuMap skuMap, long shopifyOrderId, int quantity, int poSequence)
 	{
 		var distributor = orderingProxy.GetDistributorByCode(skuMap.DistributorCode);
 		if (distributor == null)
@@ -60,13 +59,12 @@ public class PurchaseOrderCreator : IOrderGenerator
 			return null;
 		}
 		
-		var poNumberSequence = GeneratePONumber();
-		var poNumber = $"MMC{poNumberSequence.ToString("D9")}";
+		var poNumber = $"MMC{poSequence.ToString("D9")}";
 		
-		var purchaseOrder = new Model.PurchaseOrder();
+		var purchaseOrder = new Model.PurchaseDistributorOrder();
 		purchaseOrder.DistributorId = distributor.Id;
 		purchaseOrder.Ponumber = poNumber;
-		purchaseOrder.PoNumberSequence = poNumberSequence;
+		purchaseOrder.PoNumberSequence = poSequence;
 		purchaseOrder.CreateDate = DateTime.Now;
 		purchaseOrder.ShopifyOrderId = shopifyOrderId;
 		purchaseOrder.Sku = skuMap.DistributorSku;

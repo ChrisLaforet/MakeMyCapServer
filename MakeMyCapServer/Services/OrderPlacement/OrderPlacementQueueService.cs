@@ -62,104 +62,156 @@ public class OrderPlacementQueueService : IOrderPlacementProcessingService
 			serviceProxy.CloseServiceLogFor(serviceLog);
 			return false;
 		}
-
-		foreach (var pendingPurchaseOrder in pendingPurchaseOrders)
+		
+		foreach (var orders in CreateDistributorOrdersFrom(pendingPurchaseOrders))
 		{
-			if (AttemptToTransmitPurchaseOrder(pendingPurchaseOrder))
+			var success = AttemptToTransmitPurchaseOrder(orders);
+			foreach (var order in orders.PurchaseOrders)
 			{
-				pendingPurchaseOrder.SuccessDateTime = DateTime.Now;
+				if (success)
+				{
+					order.SuccessDateTime = DateTime.Now;
+				}
+				
+				order.Attempts++;
+				order.LastAttemptDateTime = DateTime.Now;
+				orderingProxy.SavePurchaseOrder((PurchaseDistributorOrder)order);
 			}
-
-			pendingPurchaseOrder.Attempts++;
-			pendingPurchaseOrder.LastAttemptDateTime = DateTime.Now;
-			orderingProxy.SavePurchaseOrder(pendingPurchaseOrder);
 		}
 
 		serviceProxy.CloseServiceLogFor(serviceLog);
 		return false;
 	}
 
-	private bool AttemptToTransmitPurchaseOrder(PurchaseOrder purchaseOrder)
+	private List<DistributorOrders> CreateDistributorOrdersFrom(List<PurchaseDistributorOrder> orders)
+	{
+		var matcher = new Dictionary<string, List<PurchaseDistributorOrder>>();
+		foreach (var order in orders)
+		{
+			if (matcher.ContainsKey(order.PoNumber))
+			{
+				matcher[order.PoNumber].Add(order);
+			}
+			else
+			{
+				var list = new List<PurchaseDistributorOrder>();
+				list.Add(order);
+				matcher[order.PoNumber] = list;
+			}
+		}
+
+		var assemblies = new List<DistributorOrders>();
+		foreach (var key in matcher.Keys)
+		{
+			var assembly = new DistributorOrders();
+			assembly.PoNumber = key;
+			assemblies.Add(assembly);
+			
+			bool isFirst = true;
+			foreach (var order in matcher[key])
+			{
+				if (isFirst)
+				{
+					assembly.DistributorName = order.DistributorName;
+					assembly.DistributorLookupCode = order.Distributor.LookupCode;
+					assembly.OrderDate = order.OrderDate;
+					assembly.ShopifyOrderId = order.ShopifyOrderId;
+					isFirst = false;
+				}
+				assembly.PurchaseOrders.Add(order);
+			}
+			
+		}
+
+		return assemblies;
+	}
+
+	private bool AttemptToTransmitPurchaseOrder(DistributorOrders orders)
 	{
 		try
 		{
-			var orderService = distributorServiceLookup.GetOrderServiceFor(purchaseOrder.Distributor.LookupCode);
-			return orderService.PlaceOrder(purchaseOrder);
+			var orderService = distributorServiceLookup.GetOrderServiceFor(orders.DistributorLookupCode);
+			return orderService.PlaceOrder(orders);
 		}
 		catch (Exception ex)
 		{
-			logger.LogError($"Exception caught while attempting to send PO {purchaseOrder.Ponumber} in record ID {purchaseOrder.Id}: {ex}");
-			HandleNotificationsFor(purchaseOrder);
+			logger.LogError($"Exception caught while attempting to send PO {orders.PoNumber}: {ex}");
+			HandleNotificationsFor(orders);
 		}
 
 		return false;
 	}
 
-	private void HandleNotificationsFor(PurchaseOrder purchaseOrder)
+	private void HandleNotificationsFor(DistributorOrders orders)
 	{
 		var now = DateTime.Now;
-		var difference = now.Subtract(purchaseOrder.CreateDate);
-		if (now.CompareTo(purchaseOrder.CreateDate.AddHours(FAILURE_HOURS)) >= 0)
+		foreach (var order in orders.PurchaseOrders)
 		{
-			logger.LogError($"PO {purchaseOrder.Ponumber} in record ID {purchaseOrder.Id} has expired the Failure time after {purchaseOrder.Attempts} attempts to deliver!");
-			TransmitErrorMessage(purchaseOrder, Convert.ToInt32(difference.TotalHours));
-			return;
-		}
+			var difference = now.Subtract(order.CreateDate);
+			if (now.CompareTo(order.CreateDate.AddHours(FAILURE_HOURS)) >= 0)
+			{
+				logger.LogError(
+					$"PO {order.PoNumber} in record ID {order.Id} has expired the Failure time after {order.Attempts} attempts to deliver!");
+				TransmitErrorMessage(order, Convert.ToInt32(difference.TotalHours));
+				return;
+			}
 
-		int expectedAlertCount = difference.Hours / WARNING_HOURS;
+			int expectedAlertCount = difference.Hours / WARNING_HOURS;
 
-		if (expectedAlertCount < purchaseOrder.Attempts)
-		{
-			logger.LogWarning($"PO {purchaseOrder.Ponumber} in record ID {purchaseOrder.Id} has not transmitted after {purchaseOrder.Attempts} attempts to deliver!");
-			TransmitWarningMessage(purchaseOrder, Convert.ToInt32(difference.TotalHours));
+			if (expectedAlertCount < order.Attempts)
+			{
+				logger.LogWarning(
+					$"PO {order.PoNumber} in record ID {order.Id} has not transmitted after {order.Attempts} attempts to deliver!");
+				TransmitWarningMessage(order, Convert.ToInt32(difference.TotalHours));
+			}
 		}
 	}
 
-	private void TransmitErrorMessage(PurchaseOrder purchaseOrder, int hours)
+	private void TransmitErrorMessage(IDistributorOrder order, int hours)
 	{
 		try
 		{
-			var subject = $"ERROR: Cannot send PO {purchaseOrder.PoNumber} to {purchaseOrder.Distributor.Name}";
+			var subject = $"ERROR: Cannot send PO {order.PoNumber} to {order.DistributorName}";
 			
 			var body = new StringBuilder();
 			body.Append($"ERROR: DELIVERY FAILED AFTER RETRYING {hours} HOURS!  Manual intervention is needed!!\r\n\r\n");
-			body.Append($"The following PO cannot be transmitted to {purchaseOrder.Distributor.Name} after trying for {purchaseOrder.Attempts} attempts.\r\n\r\n");
-			body.Append(OrderWriter.FormatOrder(purchaseOrder));
+			body.Append($"The following PO cannot be transmitted to {order.DistributorName} after trying for {order.Attempts} attempts.\r\n\r\n");
+			body.Append(OrderWriter.FormatOrder(order));
 			body.Append("\r\n");
 			body.Append("The service will not attempt to deliver this any longer.  It requires human intervention to send the order.\r\n\r\n");
 			
-			logger.LogInformation($"Transmitting ERROR message that retrying has stopped for PO {purchaseOrder.Ponumber} in record ID {purchaseOrder.Id} after {purchaseOrder.Attempts} attempts to deliver.");
+			logger.LogInformation($"Transmitting ERROR message that retrying has stopped for PO {order.PoNumber} in record ID {order.Id} after {order.Attempts} attempts to deliver.");
 			notificationProxy.SendCriticalErrorNotification(subject, body.ToString());
 			
-			purchaseOrder.FailureNotificationDateTime = DateTime.Now;
+			order.FailureNotificationDateTime = DateTime.Now;
 		}
 		catch (Exception ex)
 		{
-			logger.LogCritical($"Error transmitting ERROR message that retrying has stopped for PO {purchaseOrder.Ponumber} in record ID {purchaseOrder.Id} after {purchaseOrder.Attempts} attempts to deliver: {ex}");
+			logger.LogCritical($"Error transmitting ERROR message that retrying has stopped for PO {order.PoNumber} in record ID {order.Id} after {order.Attempts} attempts to deliver: {ex}");
 		}
 	}
 	
-	private void TransmitWarningMessage(PurchaseOrder purchaseOrder, int hours)
+	private void TransmitWarningMessage(IDistributorOrder order, int hours)
 	{
 		try
 		{
-			var subject = $"Warning: Problems sending PO {purchaseOrder.PoNumber} to {purchaseOrder.Distributor.Name}";
+			var subject = $"Warning: Problems sending PO {order.PoNumber} to {order.DistributorName}";
 
 			var body = new StringBuilder();
 			body.Append($"Warning: Deliver failed after retrying {hours} hours!  Is the distributor's service offline??  \r\n\r\n");
-			body.Append($"The following PO has not yet transmitted to {purchaseOrder.Distributor.Name} after trying for {purchaseOrder.Attempts} attempts.\r\n\r\n");
-			body.Append(OrderWriter.FormatOrder(purchaseOrder));
+			body.Append($"The following PO has not yet transmitted to {order.DistributorName} after trying for {order.Attempts} attempts.\r\n\r\n");
+			body.Append(OrderWriter.FormatOrder(order));
 			body.Append("\r\n");
 			body.Append("The service will continue attempting to deliver this PO.  Perhaps a call/email to the distributor's support is needed?\r\n\r\n");
 			
-			logger.LogInformation($"Transmitting warning message concerning retries for PO {purchaseOrder.Ponumber} in record ID {purchaseOrder.Id} after {purchaseOrder.Attempts} attempts to deliver.");
+			logger.LogInformation($"Transmitting warning message concerning retries for PO {order.PoNumber} in record ID {order.Id} after {order.Attempts} attempts to deliver.");
 			notificationProxy.SendWarningErrorNotification(subject, body.ToString());
 			
-			purchaseOrder.FailureNotificationDateTime = DateTime.Now;
+			order.FailureNotificationDateTime = DateTime.Now;
 		}
 		catch (Exception ex)
 		{
-			logger.LogError($"Error transmitting WARNING message concerning retries for PO {purchaseOrder.Ponumber} in record ID {purchaseOrder.Id} after {purchaseOrder.Attempts} attempts to deliver: {ex}");
+			logger.LogError($"Error transmitting WARNING message concerning retries for PO {order.PoNumber} in record ID {order.Id} after {order.Attempts} attempts to deliver: {ex}");
 		}
 	}
 }

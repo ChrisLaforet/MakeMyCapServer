@@ -5,7 +5,53 @@ namespace MakeMyCapServer.Orders;
 
 public static class OrderWriter
 {
-	public static string FormatOrder(IOrder order)
+	public static string FormatOrder(DistributorOrders orders)
+	{
+		var output = new StringBuilder();
+
+		output.Append("Order Details\r\n");
+		output.Append("\r\n");
+		output.Append($"Order date: {orders.OrderDate.ToString("MM/dd/yyyy")}\r\n");
+		output.Append($"PO Number: {orders.PoNumber}\r\n");
+		output.Append("Shopify order Id: ");
+		if (orders.ShopifyOrderId == null)
+		{
+			output.Append("Not provided\r\n");
+		}
+		else
+		{
+			output.Append($"{orders.ShopifyOrderId.ToString()}\r\n");
+		}
+		output.Append("Line items:\r\n");
+		foreach (var order in orders.PurchaseOrders)
+		{
+			output.Append($"{order.Quantity}");
+			if (order.Sku != null)
+			{
+				output.Append($"  Sku: {order.Sku}");
+			}
+
+			if (order.Style != null)
+			{
+				output.Append($"  Style: {order.Style}");
+			}
+
+			if (order.Color != null)
+			{
+				output.Append($"  Color: {order.Color}");
+			}
+
+			if (order.Size != null)
+			{
+				output.Append($"  Size: {order.Size}");
+			}
+			output.Append("\r\n");
+		}
+
+		return output.ToString();
+	}
+
+	public static string FormatOrder(IDistributorOrder order)
 	{
 		var output = new StringBuilder();
 
@@ -22,34 +68,31 @@ public static class OrderWriter
 		{
 			output.Append($"{order.ShopifyOrderId.ToString()}\r\n");
 		}
-		output.Append("Line items:\r\n");
-		foreach (var lineItem in order.LineItems)
+
+		output.Append("Line item:\r\n");
+
+		output.Append($"{order.Quantity}");
+		if (order.Sku != null)
 		{
-			output.Append($"{lineItem.Quantity}");
-			if (lineItem.Sku != null)
-			{
-				output.Append($"  Sku: {lineItem.Sku}");
-			}
-
-			if (lineItem.Style != null)
-			{
-				output.Append($"  Style: {lineItem.Style}");
-
-			}
-
-			if (lineItem.Color != null)
-			{
-				output.Append($"  Color: {lineItem.Color}");
-
-			}
-
-			if (lineItem.Size != null)
-			{
-				output.Append($"  Size: {lineItem.Size}");
-
-			}
-			output.Append("\r\n");
+			output.Append($"  Sku: {order.Sku}");
 		}
+
+		if (order.Style != null)
+		{
+			output.Append($"  Style: {order.Style}");
+		}
+
+		if (order.Color != null)
+		{
+			output.Append($"  Color: {order.Color}");
+		}
+
+		if (order.Size != null)
+		{
+			output.Append($"  Size: {order.Size}");
+		}
+
+		output.Append("\r\n");
 
 		return output.ToString();
 	}

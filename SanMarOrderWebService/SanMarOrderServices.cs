@@ -1,4 +1,5 @@
-﻿using SanMarOrderService;
+﻿using System.Text;
+using SanMarOrderService;
 
 namespace SanMarOrderWebService;
 
@@ -38,6 +39,7 @@ public class SanMarOrderServices
 					detail.color = requestDetail.Color;
 				}
 				detail.quantity = requestDetail.Quantity;
+				detail.quantitySpecified = true;
 				
 				details.Add(detail);
 			}
@@ -51,12 +53,26 @@ public class SanMarOrderServices
 			{
 				order.shipAddress2 = request.Address2;
 			}
-
+			
 			order.shipCity = request.City;
 			order.shipState = request.State;
 			order.shipZip = request.Zip;
+			
+			order.shipMethod = request.ShipMethod;
+			order.shipEmail = request.Email;
+			
+			order.residence = "N";
+			order.department = "";
+			
 			order.webServicePoDetailList = details.ToArray();
 			
+// handy code to show what a webservice payload will look like
+// var serxml = new System.Xml.Serialization.XmlSerializer(order.GetType());
+// var ms = new MemoryStream();
+// serxml.Serialize(ms, order);
+// string xml = Encoding.UTF8.GetString(ms.ToArray());
+// Console.Error.WriteLine(xml);
+
 			var response = await client.submitPOAsync(order, user);
 			if (response == null || response.@return == null)
 			{

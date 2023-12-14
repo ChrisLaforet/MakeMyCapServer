@@ -8,9 +8,9 @@ namespace MakeMyCapServer.Distributors.SanMar;
 
 public class SanMarInventoryService : IInventoryService
 {
-	public const string CUSTOMER_NUMBER = "SanMarCustomerNumber";
-	public const string USER_NAME = "SanMarUserName";
-	public const string PASSWORD = "SanMarPassword";
+	public const string CUSTOMER_NUMBER = "SanMarInventoryCustomerNumber";
+	public const string USER_NAME = "SanMarInventoryUserName";
+	public const string PASSWORD = "SanMarInventoryPassword";
 	
 	public const string ONE_SIZE_FITS_ALL_CODE = "OSFA";
 	public const string SANMAR_DISTRIBUTOR_CODE = "SM";

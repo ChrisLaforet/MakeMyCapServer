@@ -197,13 +197,30 @@ if (1 != 0) {
 		fulfillment.Status = shopifyFulfillment.Status;
 		order.FulfillmentOrders.Add(fulfillment);
 		
-		foreach (var lineItem in shopifyFulfillment.LineItems)
+		var poLookup = new Dictionary<string, int>();		// ensures that each distributor reuses the same PO for multiple line items in the same order
+		foreach (var shopifyLineItem in shopifyFulfillment.LineItems)
 		{
-			PrepareAndOrderLineItem(lineItem, fulfillment);
+			var skuMap = productSkuProxy.GetSkuMapFor(shopifyLineItem.Sku);
+			var poSequence = 0;
+			if (skuMap != null)
+			{
+				if (poLookup.ContainsKey(skuMap.DistributorCode))
+				{
+					poSequence = poLookup[skuMap.DistributorCode];
+				}
+				else
+				{
+					poSequence = orderGenerator.GetNextPOSequence();
+					poLookup[skuMap.DistributorCode] = poSequence;
+				}
+				
+				logger.LogInformation($"Using PO {poSequence} for ordering {shopifyLineItem.Quantity} of SKU {shopifyLineItem.Sku} in Shopify Order {fulfillment.OrderId}");
+			}
+			PrepareAndOrderLineItem(shopifyLineItem, fulfillment, poSequence, skuMap);
 		}
 	}
 
-	private void PrepareAndOrderLineItem(LineItem shopifyLineItem, FulfillmentOrder fulfillmentOrder)
+	private void PrepareAndOrderLineItem(LineItem shopifyLineItem, FulfillmentOrder fulfillmentOrder, int poSequence, DistributorSkuMap? skuMap)
 	{
 		var lineItem = new OrderLineItem();
 		lineItem.LineItemId = shopifyLineItem.Id;
@@ -215,20 +232,15 @@ if (1 != 0) {
 		lineItem.Quantity = shopifyLineItem.Quantity;
 		
 		fulfillmentOrder.OrderLineItems.Add(lineItem);
-
-		var match = productSkuProxy.GetSkuMapFor(shopifyLineItem.Sku);
-		if (match == null)
+		
+		if (skuMap == null)
 		{
 			logger.LogError($"Unable to match SKU {shopifyLineItem.Sku} in Shopify Order {fulfillmentOrder.OrderId} for automated ordering");
 			TransmitSkuNotFoundErrorMessage(shopifyLineItem, fulfillmentOrder);
 		}
 		else
 		{
-			var poNumber = orderGenerator.GenerateOrderFor(match, fulfillmentOrder.OrderId, shopifyLineItem.Quantity);
-			if (poNumber != null)
-			{
-				logger.LogInformation($"Generated PO {poNumber} for ordering {shopifyLineItem.Quantity} of SKU {shopifyLineItem.Sku} in Shopify Order {fulfillmentOrder.OrderId}");
-			}
+			orderGenerator.GenerateOrderFor(skuMap, fulfillmentOrder.OrderId, shopifyLineItem.Quantity, poSequence);
 		}
 	}
 	
