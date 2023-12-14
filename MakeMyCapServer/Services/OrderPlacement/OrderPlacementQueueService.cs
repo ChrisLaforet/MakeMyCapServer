@@ -50,7 +50,12 @@ public class OrderPlacementQueueService : IOrderPlacementProcessingService
 	}
 
 	private bool ProcessOrderQueue()
-	{
+	{ 
+//TODO: CML - PREVENTING ORDER PLACEMENT UPDATE needs to be fixed - pending SanMar	
+// if (1 != 0) {		
+// 	logger.LogCritical("PREVENTING ORDER PLACEMENT UPDATE UNTIL ORDER PLACEMENT IS TESTED!");
+// 	return false;
+// }
 		var serviceLog = serviceProxy.CreateServiceLogFor(nameof(OrderPlacementQueueService));
 
 		logger.LogInformation("Checking for queued orders that need sending");

@@ -258,8 +258,15 @@ if (1 != 0) {
 					continue;
 				}
 
-				var inStockInventories = inventoryService.GetInStockInventoryFor(variants.Select(v => v.Sku).ToList());
-				AdjustInventoryLevelsFor(inStockInventories, variants);
+				try
+				{
+					var inStockInventories = inventoryService.GetInStockInventoryFor(variants.Select(v => v.Sku).ToList());
+					AdjustInventoryLevelsFor(inStockInventories, variants);
+				}
+				catch (Exception ex)
+				{
+					logger.LogError($"Caught exception attempting to get levels for variant Skus in Shopify Product Id {variants[0].ProductId}");
+				}
 			}
 		}
 	}
