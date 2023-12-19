@@ -39,6 +39,8 @@ public partial class MakeMyCapServerContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
     
+    public virtual DbSet<UserToken> UserTokens { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
     }
@@ -328,6 +330,27 @@ public partial class MakeMyCapServerContext : DbContext
                 .IsUnicode(false);
         });
 
+        modelBuilder.Entity<UserToken>(entity =>
+        {
+            entity.ToTable("UserToken");
+
+            entity.Property(e => e.Id)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("ID");
+            entity.Property(e => e.TokenKey)
+                .HasMaxLength(255)
+                .IsUnicode(false);
+            entity.Property(e => e.UserId)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("UserID");
+
+            entity.HasOne(d => d.User).WithMany(p => p.UserTokens)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("FK_UserToken_User");
+        });
+        
         OnModelCreatingPartial(modelBuilder);
     }
 

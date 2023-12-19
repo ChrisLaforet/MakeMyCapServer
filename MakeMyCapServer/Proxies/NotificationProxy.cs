@@ -27,7 +27,7 @@ public class NotificationProxy : INotificationProxy
 				throw new RecipientsNotConfiguredException("Warning Notification Email Recipients are not configured!");
 			}
 			
-			emailQueueService.Add(recipients, subject, body.ToString());
+			emailQueueService.Add(recipients, subject, body);
 		}
 		catch (Exception ex)
 		{
@@ -47,11 +47,27 @@ public class NotificationProxy : INotificationProxy
 				throw new RecipientsNotConfiguredException("Critical Notification Email Recipients are not configured!");
 			}
 			
-			emailQueueService.Add(recipients, subject, body.ToString());
+			emailQueueService.Add(recipients, subject, body);
 		}
 		catch (Exception ex)
 		{
 			logger.LogCritical($"Error transmitting Critical Notification {subject} because of {ex}");
+			throw new NotificationNotSentException(ex);
+		}
+	}
+	
+	public void SendNotificationToSingleRecipient(string recipient, string subject, string body, string sender = null)
+	{
+		try
+		{
+			var recipients = new List<string>();
+			recipients.Add(recipient);
+			
+			emailQueueService.Add(recipients, subject, body);
+		}
+		catch (Exception ex)
+		{
+			logger.LogCritical($"Error transmitting Warning Notification {subject} because of {ex}");
 			throw new NotificationNotSentException(ex);
 		}
 	}

@@ -1,37 +1,37 @@
 ﻿using System.Security.Authentication;
 using System.Security.Cryptography;
 using System.Text;
-
+using ChurchMiceServer.Security.Auth;
+using MakeMyCapServer.Configuration;
+using MakeMyCapServer.Model;
+using MakeMyCapServer.Security.JWT;
+using Microsoft.IdentityModel.Tokens;
 
 namespace MakeMyCapServer.Proxies;
 
 public class UserProxy : IUserProxy
 {
     public readonly TimeSpan TOKEN_LIFETIME_TIMESPAN = new TimeSpan(1, 0, 0);
-
-    private readonly IRepositoryContext context;
+    
+    private readonly MakeMyCapServerContext context;
     private readonly PasswordProcessor passwordProcessor;
     private readonly string emailSender;
-    private readonly IEmailProxy emailProxy;
-    private readonly IConfigurationProxy configurationProxy;
+    private readonly INotificationProxy notificationProxy;
     
-    public UserProxy(IRepositoryContext context,
-                IEmailProxy emailProxy,
-                IConfigurationProxy configurationProxy,
+    public UserProxy(MakeMyCapServerContext context,
+                INotificationProxy notificationProxy,
                 IConfigurationLoader configurationLoader)
     {
         this.context = context;
-        this.emailProxy = emailProxy;
-        this.configurationProxy = configurationProxy;
-        this.emailSender = configurationLoader.GetKeyValueFor(IEmailSenderService.SMTP_SENDER);
+        this.notificationProxy = notificationProxy;
         this.passwordProcessor = new PasswordProcessor(configurationLoader);
     }
 
-    public User? GetUserByGuid(Guid guid) => GetUserById(UserId.From(guid.ToString()));
+    public User? GetUserByGuid(Guid guid) => GetUserById(guid.ToString());
 
-    public User? GetUserById(UserId id)
+    public User? GetUserById(string id)
     {
-        return context.Users.Find(id.Id);
+        return context.Users.Find(id);
     }
 
     public User? GetUserByUsername(string username)
@@ -54,17 +54,11 @@ public class UserProxy : IUserProxy
         user.Id = Guid.NewGuid().ToString();
         context.Users.Add(user);
         context.SaveChanges();
-
-        var role = new UserRole();
-        role.RoleLevel = Role.NO_ACCESS_LEVEL;
-        role.UserId = user.Id;
-        context.UserRoles.Add(role);
-        context.SaveChanges();
         
         return user.Id;
     }
 
-    public void UpdateUser(UserId userId, string userName, string fullName, string email)
+    public void UpdateUser(string userId, string userName, string email)
     {
         var user = GetUserById(userId);
         if (user == null)
@@ -72,7 +66,6 @@ public class UserProxy : IUserProxy
             return;
         }
         user.Email = email;
-        user.Fullname = fullName;
         user.Username = userName;
         context.SaveChanges();
     }
@@ -98,32 +91,6 @@ public class UserProxy : IUserProxy
         {
             throw new AuthenticationException();
         }
-
-        UpdateRoleForUser(user);
-    }
-
-    private void UpdateRoleForUser(User user)
-    {
-        var roles = context.UserRoles.Where(role => role.UserId == user.Id);
-        if (!roles.IsNullOrEmpty())
-        {
-            // we will not permit a high role to be overwritten
-            if (roles.FirstOrDefault(role => role.RoleLevel > Role.ATTENDER_LEVEL) != null)
-            {
-                return;
-            }
-            
-            foreach (var role in roles)
-            {
-                context.UserRoles.Remove(role);
-            }
-        }
-        
-        var newRole = new UserRole();
-        newRole.RoleLevel = Role.ATTENDER_LEVEL;
-        newRole.UserId = user.Id;
-        context.UserRoles.Add(newRole);
-        context.SaveChanges();
     }
     
     private string GenerateTokenKey()
@@ -133,30 +100,6 @@ public class UserProxy : IUserProxy
         aes.GenerateIV();
         aes.GenerateKey();
         return System.Convert.ToBase64String(aes.Key);
-    }
-
-    private List<RoleLevelCode> GetRolesFor(User user)
-    {
-        var possibleRoleLevels = context.UserRoles.Where(role => role.UserId == user.Id).Select(role => role.RoleLevel);
-        var roleLevels = new HashSet<int>();
-        if (!possibleRoleLevels.IsNullOrEmpty())
-        {
-            roleLevels = possibleRoleLevels.ToHashSet();
-        }
-
-        var roles = new List<RoleLevelCode>();
-        
-        if (!roleLevels.Any() || roleLevels.Max() <= Role.GetNoAccess().Level)
-        {
-            roles.Add(RoleLevelCode.From(Role.GetNoAccess().Code));
-        }
-        
-        foreach (var role in Roles.GetAllRolesWithinLevel(roleLevels.Max()))
-        {
-            roles.Add(RoleLevelCode.From(role.Code));
-        }
-
-        return roles;
     }
 
     private JsonWebToken CreateJWTFor(User user)
@@ -175,7 +118,7 @@ public class UserProxy : IUserProxy
         return JsonWebToken.New(userToken.TokenKey, userTokenId,
             user.Username,
             user.Id,
-            GetRolesFor(user).Select(roleLevelCode => roleLevelCode.Code).ToList(),
+            new List<string>(),
             userToken.Expired);
     }
 
@@ -254,7 +197,7 @@ public class UserProxy : IUserProxy
         context.SaveChanges();
     }
 
-    public void SetPasswordFor(UserId userId, string password)
+    public void SetPasswordFor(string userId, string password)
     {
         var user = GetUserById(userId);
         if (user == null)
@@ -297,21 +240,17 @@ public class UserProxy : IUserProxy
         context.Users.Update(user);
 
         var contents = new StringBuilder();
-        contents.Append("A password request for ChurchMice software");
-        if (!string.IsNullOrEmpty(configurationProxy.GetMinistryName()))
-        {
-            contents.Append($" for {configurationProxy.GetMinistryName()}");
-        }
+        contents.Append("A password request for MakeMyCapServer software");
         contents.Append(" has been created.  If you did not request this, you do not have to do anything.\r\nHowever, if you did, follow the link below.");
         contents.Append("\r\n\r\nYour login username is: ");
         contents.Append(user.Username);
         contents.Append("\r\n\r\nGo to the following link to Change Password: ");
-        contents.Append($"{configurationProxy.GetBaseUrl()}/changePassword");
+        contents.Append("Your normal server path + /changePassword");
         contents.Append("\r\n\r\nUse the following for the ResetKey: ");
         contents.Append(resetKey);
         contents.Append("\r\n");
 
-        emailProxy.SendMessageTo(user.Email, emailSender, "Password change requested", contents.ToString());
+        notificationProxy.SendNotificationToSingleRecipient(user.Email, "Password change requested", contents.ToString());
         context.SaveChanges();
     }
 
@@ -362,48 +301,5 @@ public class UserProxy : IUserProxy
         }
 
         context.SaveChanges();
-    }
-
-    public RoleLevelCode[] GetUserRoles(JsonWebToken token)
-    {
-        return token.GetRoles().Select(roleCode => RoleLevelCode.From(roleCode)).ToArray();
-    }
-
-    public RoleLevelCode GetAssignedRoleLevelCodeFor(UserId userId)
-    {
-        var roleLevelCode = RoleLevelCode.From(Role.GetNoAccess().Code);
-
-        var userRole = context.UserRoles.Where(role => role.UserId == userId.Id).FirstOrDefault();
-        if (userRole != null)
-        {
-            var role = Roles.GetRoleByLevel(userRole.RoleLevel);
-            roleLevelCode = RoleLevelCode.From(role.Code);
-        }
-
-        return roleLevelCode;
-    }
-
-    public bool AssignRoleTo(UserId userId, RoleLevelCode roleLevelCode)
-    {
-        var desiredRole = Roles.GetRoleByLevelCode(roleLevelCode);
-        if (desiredRole == null)
-        {
-            return false;
-        }
-
-        var role = context.UserRoles.Where(role => role.UserId == userId.Id).FirstOrDefault();
-        if (role == null)
-        {
-            role = new UserRole();
-            role.RoleLevel = desiredRole.Level;
-            role.UserId = userId;
-            context.UserRoles.Add(role);
-        }
-        else
-        {
-            role.RoleLevel = desiredRole.Level;
-        }
-        context.SaveChanges();
-        return true;
     }
 }

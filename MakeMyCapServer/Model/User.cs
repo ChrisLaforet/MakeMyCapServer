@@ -15,4 +15,6 @@ public partial class User
 	public string? ResetKey { get; set; }
 
 	public DateTime? ResetExpirationDatetime { get; set; }
+	
+	public virtual ICollection<UserToken> UserTokens { get; set; } = new List<UserToken>();
 }

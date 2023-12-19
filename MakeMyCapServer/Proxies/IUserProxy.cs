@@ -1,6 +1,5 @@
-﻿
-using MakeMyCapServer.Model;
-using Microsoft.IdentityModel.JsonWebTokens;
+﻿using MakeMyCapServer.Model;
+using MakeMyCapServer.Security.JWT;
 
 namespace MakeMyCapServer.Proxies;
 

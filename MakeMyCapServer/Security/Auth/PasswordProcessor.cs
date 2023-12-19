@@ -1,5 +1,6 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
+using MakeMyCapServer.Configuration;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 
 namespace ChurchMiceServer.Security.Auth;

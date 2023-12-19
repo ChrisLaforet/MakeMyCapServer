@@ -4,7 +4,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 
-namespace ChurchMiceServer.Security.JWT
+namespace MakeMyCapServer.Security.JWT
 {
     public class JsonWebToken
     {
