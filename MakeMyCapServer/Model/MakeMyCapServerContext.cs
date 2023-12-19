@@ -37,6 +37,8 @@ public partial class MakeMyCapServerContext : DbContext
 
     public virtual DbSet<Shipping> Shippings { get; set; }
 
+    public virtual DbSet<User> Users { get; set; }
+    
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
     }
@@ -296,6 +298,33 @@ public partial class MakeMyCapServerContext : DbContext
                 .IsUnicode(false);
             entity.Property(e => e.ShipZip)
                 .HasMaxLength(10)
+                .IsUnicode(false);
+        });
+        
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.ToTable("User");
+
+            entity.HasIndex(e => e.Username, "IX_User").IsUnique();
+
+            entity.Property(e => e.Id)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasDefaultValueSql("(newid())")
+                .HasColumnName("ID");
+            entity.Property(e => e.CreateDate).HasColumnType("date");
+            entity.Property(e => e.Email)
+                .HasMaxLength(100)
+                .IsUnicode(false);
+            entity.Property(e => e.PasswordHash)
+                .HasMaxLength(1000)
+                .IsUnicode(false);
+            entity.Property(e => e.ResetExpirationDatetime).HasColumnType("datetime");
+            entity.Property(e => e.ResetKey)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.Username)
+                .HasMaxLength(20)
                 .IsUnicode(false);
         });
 

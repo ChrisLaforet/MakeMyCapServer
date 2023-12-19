@@ -29,4 +29,11 @@
     <_ContentIncludedByDefault Remove="Views\Shopify\Index.cshtml" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="CQS\CommandHandler\" />
+    <Folder Include="CQS\Command\" />
+    <Folder Include="CQS\QueryHandler\" />
+    <Folder Include="CQS\Query\" />
+  </ItemGroup>
+
 </Project>
