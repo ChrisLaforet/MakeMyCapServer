@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using MakeMyCapServer.Configuration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 
@@ -8,6 +9,7 @@ namespace MakeMyCapServer.Security;
 public class ValidateClientMiddleware
 {
 	private const string APIKEY_HEADER_KEY = "apikey";
+	private const string APIKEY_STRING_KEY = "Apikey";
 
 	private readonly RequestDelegate next;
 	private readonly string apikey;
@@ -15,7 +17,7 @@ public class ValidateClientMiddleware
 	public ValidateClientMiddleware(RequestDelegate next, IConfigurationLoader configurationLoader)
 	{
 		this.next = next;
-		apikey = configurationLoader.GetKeyValueFor(Startup.APIKEY_STRING_KEY);
+		apikey = configurationLoader.GetKeyValueFor(APIKEY_STRING_KEY);
 	}
 
 	public async Task InvokeAsync(HttpContext context)

@@ -1,5 +1,6 @@
 ﻿using System.Security.Authentication;
 using System.Security.Principal;
+using MakeMyCapServer.Proxies;
 using MakeMyCapServer.Security.JWT;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.IdentityModel.Tokens;

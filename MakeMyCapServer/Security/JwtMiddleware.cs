@@ -1,3 +1,5 @@
+using MakeMyCapServer.Configuration;
+using MakeMyCapServer.Proxies;
 using MakeMyCapServer.Security.JWT;
 
 namespace MakeMyCapServer.Security;

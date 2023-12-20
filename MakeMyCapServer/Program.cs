@@ -4,6 +4,7 @@ using MakeMyCapServer.Distributors;
 using MakeMyCapServer.Distributors.PurchaseOrder;
 using MakeMyCapServer.Lookup;
 using MakeMyCapServer.Proxies;
+using MakeMyCapServer.Security;
 using MakeMyCapServer.Services.Email;
 using MakeMyCapServer.Services.Fulfillment;
 using MakeMyCapServer.Services.Inventory;
@@ -56,9 +57,10 @@ builder.Services.AddScoped<IUserProxy, UserProxy>();
 
 builder.Services.AddScoped<IStatusNotificationService, StatusNotificationService>();
 
-builder.Services.AddHostedService<InventoryScopedBackgroundService>();
-builder.Services.AddHostedService<FulfillmentScopedBackgroundService>();
-builder.Services.AddHostedService<OrderPlacementScopedBackgroundService>();
+// TODO: CML - Turn these services back on after testing/developing web interface
+// builder.Services.AddHostedService<InventoryScopedBackgroundService>();
+// builder.Services.AddHostedService<FulfillmentScopedBackgroundService>();
+// builder.Services.AddHostedService<OrderPlacementScopedBackgroundService>();
 builder.Services.AddHostedService<EmailSendingScopedBackgroundService>();
 
 builder.Services.AddHttpClient();
@@ -86,7 +88,10 @@ app.UseRouting();
 
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
+app.UseMiddleware<JwtMiddleware>();
+
+//app.UseAuthorization();
+//app.UseValidateClient();
 
 app.MapControllerRoute(
 	name: "default",

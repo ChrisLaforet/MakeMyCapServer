@@ -1,9 +1,9 @@
 ﻿using System.Security.Authentication;
 using System.Security.Cryptography;
 using System.Text;
-using ChurchMiceServer.Security.Auth;
 using MakeMyCapServer.Configuration;
 using MakeMyCapServer.Model;
+using MakeMyCapServer.Security.Auth;
 using MakeMyCapServer.Security.JWT;
 using Microsoft.IdentityModel.Tokens;
 
@@ -69,7 +69,6 @@ public class UserProxy : IUserProxy
         user.Username = userName;
         context.SaveChanges();
     }
-
 
     public JsonWebToken AuthenticateUser(string username, string password)
     {

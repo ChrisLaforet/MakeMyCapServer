@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ChurchMiceServer.Security.JWT
+namespace MakeMyCapServer.Security.JWT
 {
 	public class JWTDecodeException : Exception
 	{

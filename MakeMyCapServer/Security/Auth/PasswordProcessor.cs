@@ -3,13 +3,13 @@ using System.Text;
 using MakeMyCapServer.Configuration;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 
-namespace ChurchMiceServer.Security.Auth;
+namespace MakeMyCapServer.Security.Auth;
 
 public class PasswordProcessor
 {
-	const int ITERATIONS = 512;
-	const string SALT = "NTE2NTUzNjg1NjZENTk3MQ==";
-	const string NONCE = "lHGIbF86JHusugvSUUq10--877hshvGYjgsdmNNwdvjcZz029";
+	private const string SALT_STRING_KEY = "Salt";
+	private const string NONCE_STRING_KEY = "Nonce";
+	private const string KEYITERATIONS_VALUE_KEY = "KeyIterations";
 
 	private readonly string salt;
 	private readonly string nonce;
@@ -17,9 +17,9 @@ public class PasswordProcessor
 
 	public PasswordProcessor(IConfigurationLoader configurationLoader)
 	{
-		this.salt = configurationLoader.GetKeyValueFor(Startup.SALT_STRING_KEY);
-		this.nonce = configurationLoader.GetKeyValueFor(Startup.NONCE_STRING_KEY);
-		this.keyIterations = int.Parse(configurationLoader.GetKeyValueFor(Startup.KEYITERATIONS_VALUE_KEY));
+		this.salt = configurationLoader.GetKeyValueFor(SALT_STRING_KEY);
+		this.nonce = configurationLoader.GetKeyValueFor(NONCE_STRING_KEY);
+		this.keyIterations = int.Parse(configurationLoader.GetKeyValueFor(KEYITERATIONS_VALUE_KEY));
 	}
 
 	public PasswordProcessor(string salt, string nonce, int keyIterations)
@@ -40,7 +40,7 @@ public class PasswordProcessor
 			//System.Convert.FromBase64String(salt),
 			Encoding.UTF8.GetBytes(this.salt),
 			prf: KeyDerivationPrf.HMACSHA512,
-			iterationCount: ITERATIONS,
+			iterationCount: keyIterations,
 			numBytesRequested: 128 / 8);
 
 		return System.Convert.ToBase64String(key);
