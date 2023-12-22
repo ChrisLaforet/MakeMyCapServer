@@ -6,8 +6,6 @@ public partial class UserToken
 
 	public string UserId { get; set; } = null!;
 
-	public string TokenKey { get; set; } = null!;
-
 	public DateTime Created { get; set; }
 
 	public DateTime Expired { get; set; }

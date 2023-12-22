@@ -308,7 +308,9 @@ public partial class MakeMyCapServerContext : DbContext
             entity.ToTable("User");
 
             entity.HasIndex(e => e.Username, "IX_User").IsUnique();
-
+            
+            entity.HasIndex(e => e.Email, "IX_User_1").IsUnique();
+            
             entity.Property(e => e.Id)
                 .HasMaxLength(50)
                 .IsUnicode(false)
@@ -338,9 +340,7 @@ public partial class MakeMyCapServerContext : DbContext
                 .HasMaxLength(50)
                 .IsUnicode(false)
                 .HasColumnName("ID");
-            entity.Property(e => e.TokenKey)
-                .HasMaxLength(255)
-                .IsUnicode(false);
+
             entity.Property(e => e.UserId)
                 .HasMaxLength(50)
                 .IsUnicode(false)

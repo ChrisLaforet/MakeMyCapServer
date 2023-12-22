@@ -3,8 +3,9 @@ using System.Security.Cryptography;
 using System.Text;
 using MakeMyCapServer.Configuration;
 using MakeMyCapServer.Model;
+using MakeMyCapServer.Models;
+using MakeMyCapServer.Proxies.Exceptions;
 using MakeMyCapServer.Security.Auth;
-using MakeMyCapServer.Security.JWT;
 using Microsoft.IdentityModel.Tokens;
 
 namespace MakeMyCapServer.Proxies;
@@ -36,12 +37,12 @@ public class UserProxy : IUserProxy
 
     public User? GetUserByUsername(string username)
     {
-        return context.Users.FirstOrDefault(user => user.Username == username);
+        return context.Users.FirstOrDefault(user => user.Username.ToLower().Equals(username.ToLower()));
     }
 
-    public IList<User> GetUsersByEmail(string email)
+    public User? GetUserByEmail(string email)
     {
-        return context.Users.Where(user => user.Email != null && user.Email.ToLower().Equals(email.ToLower())).ToList();
+        return context.Users.FirstOrDefault(user => user.Email.ToLower().Equals(email.ToLower()));
     }
 
     public IList<User> GetUsers()
@@ -70,7 +71,7 @@ public class UserProxy : IUserProxy
         context.SaveChanges();
     }
 
-    public JsonWebToken AuthenticateUser(string username, string password)
+    public AuthenticatedUser AuthenticateUser(string username, string password)
     {
         var passwordHash = passwordProcessor.HashPassword(password);
         var user = GetUserByUsername(username);
@@ -79,7 +80,9 @@ public class UserProxy : IUserProxy
             throw new AuthenticationException();
         }
 
-        return CreateJWTFor(user);
+        var token = UpdateOrCreateUserToken(user);
+
+        return new AuthenticatedUser(user.Username, user.Email, token);
     }
 
     public void ValidateEmailForUser(string username, string password)
@@ -91,34 +94,40 @@ public class UserProxy : IUserProxy
             throw new AuthenticationException();
         }
     }
-    
-    private string GenerateTokenKey()
+
+    private string UpdateOrCreateUserToken(User user)
     {
-        var aes = Aes.Create();
-        aes.KeySize = 256;
-        aes.GenerateIV();
-        aes.GenerateKey();
-        return System.Convert.ToBase64String(aes.Key);
+        var userToken = context.UserTokens.FirstOrDefault(userToken => userToken.User == user);
+        if (userToken != null)
+        {
+            if (userToken.Expired <= DateTime.Now)
+            {
+                context.UserTokens.Remove(userToken);
+                context.SaveChanges();
+            }
+            else
+            {
+                userToken.Expired = DateTime.Now.Add(TOKEN_LIFETIME_TIMESPAN);
+                context.SaveChanges();
+                return userToken.Id;
+            }
+        }
+        return CreateUserToken(user);
     }
 
-    private JsonWebToken CreateJWTFor(User user)
+    private string CreateUserToken(User user)
     {
         var userTokenId = Guid.NewGuid(); // jwt serial
 
         var userToken = new UserToken();
         userToken.Id = userTokenId.ToString();
         userToken.UserId = user.Id;
-        userToken.TokenKey = GenerateTokenKey();
         userToken.Created = DateTime.Now;
         userToken.Expired = userToken.Created.Add(TOKEN_LIFETIME_TIMESPAN);
         context.UserTokens.Add(userToken);
         context.SaveChanges();
 
-        return JsonWebToken.New(userToken.TokenKey, userTokenId,
-            user.Username,
-            user.Id,
-            new List<string>(),
-            userToken.Expired);
+        return userToken.Id;
     }
 
     public void ExpireUserTokens()
@@ -131,44 +140,20 @@ public class UserProxy : IUserProxy
         context.SaveChanges();
     }
 
-    public void DestroyUserToken(JsonWebToken token)
+    public UserToken? ValidateUserToken(string token)
     {
-        var userToken = context.UserTokens.Find(token.Serial);
+        ExpireUserTokens();
+        var userToken = context.UserTokens.Find(token);
         if (userToken != null)
         {
-            try
-            {
-                token.AssertTokenIsValid(userToken.TokenKey);
-                context.Remove(userToken);
-                context.SaveChanges();
-            }
-            catch (Exception)
-            {
-                // do nothing since token is not valid
-            }
-        }
-    }
-
-    public bool ValidateUserToken(JsonWebToken token)
-    {
-        var userToken = context.UserTokens.Find(token.Serial);
-        if (userToken != null)
-        {
-            try
-            {
-                token.AssertTokenIsValid(userToken.TokenKey);
-                token.AssertTokenIsExpired();
-                return true;
-            }
-            catch (Exception)
-            {
-                // do nothing but pass through to false
-            }
+            userToken.Expired = DateTime.Now.Add(TOKEN_LIFETIME_TIMESPAN);
+            context.SaveChanges();
         }
 
-        return false;
+        return userToken;
     }
 
+    
     public void SetPasswordFor(string username, string resetKey, string password)
     {
         var user = GetUserByUsername(username);
@@ -224,14 +209,14 @@ public class UserProxy : IUserProxy
         return passwordProcessor.HashPassword(password);
     }
 
-    public void ChangePasswordFor(string username)
+    public void ChangePasswordFor(string email)
     {
         var resetKey = GenerateResetKey();
 
-        var user = GetUserByUsername(username);
+        var user = GetUserByEmail(email);
         if (user == null)
         {
-            return;
+            throw new UserNotFoundException($"No user with Email of {email}");
         }
 
         user.ResetKey = resetKey;
@@ -244,7 +229,7 @@ public class UserProxy : IUserProxy
         contents.Append("\r\n\r\nYour login username is: ");
         contents.Append(user.Username);
         contents.Append("\r\n\r\nGo to the following link to Change Password: ");
-        contents.Append("Your normal server path + /changePassword");
+        contents.Append("Your normal server path + /Login/ChangePassword or follow the link at the bottom of the Login page.");
         contents.Append("\r\n\r\nUse the following for the ResetKey: ");
         contents.Append(resetKey);
         contents.Append("\r\n");

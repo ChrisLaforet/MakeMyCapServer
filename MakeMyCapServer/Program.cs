@@ -1,5 +1,6 @@
 using MakeMyCapServer.Model;
 using MakeMyCapServer.Configuration;
+using MakeMyCapServer.Controllers;
 using MakeMyCapServer.Distributors;
 using MakeMyCapServer.Distributors.PurchaseOrder;
 using MakeMyCapServer.Lookup;
@@ -70,6 +71,14 @@ builder.Services.AddSingleton<ShopifyWebhookService>();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+builder.Services
+	.AddAuthentication(LoginController.COOKIE_NAME)
+	.AddCookie(LoginController.COOKIE_NAME, options =>
+	{
+		options.Cookie.Name = LoginController.COOKIE_NAME;
+		options.LoginPath = "/Login";
+	});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -88,10 +97,9 @@ app.UseRouting();
 
 app.UseHttpsRedirection();
 
-app.UseMiddleware<JwtMiddleware>();
-
-//app.UseAuthorization();
-//app.UseValidateClient();
+app.UseAuthentication();
+app.UseMiddleware<TokenValidationMiddleware>();
+app.UseAuthorization();
 
 app.MapControllerRoute(
 	name: "default",

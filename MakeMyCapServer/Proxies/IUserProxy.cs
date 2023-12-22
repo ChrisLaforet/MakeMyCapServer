@@ -1,5 +1,5 @@
 ﻿using MakeMyCapServer.Model;
-using MakeMyCapServer.Security.JWT;
+using MakeMyCapServer.Models;
 
 namespace MakeMyCapServer.Proxies;
 
@@ -8,8 +8,9 @@ public interface IUserProxy
 	User? GetUserById(string id);
 	User? GetUserByGuid(Guid guid);
 	User? GetUserByUsername(string username);
+	User? GetUserByEmail(string email);
 	IList<User> GetUsers();
-	JsonWebToken AuthenticateUser(string username, string password);
+	AuthenticatedUser AuthenticateUser(string username, string password);
 	string CreateUser(User user);
 	void ValidateEmailForUser(string username, string password);
 	void UpdateUser(string userId, string userName, string email);
@@ -21,6 +22,5 @@ public interface IUserProxy
 	void LogoutUser(string username);
 	
 	void ExpireUserTokens();
-	void DestroyUserToken(JsonWebToken token);
-	bool ValidateUserToken(JsonWebToken token);
-	}
+	UserToken? ValidateUserToken(string token);
+}
