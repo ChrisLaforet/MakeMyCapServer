@@ -46,4 +46,23 @@ public class ProductSkuProxy : IProductSkuProxy
 	{
 		return context.DistributorSkuMaps.FirstOrDefault(map => map.Sku.ToUpper() == sku.ToUpper());
 	}
+
+	public DistributorSkuMap CreateSkuMap(string sku, string distributorCode, string? distributorSku, string? brand, 
+											string styleCode, string? partId, string? color, string? colorCode, string? sizeCode)
+	{
+		var map = new DistributorSkuMap();
+		map.Sku = sku;
+		map.DistributorCode = distributorCode;
+		map.DistributorSku = distributorSku;
+		map.Brand = brand;
+		map.StyleCode = styleCode;
+		map.PartId = partId;
+		map.Color = color;
+		map.ColorCode = colorCode;
+		map.SizeCode = sizeCode;
+
+		context.DistributorSkuMaps.Add(map);
+		context.SaveChanges();
+		return map;
+	}
 }

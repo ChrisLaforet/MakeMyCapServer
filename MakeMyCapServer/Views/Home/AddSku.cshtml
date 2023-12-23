@@ -1,6 +1,115 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model MakeMyCapServer.Controllers.Model.CreateSku;
+
+@{
     ViewData["Title"] = "Add Sku";
 }
 <h1>@ViewData["Title"]</h1>
 
-<p>Use this page to add Sku.</p>
+<div class="container border" style="padding: 20px;">
+	<form method="post" action="/home/CreateSku">
+	    <div asp-validation-summary="ModelOnly" class="alert-danger"></div>
+
+		<div class="form-group row" style="padding: 10px;">
+			<div class="col-2">
+				<label asp-for="Sku" class="control-label"></label>
+			</div>
+			<div class="col-6">
+				<input type="text" asp-for="Sku" class="form-control"/>
+				<input type="text" hidden="true" id="DistributorCode" />
+			</div>
+		</div>
+
+		<div class="form-group row" style="padding: 10px;">
+			<div class="col-2">
+				<label asp-for="Sku" class="control-label"></label>
+			</div>
+			<div class="col-6">
+				<input type="text" asp-for="Sku" class="form-control"/>
+				<span class="text-danger field-validation-valid" asp-validation-for="Sku"></span>
+			</div>
+		</div>
+		
+		<div class="form-group row" style="padding: 10px;">
+			<div class="col-2">
+				<label asp-for="DistributorSku" class="control-label"></label>
+			</div>
+			<div class="col-6">
+				<input type="text" asp-for="DistributorSku" class="form-control"/>
+				<span class="text-danger field-validation-valid" asp-validation-for="DistributorSku"></span>
+			</div>
+		</div>
+		
+		<div class="form-group row" style="padding: 10px;">
+        	<div class="col-2">
+        		<label asp-for="Brand" class="control-label"></label>
+        	</div>
+        	<div class="col-6">
+        		<input type="text" asp-for="Brand" class="form-control"/>
+        		<span class="text-danger field-validation-valid" asp-validation-for="Brand"></span>
+        	</div>
+		</div>		
+		
+		<div class="form-group row" style="padding: 10px;">
+			<div class="col-2">
+				<label asp-for="StyleCode" class="control-label"></label>
+			</div>
+			<div class="col-6">
+				<input type="text" asp-for="StyleCode" class="form-control"/>
+				<span class="text-danger field-validation-valid" asp-validation-for="StyleCode"></span>
+			</div>
+		</div>
+		
+		<div class="form-group row" style="padding: 10px;">
+			<div class="col-2">
+				<label asp-for="PartId" class="control-label"></label>
+			</div>
+			<div class="col-6">
+				<input type="text" asp-for="PartId" class="form-control"/>
+				<span class="text-danger field-validation-valid" asp-validation-for="PartId"></span>
+			</div>
+		</div>
+		
+		<div class="form-group row" style="padding: 10px;">
+			<div class="col-2">
+				<label asp-for="Color" class="control-label"></label>
+			</div>
+			<div class="col-6">
+				<input type="text" asp-for="Color" class="form-control"/>
+				<span class="text-danger field-validation-valid" asp-validation-for="Color"></span>
+			</div>
+		</div>
+		
+		<div class="form-group row" style="padding: 10px;">
+			<div class="col-2">
+				<label asp-for="ColorCode" class="control-label"></label>
+			</div>
+			<div class="col-6">
+				<input type="text" asp-for="ColorCode" class="form-control"/>
+				<span class="text-danger field-validation-valid" asp-validation-for="ColorCode"></span>
+			</div>
+		</div>
+		
+		<div class="form-group row" style="padding: 10px;">
+			<div class="col-2">
+				<label asp-for="SizeCode" class="control-label"></label>
+			</div>
+			<div class="col-6">
+				<input type="text" asp-for="SizeCode" class="form-control"/>
+				<span class="text-danger field-validation-valid" asp-validation-for="SizeCode"></span>
+			</div>
+		</div>
+		
+		<div class="form-group row" style="padding: 10px;">
+			<div class="col-2">
+			</div>
+			<div class="col-6">
+				<button type="submit" class="btn btn-primary">Create Sku</button>
+			</div>
+		</div>
+	</form>
+</div>
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+}

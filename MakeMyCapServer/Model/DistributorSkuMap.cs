@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
+﻿
 namespace MakeMyCapServer.Model;
 
 public partial class DistributorSkuMap
