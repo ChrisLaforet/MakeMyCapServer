@@ -109,6 +109,11 @@ public class ServiceProxy : IServiceProxy
 		}
 	}
 
+	public List<ServiceLog> GetLastServiceLogsFor(string serviceName, int number = 3)
+	{
+		return context.ServiceLogs.Where(log => log.ServiceName == serviceName).OrderByDescending(log => log.StartTime).Take(number).ToList();
+	}
+
 	public int GetNextPoNumberSequence()
 	{
 		var setting = context.Settings.FirstOrDefault();
