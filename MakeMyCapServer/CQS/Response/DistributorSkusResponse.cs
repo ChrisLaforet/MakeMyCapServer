@@ -4,9 +4,9 @@ public class DistributorSkusResponse
 {
 	public string DistributorName { get; }
 	public string DistributorCode { get; }
-	public List<AssignedSku> Skus { get; }
+	public List<AssignedSkuResponse> Skus { get; }
 
-	public DistributorSkusResponse(string distributorName, string distributorCode, List<AssignedSku> skus)
+	public DistributorSkusResponse(string distributorName, string distributorCode, List<AssignedSkuResponse> skus)
 	{
 		DistributorName = distributorName;
 		DistributorCode = distributorCode;

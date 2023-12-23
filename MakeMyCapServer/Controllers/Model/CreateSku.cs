@@ -6,7 +6,7 @@ namespace MakeMyCapServer.Controllers.Model;
 
 public class CreateSku
 {
-	private List<DistributorResponse> Distributors { get; set; }
+	public List<DistributorResponse>? Distributors { get; set; }
 	
 	[Required] 
 	[DisplayName("MMC Sku")]
@@ -14,6 +14,7 @@ public class CreateSku
 	public string Sku { get; set; }
 
 	[Required]
+	[DisplayName("Distributor")]
 	[MaxLength(5)]
 	public string DistributorCode { get; set; }
 

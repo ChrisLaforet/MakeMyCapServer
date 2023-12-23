@@ -23,14 +23,14 @@ public class DistributorSkusQueryHandler : IQueryHandler<DistributorSkusQuery, D
 		if (distributor == null)
 		{
 			logger.LogInformation($"Request for skus for non-existent distributor code {query.DistributorCode}");
-			return new DistributorSkusResponse("", query.DistributorCode, new List<AssignedSku>());
+			return new DistributorSkusResponse("", query.DistributorCode, new List<AssignedSkuResponse>());
 		}
 		
 		var maps = productSkuProxy.GetSkuMapsFor(query.DistributorCode);
-		var assignedSkus = new List<AssignedSku>();
+		var assignedSkus = new List<AssignedSkuResponse>();
 		foreach (var map in maps)
 		{
-			assignedSkus.Add(new AssignedSku(map));
+			assignedSkus.Add(new AssignedSkuResponse(map));
 		}
 		
 		return new DistributorSkusResponse(distributor.Name, distributor.LookupCode, assignedSkus);

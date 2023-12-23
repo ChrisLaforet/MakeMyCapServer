@@ -18,9 +18,13 @@ public class HomeController : Controller
 {
 	private readonly ServiceStatusQueryHandler ServiceStatusQueryHandler;
 	private readonly SettingsQueryHandler SettingsQueryHandler;
-	private readonly ChangeSettingsCommandHandler ChangeSettingsCommandHandler;
 	private readonly DistributorsQueryHandler DistributorsQueryHandler;
 	private readonly DistributorSkusQueryHandler DistributorSkusQueryHandler;
+	private readonly SkuQueryHandler SkuQueryHandler;
+	
+	private readonly ChangeSettingsCommandHandler ChangeSettingsCommandHandler;
+	private readonly CreateSkuCommandHandler CreateSkuCommandHandler;
+
 	private readonly ILogger<HomeController> _logger;
 
 	public HomeController(IServiceProvider? serviceProvider, ILogger<HomeController> logger)
@@ -31,8 +35,10 @@ public class HomeController : Controller
 		SettingsQueryHandler = ActivatorUtilities.CreateInstance<SettingsQueryHandler>(serviceProvider);
 		DistributorSkusQueryHandler = ActivatorUtilities.CreateInstance<DistributorSkusQueryHandler>(serviceProvider);
 		DistributorsQueryHandler = ActivatorUtilities.CreateInstance<DistributorsQueryHandler>(serviceProvider);
+		SkuQueryHandler = ActivatorUtilities.CreateInstance<SkuQueryHandler>(serviceProvider);
 
 		ChangeSettingsCommandHandler = ActivatorUtilities.CreateInstance<ChangeSettingsCommandHandler>(serviceProvider);
+		CreateSkuCommandHandler = ActivatorUtilities.CreateInstance<CreateSkuCommandHandler>(serviceProvider);
 	}
 
 	[Authorize]
@@ -101,7 +107,39 @@ public class HomeController : Controller
 	[Authorize]
 	public IActionResult AddSku()
 	{
-		return View();
+		var createSku = new CreateSku();
+		createSku.Distributors = DistributorsQueryHandler.Handle(new DistributorsQuery());
+		return View("AddSku", createSku);
+	}
+	
+	[Authorize]
+	[HttpPost]
+	public IActionResult AddSku(CreateSku model)
+	{
+		model.Distributors = DistributorsQueryHandler.Handle(new DistributorsQuery());		 // prepopulate in case we send model back out
+
+		if (!ModelState.IsValid)
+		{
+			return View("AddSku", model);
+		}
+
+		var skuResponse = SkuQueryHandler.Handle(new SkuQuery(model.Sku.Trim()));
+		if (skuResponse != null)
+		{
+			ModelState.AddModelError("Failed", $"There is already an assigned record with SKU {model.Sku} for {skuResponse.DistributorCode}");
+			return View("AddSku", model);
+		}
+
+		try
+		{
+			CreateSkuCommandHandler.Handle(new CreateSkuCommand(model));
+			return RedirectToAction("AddSku", "Home");
+		}
+		catch (Exception)
+		{
+			ModelState.AddModelError("Failed", $"There was an error while creating record with SKU {model.Sku}");
+			return View("AddSku", model);
+		}
 	}
 	
 	[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

@@ -2,7 +2,7 @@
 
 namespace MakeMyCapServer.CQS.Response;
 
-public class AssignedSku
+public class AssignedSkuResponse
 {
 	public string Sku { get; }
 	public string DistributorCode { get; }
@@ -14,7 +14,7 @@ public class AssignedSku
 	public string? ColorCode { get; }
 	public string? SizeCode { get; }
 
-	public AssignedSku(DistributorSkuMap map)
+	public AssignedSkuResponse(DistributorSkuMap map)
 	{
 		Sku = map.Sku;
 		DistributorCode = map.DistributorCode;
