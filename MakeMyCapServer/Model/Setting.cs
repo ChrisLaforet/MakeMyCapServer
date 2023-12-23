@@ -5,6 +5,8 @@ namespace MakeMyCapServer.Model;
 
 public partial class Setting
 {
+    public int Id { get; set; }
+    
     public int InventoryCheckHours { get; set; }
 
     public int FulfillmentCheckHours { get; set; }

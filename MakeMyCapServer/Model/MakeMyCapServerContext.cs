@@ -245,8 +245,7 @@ public partial class MakeMyCapServerContext : DbContext
 
         modelBuilder.Entity<Setting>(entity =>
         {
-            entity.HasNoKey();
-
+            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.CriticalEmailRecipient1)
                 .HasMaxLength(120)
                 .IsUnicode(false);

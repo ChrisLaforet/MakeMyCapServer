@@ -23,6 +23,18 @@ public class ServiceProxy : IServiceProxy
 		}
 		return setting.InventoryCheckHours;
 	}
+	
+	public void UpdateInventoryCheckHours(int hours)
+	{
+		var setting = context.Settings.FirstOrDefault();
+		if (setting == null)
+		{
+			setting = CreateDefaultSetting();
+		}
+
+		setting.InventoryCheckHours = hours;
+		context.SaveChanges();
+	}
 
 	public int? GetFulfillmentCheckHours()
 	{
@@ -32,6 +44,18 @@ public class ServiceProxy : IServiceProxy
 			return null;
 		}
 		return setting.FulfillmentCheckHours;
+	}
+	
+	public void UpdateFulfillmentCheckHours(int hours)
+	{
+		var setting = context.Settings.FirstOrDefault();
+		if (setting == null)
+		{
+			setting = CreateDefaultSetting();
+		}
+
+		setting.FulfillmentCheckHours = hours;
+		context.SaveChanges();
 	}
 
 	public List<string> GetStatusEmailRecipients()
@@ -135,10 +159,21 @@ public class ServiceProxy : IServiceProxy
 		var setting = context.Settings.FirstOrDefault();
 		if (setting == null)
 		{
-			throw new SettingsNotConfiguredException();
+			setting = CreateDefaultSetting();
 		}
 
 		setting.NextPosequence = nextPoNumberSequence;
 		context.SaveChanges();
+	}
+
+	private Setting CreateDefaultSetting()
+	{
+		var setting = new Setting();
+		setting.Id = 1;
+		setting.InventoryCheckHours = 8;
+		setting.FulfillmentCheckHours = 1;
+		setting.NextPosequence = 1;
+		context.Settings.Add(setting);
+		return setting;
 	}
 }

@@ -8,6 +8,8 @@ public interface IOrderingProxy
 
 	Distributor? GetDistributorByCode(string code);
 
+	List<Distributor> GetDistributors();
+
 	void SavePurchaseOrder(PurchaseDistributorOrder purchaseDistributorOrder);
 
 	List<PurchaseDistributorOrder> GetPurchaseOrders();

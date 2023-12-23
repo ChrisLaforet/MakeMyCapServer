@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using MakeMyCapServer.Controllers.Model;
+using MakeMyCapServer.CQS.Command;
+using MakeMyCapServer.CQS.CommandHandler;
 using MakeMyCapServer.CQS.Query;
 using MakeMyCapServer.CQS.QueryHandler;
 using MakeMyCapServer.Services.Email;
@@ -16,13 +18,21 @@ public class HomeController : Controller
 {
 	private readonly ServiceStatusQueryHandler ServiceStatusQueryHandler;
 	private readonly SettingsQueryHandler SettingsQueryHandler;
+	private readonly ChangeSettingsCommandHandler ChangeSettingsCommandHandler;
+	private readonly DistributorsQueryHandler DistributorsQueryHandler;
+	private readonly DistributorSkusQueryHandler DistributorSkusQueryHandler;
 	private readonly ILogger<HomeController> _logger;
 
 	public HomeController(IServiceProvider? serviceProvider, ILogger<HomeController> logger)
 	{
 		_logger = logger;
+		
 		ServiceStatusQueryHandler = ActivatorUtilities.CreateInstance<ServiceStatusQueryHandler>(serviceProvider);
 		SettingsQueryHandler = ActivatorUtilities.CreateInstance<SettingsQueryHandler>(serviceProvider);
+		DistributorSkusQueryHandler = ActivatorUtilities.CreateInstance<DistributorSkusQueryHandler>(serviceProvider);
+		DistributorsQueryHandler = ActivatorUtilities.CreateInstance<DistributorsQueryHandler>(serviceProvider);
+
+		ChangeSettingsCommandHandler = ActivatorUtilities.CreateInstance<ChangeSettingsCommandHandler>(serviceProvider);
 	}
 
 	[Authorize]
@@ -61,7 +71,13 @@ public class HomeController : Controller
 	[HttpPost]
 	public IActionResult Settings(Settings settings)
 	{
-		return View();
+		if (!ModelState.IsValid)
+		{
+			return View("Settings", settings);
+		}
+
+		ChangeSettingsCommandHandler.Handle(new ChangeSettingsCommand(settings.InventoryCheckHours, settings.FulfillmentCheckHours, settings.NextPoSequence));
+		return RedirectToAction("Settings", "Home");
 	}
 	
 	[Authorize]
@@ -70,6 +86,24 @@ public class HomeController : Controller
 		return View();
 	}
 
+	[Authorize]
+	public IActionResult Skus()
+	{
+		return View("skus", DistributorsQueryHandler.Handle(new DistributorsQuery()));
+	}
+
+	[Authorize]
+	public IActionResult DistributorSkus(string id)
+	{
+		return PartialView("DistributorSkus", DistributorSkusQueryHandler.Handle(new DistributorSkusQuery(id)));
+	}
+	
+	[Authorize]
+	public IActionResult AddSku()
+	{
+		return View();
+	}
+	
 	[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
 	public IActionResult Error()
 	{

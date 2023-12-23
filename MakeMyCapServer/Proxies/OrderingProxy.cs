@@ -22,6 +22,12 @@ public class OrderingProxy : IOrderingProxy
 		return context.Distributors.FirstOrDefault(distributor => distributor.LookupCode.ToUpper() == code.ToUpper());
 	}
 
+	public List<Distributor> GetDistributors()
+	{
+		return context.Distributors.ToList();
+	}
+
+
 	public void SavePurchaseOrder(PurchaseDistributorOrder purchaseDistributorOrder)
 	{
 		if (purchaseDistributorOrder.Id <= 0)

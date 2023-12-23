@@ -5,7 +5,9 @@ namespace MakeMyCapServer.Proxies;
 public interface IServiceProxy
 {
 	int? GetInventoryCheckHours();
+	void UpdateInventoryCheckHours(int hours);
 	int? GetFulfillmentCheckHours();
+	void UpdateFulfillmentCheckHours(int hours);
 
 	List<string> GetStatusEmailRecipients();
 

@@ -65,6 +65,8 @@ public class LoginController : Controller
 			ClaimsPrincipal claimsPrincipal = new ClaimsPrincipal(identity);
 
 			await HttpContext.SignInAsync(COOKIE_NAME, claimsPrincipal);
+			
+			_logger.LogInformation($"Logged in user {user.UserName}");
 			return RedirectToAction("Index", "Home");
 		}
 		catch (Exception ex)
