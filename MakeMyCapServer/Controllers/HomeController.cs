@@ -21,9 +21,11 @@ public class HomeController : Controller
 	private readonly DistributorsQueryHandler DistributorsQueryHandler;
 	private readonly DistributorSkusQueryHandler DistributorSkusQueryHandler;
 	private readonly SkuQueryHandler SkuQueryHandler;
-	
+	private readonly NotificationsQueryHandler NotificationsQueryHandler;
+
 	private readonly ChangeSettingsCommandHandler ChangeSettingsCommandHandler;
 	private readonly CreateSkuCommandHandler CreateSkuCommandHandler;
+	private readonly ChangeNotificationsCommandHandler ChangeNotificationsCommandHandler;
 
 	private readonly ILogger<HomeController> _logger;
 
@@ -36,9 +38,11 @@ public class HomeController : Controller
 		DistributorSkusQueryHandler = ActivatorUtilities.CreateInstance<DistributorSkusQueryHandler>(serviceProvider);
 		DistributorsQueryHandler = ActivatorUtilities.CreateInstance<DistributorsQueryHandler>(serviceProvider);
 		SkuQueryHandler = ActivatorUtilities.CreateInstance<SkuQueryHandler>(serviceProvider);
+		NotificationsQueryHandler = ActivatorUtilities.CreateInstance<NotificationsQueryHandler>(serviceProvider);
 
 		ChangeSettingsCommandHandler = ActivatorUtilities.CreateInstance<ChangeSettingsCommandHandler>(serviceProvider);
 		CreateSkuCommandHandler = ActivatorUtilities.CreateInstance<CreateSkuCommandHandler>(serviceProvider);
+		ChangeNotificationsCommandHandler = ActivatorUtilities.CreateInstance<ChangeNotificationsCommandHandler>(serviceProvider);
 	}
 
 	[Authorize]
@@ -56,7 +60,30 @@ public class HomeController : Controller
 	[Authorize]
 	public IActionResult Notifications()
 	{
-		return View();
+		var notificationResponse = NotificationsQueryHandler.Handle(new NotificationsQuery());
+		var notificationEmails = new NotificationEmails()
+		{
+			WarningEmail1 = notificationResponse.WarningEmail1,
+			WarningEmail2 = notificationResponse.WarningEmail2,
+			WarningEmail3 = notificationResponse.WarningEmail3,
+			CriticalEmail1 = notificationResponse.CriticalEmail1,
+			CriticalEmail2 = notificationResponse.CriticalEmail2,
+			CriticalEmail3 = notificationResponse.CriticalEmail3
+		};
+		return View(notificationEmails);
+	}
+
+	[Authorize]
+	[HttpPost]
+	public IActionResult Notifications(NotificationEmails notificationEmails)
+	{
+		if (!ModelState.IsValid)
+		{
+			return View("Notifications", notificationEmails);
+		}
+		
+		ChangeNotificationsCommandHandler.Handle(new ChangeNotificationsCommand(notificationEmails));
+		return RedirectToAction("Notifications", "Home");
 	}
 	
 	[Authorize]

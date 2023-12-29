@@ -83,6 +83,21 @@ public class ServiceProxy : IServiceProxy
 		return emails;
 	}
 
+	public void SetStatusEmailRecipients(string email1, string? email2 = null, string? email3 = null)
+	{
+		var setting = context.Settings.FirstOrDefault();
+		if (setting == null)
+		{
+			setting = CreateDefaultSetting();
+		}
+
+		setting.StatusEmailRecipient1 = email1;
+		setting.StatusEmailRecipient2 = email2;
+		setting.StatusEmailRecipient3 = email3;
+
+		context.SaveChanges();
+	}
+
 	public List<string> GetCriticalEmailRecipients()
 	{
 		var emails = new List<string>();
@@ -106,6 +121,21 @@ public class ServiceProxy : IServiceProxy
 		}
 
 		return emails;		
+	}
+	
+	public void SetCriticalEmailRecipients(string email1, string? email2 = null, string? email3 = null)
+	{
+		var setting = context.Settings.FirstOrDefault();
+		if (setting == null)
+		{
+			setting = CreateDefaultSetting();
+		}
+
+		setting.CriticalEmailRecipient1 = email1;
+		setting.CriticalEmailRecipient2 = email2;
+		setting.CriticalEmailRecipient3 = email3;
+
+		context.SaveChanges();
 	}
 	
 	public ServiceLog CreateServiceLogFor(string serviceName)
