@@ -12,4 +12,22 @@ public class Warehouse
 		
 	[JsonPropertyName("qty")]
 	public long Quantity { get; set; }
+	
+	[JsonPropertyName("closeout")]
+	public bool? Closeout { get; set; }
+	
+	[JsonPropertyName("dropship")]
+	public bool? Dropship { get; set; }
+	
+	[JsonPropertyName("excludeFreeFreight")]
+	public bool? ExcludeFreeFreight { get; set; }
+	
+	[JsonPropertyName("fullCaseOnly")]
+	public bool? FullCaseOnly { get; set; }
+	
+	[JsonPropertyName("returnable")]
+	public bool? Returnable { get; set; }
+	
+	[JsonPropertyName("expectedInventory")]
+	public string ExpectedInventory { get; set; }
 }

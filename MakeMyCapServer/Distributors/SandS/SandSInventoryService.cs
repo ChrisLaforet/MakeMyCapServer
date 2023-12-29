@@ -37,6 +37,11 @@ public class SandSInventoryService : IInventoryService
 	
 	public List<InStockInventory> GetInStockInventoryFor(List<string> skus)
 	{
+if (skus.Contains("SSB18095480") || skus.Contains("B18095500") || skus.Contains("B18095501"))
+{
+	Console.WriteLine("HERE");
+}
+
 		var lookup = productSkuProxy.GetSkuMapsFor(S_AND_S_DISTRIBUTOR_CODE);
 		var maps = MapSkusFrom(skus);
 		
@@ -46,7 +51,6 @@ public class SandSInventoryService : IInventoryService
 		var client = new HttpClient();
 		PrepareHeadersFor(client);
 
-		
 		string url = $"{INVENTORY_ENDPOINT}{string.Join(",", maps.Select(map => map.DistributorSku).ToArray())}";
 		var request = new HttpRequestMessage(HttpMethod.Get, url);
 		var authenticationValue = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{accountNumber}:{apiKey}"));
@@ -92,19 +96,22 @@ public class SandSInventoryService : IInventoryService
 	{
 		var found = new List<string>();
 		var inStock = new List<InStockInventory>();
-		foreach (var response in responses)
+
+		var warehouseMap = AssembleSkuWarehouses(responses);
+		foreach (var distributorSku in warehouseMap.Keys)
 		{
-			var match = maps.SingleOrDefault(map => string.Compare(map.DistributorSku, response.Sku, true) == 0);
+			var match = maps.SingleOrDefault(map => string.Compare(map.DistributorSku, distributorSku, true) == 0);
 			if (match == null)
 			{
-				logger.LogError($"S&S returned a SKU ({response.Sku}) that does not match one we requested.");
+				logger.LogError($"S&S returned a SKU ({distributorSku}) that does not match one we requested.");
 				continue;
 			}
+			
 			var inStockInventory = new InStockInventory();
-			inStockInventory.DistributorSku = response.Sku;
+			inStockInventory.DistributorSku = distributorSku;
 			inStockInventory.Sku = match.Sku;
 			long available = 0;
-			foreach (var warehouse in response.Warehouses)
+			foreach (var warehouse in warehouseMap[distributorSku])
 			{
 				available += warehouse.Quantity;
 			}
@@ -125,5 +132,23 @@ public class SandSInventoryService : IInventoryService
 		}
 		
 		return inStock;
+	}
+
+	private Dictionary<string, List<Warehouse>> AssembleSkuWarehouses(QuantityResponse[] responses)
+	{
+		var map = new Dictionary<string, List<Warehouse>>();
+		foreach (var response in responses)
+		{
+			var key = response.Sku;
+			if (!map.ContainsKey(key))
+			{
+				map[key] = new List<Warehouse>();
+			}
+
+			var warehouses = map[key];
+			warehouses.AddRange(response.Warehouses);
+		}
+
+		return map;
 	}
 }

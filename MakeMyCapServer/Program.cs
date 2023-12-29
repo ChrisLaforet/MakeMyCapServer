@@ -58,10 +58,9 @@ builder.Services.AddScoped<IUserProxy, UserProxy>();
 
 builder.Services.AddScoped<IStatusNotificationService, StatusNotificationService>();
 
-// TODO: CML - Turn these services back on after testing/developing web interface
-// builder.Services.AddHostedService<InventoryScopedBackgroundService>();
-// builder.Services.AddHostedService<FulfillmentScopedBackgroundService>();
-// builder.Services.AddHostedService<OrderPlacementScopedBackgroundService>();
+builder.Services.AddHostedService<InventoryScopedBackgroundService>();
+builder.Services.AddHostedService<FulfillmentScopedBackgroundService>();
+builder.Services.AddHostedService<OrderPlacementScopedBackgroundService>();
 builder.Services.AddHostedService<EmailSendingScopedBackgroundService>();
 
 builder.Services.AddHttpClient();
