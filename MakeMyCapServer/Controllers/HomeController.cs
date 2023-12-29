@@ -22,10 +22,12 @@ public class HomeController : Controller
 	private readonly DistributorSkusQueryHandler DistributorSkusQueryHandler;
 	private readonly SkuQueryHandler SkuQueryHandler;
 	private readonly NotificationsQueryHandler NotificationsQueryHandler;
+	private readonly UserQueryHandler UserQueryHandler;
 
 	private readonly ChangeSettingsCommandHandler ChangeSettingsCommandHandler;
 	private readonly CreateSkuCommandHandler CreateSkuCommandHandler;
 	private readonly ChangeNotificationsCommandHandler ChangeNotificationsCommandHandler;
+	private readonly CreateUserCommandHandler CreateUserCommandHandler;
 
 	private readonly ILogger<HomeController> _logger;
 
@@ -39,10 +41,12 @@ public class HomeController : Controller
 		DistributorsQueryHandler = ActivatorUtilities.CreateInstance<DistributorsQueryHandler>(serviceProvider);
 		SkuQueryHandler = ActivatorUtilities.CreateInstance<SkuQueryHandler>(serviceProvider);
 		NotificationsQueryHandler = ActivatorUtilities.CreateInstance<NotificationsQueryHandler>(serviceProvider);
+		UserQueryHandler = ActivatorUtilities.CreateInstance<UserQueryHandler>(serviceProvider);
 
 		ChangeSettingsCommandHandler = ActivatorUtilities.CreateInstance<ChangeSettingsCommandHandler>(serviceProvider);
 		CreateSkuCommandHandler = ActivatorUtilities.CreateInstance<CreateSkuCommandHandler>(serviceProvider);
 		ChangeNotificationsCommandHandler = ActivatorUtilities.CreateInstance<ChangeNotificationsCommandHandler>(serviceProvider);
+		CreateUserCommandHandler = ActivatorUtilities.CreateInstance<CreateUserCommandHandler>(serviceProvider);
 	}
 
 	[Authorize]
@@ -114,9 +118,46 @@ public class HomeController : Controller
 	}
 	
 	[Authorize]
-	public IActionResult Users()
+	public IActionResult AddUser()
 	{
-		return View();
+		return View(new CreateUser());
+	}
+
+	[Authorize]
+	[HttpPost]
+	public IActionResult AddUser(CreateUser model)
+	{
+		if (!ModelState.IsValid)
+		{
+			return View("AddUser", model);
+		}
+
+		var userResponse = UserQueryHandler.Handle(new UserQuery(model.UserName, model.Email));
+		if (userResponse.EmailExists || userResponse.UserNameExists)
+		{
+			if (userResponse.EmailExists)
+			{
+				ModelState.AddModelError("Failed", $"There is already a user with an Email of {model.Email}");
+			}
+
+			if (userResponse.UserNameExists)
+			{
+				ModelState.AddModelError("Failed", $"There is already a user with a username of {model.UserName}");
+			}
+
+			return View("AddUser", model);
+		}
+		
+		try
+		{
+			CreateUserCommandHandler.Handle(new CreateUserCommand(model.UserName, model.Email));
+			return RedirectToAction("Index", "Home");
+		}
+		catch (Exception)
+		{
+			ModelState.AddModelError("Failed", $"There was an error while creating user record");
+			return View("AddUser", model);
+		}
 	}
 
 	[Authorize]

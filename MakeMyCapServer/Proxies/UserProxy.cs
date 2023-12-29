@@ -286,4 +286,15 @@ public class UserProxy : IUserProxy
 
         context.SaveChanges();
     }
+
+    public User CreateUser(string userName, string email)
+    {
+        var user = new User();
+        user.Username = userName;
+        user.Email = email;
+        user.CreateDate = DateTime.Now;
+        context.Users.Add(user);
+        context.SaveChanges();
+        return user;
+    }
 }
