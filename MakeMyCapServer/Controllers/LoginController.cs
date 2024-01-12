@@ -20,7 +20,7 @@ public class LoginController : Controller
 
 	private readonly ILogger<LoginController> _logger;
 
-	public LoginController(IServiceProvider? serviceProvider, ILogger<LoginController> logger)
+	public LoginController(IServiceProvider serviceProvider, ILogger<LoginController> logger)
 	{
 		_logger = logger;
 		AuthenticateCommandHandler = ActivatorUtilities.CreateInstance<AuthenticateCommandHandler>(serviceProvider);

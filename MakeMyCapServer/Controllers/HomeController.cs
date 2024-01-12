@@ -31,7 +31,7 @@ public class HomeController : Controller
 
 	private readonly ILogger<HomeController> _logger;
 
-	public HomeController(IServiceProvider? serviceProvider, ILogger<HomeController> logger)
+	public HomeController(IServiceProvider serviceProvider, ILogger<HomeController> logger)
 	{
 		_logger = logger;
 		
