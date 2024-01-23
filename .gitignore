@@ -1,3 +1,4 @@
 .idea/*
 .vs/*
 MakeMyCapServer.sln.DotSettings.user
+/MakeMyCapAdmin/obj

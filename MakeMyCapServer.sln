@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SanMarWebService", "SanMarW
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CapAmericaService", "CapAmericaService\CapAmericaService.csproj", "{1932FEBD-21F1-4DF4-8767-40199AAB0286}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanMarOrderWebService", "SanMarOrderWebService\SanMarOrderWebService.csproj", "{B2433538-BFF9-48F6-9D1E-C09A15482BAD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SanMarOrderWebService", "SanMarOrderWebService\SanMarOrderWebService.csproj", "{B2433538-BFF9-48F6-9D1E-C09A15482BAD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MakeMyCapAdmin", "MakeMyCapAdmin\MakeMyCapAdmin.csproj", "{F7156C56-0F94-4DE1-97D7-2A761C9A11F4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{B2433538-BFF9-48F6-9D1E-C09A15482BAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B2433538-BFF9-48F6-9D1E-C09A15482BAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B2433538-BFF9-48F6-9D1E-C09A15482BAD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7156C56-0F94-4DE1-97D7-2A761C9A11F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7156C56-0F94-4DE1-97D7-2A761C9A11F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7156C56-0F94-4DE1-97D7-2A761C9A11F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7156C56-0F94-4DE1-97D7-2A761C9A11F4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
