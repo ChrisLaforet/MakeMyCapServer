@@ -52,13 +52,18 @@ public class HomeController : Controller
 
 	public IActionResult Index()
 	{
-		var serviceStatus = new ServiceStatus();
-		serviceStatus.EmailServiceStatus = ServiceStatusQueryHandler.Handle(new ServiceStatusQuery(nameof(EmailQueueProcessingService)));
-		serviceStatus.FulfillmentServiceStatus = ServiceStatusQueryHandler.Handle(new ServiceStatusQuery(nameof(FulfillmentUpdateService)));
-		serviceStatus.InventoryServiceStatus = ServiceStatusQueryHandler.Handle(new ServiceStatusQuery(nameof(InventoryUpdateService)));
-		serviceStatus.OrderPlacementServiceStatus = ServiceStatusQueryHandler.Handle(new ServiceStatusQuery(nameof(OrderPlacementQueueService)));
+		if (this.User.Identity.IsAuthenticated)
+		{
+			var serviceStatus = new ServiceStatus();
+			serviceStatus.EmailServiceStatus = ServiceStatusQueryHandler.Handle(new ServiceStatusQuery(nameof(EmailQueueProcessingService)));
+			serviceStatus.FulfillmentServiceStatus = ServiceStatusQueryHandler.Handle(new ServiceStatusQuery(nameof(FulfillmentUpdateService)));
+			serviceStatus.InventoryServiceStatus = ServiceStatusQueryHandler.Handle(new ServiceStatusQuery(nameof(InventoryUpdateService)));
+			serviceStatus.OrderPlacementServiceStatus = ServiceStatusQueryHandler.Handle(new ServiceStatusQuery(nameof(OrderPlacementQueueService)));
 
-		return View("Index", serviceStatus);
+			return View("StatusIndex", serviceStatus);
+		}
+
+		return View("Index");
 	}
 	
 	[Authorize]
