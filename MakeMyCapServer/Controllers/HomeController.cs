@@ -49,7 +49,7 @@ public class HomeController : Controller
 		CreateUserCommandHandler = ActivatorUtilities.CreateInstance<CreateUserCommandHandler>(serviceProvider);
 	}
 
-	[Authorize]
+
 	public IActionResult Index()
 	{
 		var serviceStatus = new ServiceStatus();

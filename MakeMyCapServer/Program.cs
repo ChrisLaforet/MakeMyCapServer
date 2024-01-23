@@ -58,10 +58,11 @@ builder.Services.AddScoped<IUserProxy, UserProxy>();
 
 builder.Services.AddScoped<IStatusNotificationService, StatusNotificationService>();
 
-builder.Services.AddHostedService<InventoryScopedBackgroundService>();
-builder.Services.AddHostedService<FulfillmentScopedBackgroundService>();
-builder.Services.AddHostedService<OrderPlacementScopedBackgroundService>();
-builder.Services.AddHostedService<EmailSendingScopedBackgroundService>();
+// TODO: CML - restore these services when finished with Brandon -----------------------------------------
+//builder.Services.AddHostedService<InventoryScopedBackgroundService>();
+//builder.Services.AddHostedService<FulfillmentScopedBackgroundService>();
+//builder.Services.AddHostedService<OrderPlacementScopedBackgroundService>();
+//builder.Services.AddHostedService<EmailSendingScopedBackgroundService>();
 
 builder.Services.AddHttpClient();
 
@@ -96,7 +97,7 @@ app.UseRouting();
 
 app.UseHttpsRedirection();
 
-app.UseAuthentication();
+//app.UseAuthentication();
 app.UseMiddleware<TokenValidationMiddleware>();
 app.UseAuthorization();
 
