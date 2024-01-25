@@ -1,7 +1,7 @@
-﻿using MakeMyCapServer.Model;
+﻿using MakeMyCapAdmin.Model;
 using Microsoft.EntityFrameworkCore;
 
-namespace MakeMyCapServer.Proxies;
+namespace MakeMyCapAdmin.Proxies;
 
 public class OrderingProxy : IOrderingProxy
 {

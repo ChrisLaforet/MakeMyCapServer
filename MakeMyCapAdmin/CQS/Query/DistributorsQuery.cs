@@ -1,4 +1,4 @@
-﻿namespace MakeMyCapServer.CQS.Query;
+﻿namespace MakeMyCapAdmin.CQS.Query;
 
 public class DistributorsQuery : IQuery
 {

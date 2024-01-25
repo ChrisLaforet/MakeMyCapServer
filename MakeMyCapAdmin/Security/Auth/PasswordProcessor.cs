@@ -1,9 +1,9 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
-using MakeMyCapServer.Configuration;
+using MakeMyCapAdmin.Configuration;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 
-namespace MakeMyCapServer.Security.Auth;
+namespace MakeMyCapAdmin.Security.Auth;
 
 public class PasswordProcessor
 {

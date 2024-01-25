@@ -1,4 +1,4 @@
-﻿namespace MakeMyCapServer.CQS.Command;
+﻿namespace MakeMyCapAdmin.CQS.Command;
 
 public class ChangeSettingsCommand : ICommand
 {

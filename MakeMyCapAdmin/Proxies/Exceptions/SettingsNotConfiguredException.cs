@@ -1,4 +1,4 @@
-﻿namespace MakeMyCapServer.Proxies.Exceptions;
+﻿namespace MakeMyCapAdmin.Proxies.Exceptions;
 
 public class SettingsNotConfiguredException : Exception
 {

@@ -1,7 +1,7 @@
-﻿using MakeMyCapServer.Model;
-using MakeMyCapServer.Models;
+﻿using MakeMyCapAdmin.Model;
+using MakeMyCapAdmin.Models;
 
-namespace MakeMyCapServer.Proxies;
+namespace MakeMyCapAdmin.Proxies;
 
 public interface IUserProxy
 {

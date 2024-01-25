@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace MakeMyCapServer.Model;
+namespace MakeMyCapAdmin.Model;
 
 public partial class Setting
 {

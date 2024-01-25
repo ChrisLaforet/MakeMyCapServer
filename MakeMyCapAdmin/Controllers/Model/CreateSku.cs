@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using MakeMyCapServer.CQS.Response;
+using MakeMyCapAdmin.CQS.Response;
 
-namespace MakeMyCapServer.Controllers.Model;
+namespace MakeMyCapAdmin.Controllers.Model;
 
 public class CreateSku
 {

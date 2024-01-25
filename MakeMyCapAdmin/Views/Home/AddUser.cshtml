@@ -1,0 +1,46 @@
+﻿@model MakeMyCapAdmin.Controllers.Model.CreateUser;
+
+@{
+    ViewData["Title"] = "Users";
+}
+<h1>@ViewData["Title"]</h1>
+
+<div class="container border" style="padding: 20px;">
+	<form method="post" action="/Home/AddUser">
+
+		<div asp-validation-summary="All" class="alert-danger"></div>
+
+		<div class="form-group row" style="padding: 10px;">
+			<div class="col-2">
+				<label asp-for="UserName" class="control-label"></label>
+			</div>
+			<div class="col-6">
+				<input type="text" asp-for="UserName" class="form-control"/>
+				<span class="text-danger field-validation-valid" asp-validation-for="UserName"></span>
+			</div>
+		</div>
+
+		<div class="form-group row" style="padding: 10px;">
+			<div class="col-2">
+				<label asp-for="Email" class="control-label"></label>
+			</div>
+			<div class="col-6">
+				<input type="text" asp-for="Email" class="form-control"/>
+				<span class="text-danger field-validation-valid" asp-validation-for="Email"></span>
+			</div>
+		</div>
+		
+		<div class="form-group row" style="padding: 10px;">
+			<div class="col-2">
+			</div>
+			<div class="col-6">
+				<button type="submit" class="btn btn-primary">Create User</button>
+			</div>
+		</div>
+	</form>
+</div>
+
+
+@section Scripts {
+	<partial name="_ValidationScriptsPartial"/>
+}

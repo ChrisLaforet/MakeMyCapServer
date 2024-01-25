@@ -1,8 +1,8 @@
-﻿using MakeMyCapServer.CQS.Query;
-using MakeMyCapServer.CQS.Response;
-using MakeMyCapServer.Proxies;
+﻿using MakeMyCapAdmin.CQS.Query;
+using MakeMyCapAdmin.CQS.Response;
+using MakeMyCapAdmin.Proxies;
 
-namespace MakeMyCapServer.CQS.QueryHandler;
+namespace MakeMyCapAdmin.CQS.QueryHandler;
 
 public class SkuQueryHandler : IQueryHandler<SkuQuery, AssignedSkuResponse?>
 {

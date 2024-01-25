@@ -1,4 +1,4 @@
-﻿namespace MakeMyCapServer.CQS
+﻿namespace MakeMyCapAdmin.CQS
 {
 	public interface IQueryHandler<in TQuery, out TResponse>
 		where TQuery : IQuery

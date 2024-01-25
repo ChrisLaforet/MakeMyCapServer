@@ -1,9 +1,9 @@
-﻿using MakeMyCapServer.CQS.Command;
-using MakeMyCapServer.CQS.Response;
-using MakeMyCapServer.Proxies;
+﻿using MakeMyCapAdmin.CQS.Command;
+using MakeMyCapAdmin.CQS.Response;
+using MakeMyCapAdmin.Proxies;
 using Microsoft.Identity.Client;
 
-namespace MakeMyCapServer.CQS.CommandHandler;
+namespace MakeMyCapAdmin.CQS.CommandHandler;
 
 public class CreateUserCommandHandler : ICommandHandler<CreateUserCommand, NothingnessResponse>
 {

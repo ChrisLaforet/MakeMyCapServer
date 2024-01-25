@@ -1,18 +1,14 @@
-﻿using MakeMyCapServer.Models;
+﻿using MakeMyCapAdmin.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using MakeMyCapServer.Controllers.Model;
-using MakeMyCapServer.CQS.Command;
-using MakeMyCapServer.CQS.CommandHandler;
-using MakeMyCapServer.CQS.Query;
-using MakeMyCapServer.CQS.QueryHandler;
-using MakeMyCapServer.Services.Email;
-using MakeMyCapServer.Services.Fulfillment;
-using MakeMyCapServer.Services.Inventory;
-using MakeMyCapServer.Services.OrderPlacement;
+using MakeMyCapAdmin.Controllers.Model;
+using MakeMyCapAdmin.CQS.Command;
+using MakeMyCapAdmin.CQS.CommandHandler;
+using MakeMyCapAdmin.CQS.Query;
+using MakeMyCapAdmin.CQS.QueryHandler;
 using Microsoft.AspNetCore.Authorization;
 
-namespace MakeMyCapServer.Controllers;
+namespace MakeMyCapAdmin.Controllers;
 
 public class HomeController : Controller
 {
@@ -52,13 +48,18 @@ public class HomeController : Controller
 
 	public IActionResult Index()
 	{
-		var serviceStatus = new ServiceStatus();
-		serviceStatus.EmailServiceStatus = ServiceStatusQueryHandler.Handle(new ServiceStatusQuery(nameof(EmailQueueProcessingService)));
-		serviceStatus.FulfillmentServiceStatus = ServiceStatusQueryHandler.Handle(new ServiceStatusQuery(nameof(FulfillmentUpdateService)));
-		serviceStatus.InventoryServiceStatus = ServiceStatusQueryHandler.Handle(new ServiceStatusQuery(nameof(InventoryUpdateService)));
-		serviceStatus.OrderPlacementServiceStatus = ServiceStatusQueryHandler.Handle(new ServiceStatusQuery(nameof(OrderPlacementQueueService)));
+		if (User.Identity.IsAuthenticated)
+		{
+			var serviceStatus = new ServiceStatus();
+			serviceStatus.EmailServiceStatus = ServiceStatusQueryHandler.Handle(new ServiceStatusQuery("EmailQueueProcessingService"));
+			serviceStatus.FulfillmentServiceStatus = ServiceStatusQueryHandler.Handle(new ServiceStatusQuery("FulfillmentUpdateService"));
+			serviceStatus.InventoryServiceStatus = ServiceStatusQueryHandler.Handle(new ServiceStatusQuery("InventoryUpdateService"));
+			serviceStatus.OrderPlacementServiceStatus = ServiceStatusQueryHandler.Handle(new ServiceStatusQuery("OrderPlacementQueueService"));
 
-		return View("Index", serviceStatus);
+			return View("StatusIndex", serviceStatus);
+		}
+
+		return View("Index");
 	}
 	
 	[Authorize]

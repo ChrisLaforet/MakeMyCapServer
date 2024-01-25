@@ -1,11 +1,11 @@
 ﻿using MakeMyCapServer.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using MakeMyCapServer.CQS.QueryHandler;
 using MakeMyCapServer.Controllers.Model;
 using MakeMyCapServer.CQS.Command;
 using MakeMyCapServer.CQS.CommandHandler;
 using MakeMyCapServer.CQS.Query;
-using MakeMyCapServer.CQS.QueryHandler;
 using MakeMyCapServer.Services.Email;
 using MakeMyCapServer.Services.Fulfillment;
 using MakeMyCapServer.Services.Inventory;

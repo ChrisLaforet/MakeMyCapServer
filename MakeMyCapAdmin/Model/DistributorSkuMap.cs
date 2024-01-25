@@ -1,5 +1,5 @@
 ﻿
-namespace MakeMyCapServer.Model;
+namespace MakeMyCapAdmin.Model;
 
 public partial class DistributorSkuMap
 {

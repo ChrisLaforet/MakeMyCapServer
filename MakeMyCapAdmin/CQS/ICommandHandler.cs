@@ -1,4 +1,4 @@
-﻿namespace MakeMyCapServer.CQS
+﻿namespace MakeMyCapAdmin.CQS
 {
 	public interface ICommandHandler<in TCommand, out TResponse>
 		where TCommand : ICommand

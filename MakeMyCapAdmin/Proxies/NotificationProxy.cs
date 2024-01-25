@@ -1,19 +1,25 @@
-﻿using MakeMyCapServer.Proxies.Exceptions;
-using MakeMyCapServer.Services.Email;
+﻿using MakeMyCapAdmin.Configuration;
+using MakeMyCapAdmin.Proxies.Exceptions;
 
-namespace MakeMyCapServer.Proxies;
+namespace MakeMyCapAdmin.Proxies;
 
 public class NotificationProxy : INotificationProxy
 {
+	public const string SENDGRID_SENDER = "SendGridSender";
+	
+	private readonly string defaultSender;
+	
 	private readonly IServiceProxy serviceProxy;
-	private readonly IEmailQueueService emailQueueService;
+	private readonly IEmailProxy emailProxy;
+
 	private readonly ILogger<NotificationProxy> logger;
 	
-	public NotificationProxy(IServiceProxy serviceProxy, IEmailQueueService emailQueueService, ILogger<NotificationProxy> logger)
+	public NotificationProxy(IServiceProxy serviceProxy, IConfigurationLoader configurationLoader, IEmailProxy emailProxy, ILogger<NotificationProxy> logger)
 	{
 		this.serviceProxy = serviceProxy;
-		this.emailQueueService = emailQueueService;
+		this.emailProxy = emailProxy;
 		this.logger = logger;
+		defaultSender = configurationLoader.GetKeyValueFor(SENDGRID_SENDER);
 	}
 
 	public void SendWarningErrorNotification(string subject, string body, string sender = null)
@@ -27,7 +33,7 @@ public class NotificationProxy : INotificationProxy
 				throw new RecipientsNotConfiguredException("Warning Notification Email Recipients are not configured!");
 			}
 			
-			emailQueueService.Add(recipients, subject, body);
+			emailProxy.QueueMessage(string.IsNullOrEmpty(sender) ? defaultSender : sender, recipients, subject, body);
 		}
 		catch (Exception ex)
 		{
@@ -46,8 +52,7 @@ public class NotificationProxy : INotificationProxy
 				logger.LogCritical($"Critical Notification Email Recipients are not configured to receive notification of {subject}!!");
 				throw new RecipientsNotConfiguredException("Critical Notification Email Recipients are not configured!");
 			}
-			
-			emailQueueService.Add(recipients, subject, body);
+			emailProxy.QueueMessage(string.IsNullOrEmpty(sender) ? defaultSender : sender, recipients, subject, body);
 		}
 		catch (Exception ex)
 		{
@@ -63,7 +68,7 @@ public class NotificationProxy : INotificationProxy
 			var recipients = new List<string>();
 			recipients.Add(recipient);
 			
-			emailQueueService.Add(recipients, subject, body);
+			emailProxy.QueueMessage(string.IsNullOrEmpty(sender) ? defaultSender : sender, recipients, subject, body);
 		}
 		catch (Exception ex)
 		{

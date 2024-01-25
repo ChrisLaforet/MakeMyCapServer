@@ -1,4 +1,4 @@
-﻿namespace MakeMyCapServer.CQS.Response;
+﻿namespace MakeMyCapAdmin.CQS.Response;
 
 public class NothingnessResponse
 {

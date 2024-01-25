@@ -1,0 +1,33 @@
+﻿@model MakeMyCapAdmin.CQS.Response.DistributorSkusResponse;
+
+<table class="table table-striped table-sm" style="margin-top: 8px;">
+	<thead class="table-dark">
+	<tr>
+		<th style="width: 14%">MMC Sku</th>
+		<th style="width: 6%">Dist</th>
+		<th style="width: 14%">Dist Sku</th>
+		<th style="width: 18%">Brand</th>
+		<th style="width: 10%">Style Code</th>
+		<th style="width: 10%">Part Id</th>
+		<th style="width: 10%">Color</th>
+		<th style="width: 9%">Color Code</th>
+		<th style="width: 9%">Size Code</th>
+	</tr>
+	</thead>
+	<tbody>
+	@foreach (var sku in @Model.Skus)
+	{
+		<tr>
+			<td>@sku.Sku</td>
+			<td>@sku.DistributorCode</td>
+			<td>@sku.DistributorSku</td>
+			<td>@sku.Brand</td>
+			<td>@sku.StyleCode</td>
+			<td>@sku.PartId</td>
+			<td>@sku.Color</td>
+			<td>@sku.ColorCode</td>
+			<td>@sku.SizeCode</td>
+		</tr>
+	}
+	</tbody>
+</table>

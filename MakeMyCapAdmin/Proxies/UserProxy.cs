@@ -1,14 +1,14 @@
 ﻿using System.Security.Authentication;
 using System.Security.Cryptography;
 using System.Text;
-using MakeMyCapServer.Configuration;
-using MakeMyCapServer.Model;
-using MakeMyCapServer.Models;
-using MakeMyCapServer.Proxies.Exceptions;
-using MakeMyCapServer.Security.Auth;
+using MakeMyCapAdmin.Configuration;
+using MakeMyCapAdmin.Model;
+using MakeMyCapAdmin.Models;
+using MakeMyCapAdmin.Proxies.Exceptions;
+using MakeMyCapAdmin.Security.Auth;
 using Microsoft.IdentityModel.Tokens;
 
-namespace MakeMyCapServer.Proxies;
+namespace MakeMyCapAdmin.Proxies;
 
 public class UserProxy : IUserProxy
 {

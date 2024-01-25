@@ -1,6 +1,6 @@
-﻿using MakeMyCapServer.Controllers.Model;
+﻿using MakeMyCapAdmin.Controllers.Model;
 
-namespace MakeMyCapServer.CQS.Command;
+namespace MakeMyCapAdmin.CQS.Command;
 
 public class CreateSkuCommand : ICommand
 {

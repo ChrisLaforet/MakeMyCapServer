@@ -1,9 +1,9 @@
-﻿using MakeMyCapServer.Configuration;
-using MakeMyCapServer.Controllers;
-using MakeMyCapServer.Model;
-using MakeMyCapServer.Proxies;
+﻿using MakeMyCapAdmin.Configuration;
+using MakeMyCapAdmin.Controllers;
+using MakeMyCapAdmin.Model;
+using MakeMyCapAdmin.Proxies;
 
-namespace MakeMyCapServer.Security;
+namespace MakeMyCapAdmin.Security;
 
 public class TokenValidationMiddleware
 {

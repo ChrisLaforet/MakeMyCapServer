@@ -1,6 +1,6 @@
-﻿using MakeMyCapServer.Model;
+﻿using MakeMyCapAdmin.Model;
 
-namespace MakeMyCapServer.CQS.Response;
+namespace MakeMyCapAdmin.CQS.Response;
 
 public class AssignedSkuResponse
 {

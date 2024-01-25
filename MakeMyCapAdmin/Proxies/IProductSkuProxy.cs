@@ -1,6 +1,6 @@
-﻿using MakeMyCapServer.Model;
+﻿using MakeMyCapAdmin.Model;
 
-namespace MakeMyCapServer.Proxies;
+namespace MakeMyCapAdmin.Proxies;
 
 public interface IProductSkuProxy
 {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
-namespace MakeMyCapServer.Model;
+namespace MakeMyCapAdmin.Model;
 
 public partial class MakeMyCapServerContext : DbContext
 {

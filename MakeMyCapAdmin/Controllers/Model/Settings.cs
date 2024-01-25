@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace MakeMyCapServer.Controllers.Model;
+namespace MakeMyCapAdmin.Controllers.Model;
 
 public class Settings
 {

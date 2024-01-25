@@ -1,4 +1,4 @@
-﻿namespace MakeMyCapServer.Proxies;
+﻿namespace MakeMyCapAdmin.Proxies;
 
 public interface INotificationProxy
 {

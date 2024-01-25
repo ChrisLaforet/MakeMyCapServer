@@ -1,0 +1,147 @@
+﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model MakeMyCapAdmin.Controllers.Model.CreateSku;
+
+@{
+    ViewData["Title"] = "Add Sku";
+}
+<h1>@ViewData["Title"]</h1>
+
+<div class="container border" style="padding: 20px;">
+	<form method="post" action="/Home/AddSku">
+
+		<div class="form-group row" style="padding: 10px;">
+			<span class="col-2">
+				&nbsp;
+			</span>
+			<span class="col-6">
+				<p>Notice: Be careful to insert the data that is needed to identify this item on the distributor's site and to ensure that if there are spaces between words, they are exactly as defined by the distributor.</p>
+				<p>
+					<b>CapAmerica</b> uses StyleCode, PartId, Color<br />
+					<b>SanMar</b> uses Brand, StyleCode, Color, and SizeCode<br/>
+					<b>S&amp;S</b> uses DsitributorSku, StyleCode, Color, ColorCode, and SizeCode
+				</p>
+			</span>
+		</div>
+		
+		<div asp-validation-summary="All" class="alert-danger"></div>
+
+		<div class="form-group row" style="padding: 10px;">
+			<div class="col-2">
+				<label asp-for="DistributorCode" class="control-label"></label>
+			</div>
+			<div class="col-6">
+				<select id="SelectDistributor" class="form-control" onchange="changeDistributor(this.value)">
+					@foreach (var distributor in @Model.Distributors)
+					{
+						<option value="@distributor.DistributorCode">@distributor.DistributorName</option>
+					}
+				</select>
+				@* See "maxscan" answer to ensure a hidden field populates model: https://stackoverflow.com/questions/20657706/mvc-4-html-hiddenfor-are-not-updating-on-a-postback *@
+				<input type="text" hidden="hidden" id="DistributorCode" name="DistributorCode" value="@Model.DistributorCode"/>
+			</div>
+		</div>
+
+		<div class="form-group row" style="padding: 10px;">
+			<div class="col-2">
+				<label asp-for="Sku" class="control-label"></label>
+			</div>
+			<div class="col-6">
+				<input type="text" asp-for="Sku" class="form-control"/>
+				<span class="text-danger field-validation-valid" asp-validation-for="Sku"></span>
+			</div>
+		</div>
+		
+		<div class="form-group row" style="padding: 10px;">
+			<div class="col-2">
+				<label asp-for="DistributorSku" class="control-label"></label>
+			</div>
+			<div class="col-6">
+				<input type="text" asp-for="DistributorSku" class="form-control"/>
+				<span class="text-danger field-validation-valid" asp-validation-for="DistributorSku"></span>
+			</div>
+		</div>
+		
+		<div class="form-group row" style="padding: 10px;">
+        	<div class="col-2">
+        		<label asp-for="Brand" class="control-label"></label>
+        	</div>
+        	<div class="col-6">
+        		<input type="text" asp-for="Brand" class="form-control"/>
+        		<span class="text-danger field-validation-valid" asp-validation-for="Brand"></span>
+        	</div>
+		</div>		
+		
+		<div class="form-group row" style="padding: 10px;">
+			<div class="col-2">
+				<label asp-for="StyleCode" class="control-label"></label>
+			</div>
+			<div class="col-6">
+				<input type="text" asp-for="StyleCode" class="form-control"/>
+				<span class="text-danger field-validation-valid" asp-validation-for="StyleCode"></span>
+			</div>
+		</div>
+		
+		<div class="form-group row" style="padding: 10px;">
+			<div class="col-2">
+				<label asp-for="PartId" class="control-label"></label>
+			</div>
+			<div class="col-6">
+				<input type="text" asp-for="PartId" class="form-control"/>
+				<span class="text-danger field-validation-valid" asp-validation-for="PartId"></span>
+			</div>
+		</div>
+		
+		<div class="form-group row" style="padding: 10px;">
+			<div class="col-2">
+				<label asp-for="Color" class="control-label"></label>
+			</div>
+			<div class="col-6">
+				<input type="text" asp-for="Color" class="form-control"/>
+				<span class="text-danger field-validation-valid" asp-validation-for="Color"></span>
+			</div>
+		</div>
+		
+		<div class="form-group row" style="padding: 10px;">
+			<div class="col-2">
+				<label asp-for="ColorCode" class="control-label"></label>
+			</div>
+			<div class="col-6">
+				<input type="text" asp-for="ColorCode" class="form-control"/>
+				<span class="text-danger field-validation-valid" asp-validation-for="ColorCode"></span>
+			</div>
+		</div>
+		
+		<div class="form-group row" style="padding: 10px;">
+			<div class="col-2">
+				<label asp-for="SizeCode" class="control-label"></label>
+			</div>
+			<div class="col-6">
+				<input type="text" asp-for="SizeCode" class="form-control"/>
+				<span class="text-danger field-validation-valid" asp-validation-for="SizeCode"></span>
+			</div>
+		</div>
+		
+		<div class="form-group row" style="padding: 10px;">
+			<div class="col-2">
+			</div>
+			<div class="col-6">
+				<button type="submit" class="btn btn-primary">Create Sku</button>
+			</div>
+		</div>
+	</form>
+</div>
+
+
+@section Scripts {
+	<partial name="_ValidationScriptsPartial" />
+
+	<script>
+    function changeDistributor(distributorCode) {
+		$("#DistributorCode").val(distributorCode);
+	}
+
+	$(document).ready(function() {
+		changeDistributor($("#SelectDistributor option:first").val());
+    });
+</script>
+}

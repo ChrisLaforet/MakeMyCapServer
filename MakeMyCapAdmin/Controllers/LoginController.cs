@@ -1,13 +1,12 @@
 ﻿using System.Security.Claims;
-using MakeMyCapServer.Controllers.Model;
-using MakeMyCapServer.CQS.Command;
-using MakeMyCapServer.CQS.CommandHandler;
+using MakeMyCapAdmin.Controllers.Model;
+using MakeMyCapAdmin.CQS.Command;
+using MakeMyCapAdmin.CQS.CommandHandler;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Protocols.WsFed;
 
-namespace MakeMyCapServer.Controllers;
+namespace MakeMyCapAdmin.Controllers;
 
 public class LoginController : Controller
 {

@@ -1,7 +1,7 @@
-﻿using MakeMyCapServer.Model;
-using MakeMyCapServer.Proxies.Exceptions;
+﻿using MakeMyCapAdmin.Model;
+using MakeMyCapAdmin.Proxies.Exceptions;
 
-namespace MakeMyCapServer.Proxies;
+namespace MakeMyCapAdmin.Proxies;
 
 public class ServiceProxy : IServiceProxy
 {

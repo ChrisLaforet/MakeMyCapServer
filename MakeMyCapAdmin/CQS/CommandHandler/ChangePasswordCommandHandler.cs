@@ -1,8 +1,8 @@
-﻿using MakeMyCapServer.CQS.Command;
-using MakeMyCapServer.CQS.Response;
-using MakeMyCapServer.Proxies;
+﻿using MakeMyCapAdmin.CQS.Command;
+using MakeMyCapAdmin.CQS.Response;
+using MakeMyCapAdmin.Proxies;
 
-namespace MakeMyCapServer.CQS.CommandHandler;
+namespace MakeMyCapAdmin.CQS.CommandHandler;
 
 public class ChangePasswordCommandHandler : ICommandHandler<ChangePasswordCommand, NothingnessResponse>
 {
