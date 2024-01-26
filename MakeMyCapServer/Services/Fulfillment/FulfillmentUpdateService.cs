@@ -44,6 +44,7 @@ public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 		this.fulfillmentProxy = fulfillmentProxy;
 		this.orderService = orderService;
 		this.serviceProxy = serviceProxy;
+		this.orderGenerator = orderGenerator;
 		this.distributorServiceLookup = distributorServiceLookup;
 		this.logger = logger;
 		this.notificationProxy = notificationProxy;
@@ -152,7 +153,7 @@ public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 		PrepareOrder(shopifyOrder);
 	}
 
-	private DbOrder PrepareOrder(ShopifyOrder shopifyOrder)
+	private DbOrder? PrepareOrder(ShopifyOrder shopifyOrder)
 	{
 		try
 		{
@@ -160,7 +161,7 @@ public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 			order.OrderId = shopifyOrder.Id;
 			if (shopifyOrder.OrderNumber != null)
 			{
-				order.OrderNumber = shopifyOrder.OrderNumber.ToString();
+				order.OrderNumber = ((int)shopifyOrder.OrderNumber).ToString();
 			}
 
 			order.CheckoutId = shopifyOrder.CheckoutId == null ? 0 : (long)shopifyOrder.CheckoutId;

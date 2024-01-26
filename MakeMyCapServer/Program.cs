@@ -1,11 +1,9 @@
 using MakeMyCapServer.Model;
 using MakeMyCapServer.Configuration;
-using MakeMyCapServer.Controllers;
 using MakeMyCapServer.Distributors;
 using MakeMyCapServer.Distributors.PurchaseOrder;
 using MakeMyCapServer.Lookup;
 using MakeMyCapServer.Proxies;
-using MakeMyCapServer.Security;
 using MakeMyCapServer.Services.Email;
 using MakeMyCapServer.Services.Fulfillment;
 using MakeMyCapServer.Services.Inventory;
@@ -70,14 +68,6 @@ builder.Services.AddSingleton<ShopifyWebhookService>();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-builder.Services
-	.AddAuthentication(LoginController.COOKIE_NAME)
-	.AddCookie(LoginController.COOKIE_NAME, options =>
-	{
-		options.Cookie.Name = LoginController.COOKIE_NAME;
-		options.LoginPath = "/Login";
-	});
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -90,19 +80,8 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
 
 app.UseRouting();
-
-app.UseHttpsRedirection();
-
-app.UseAuthentication();
-app.UseMiddleware<TokenValidationMiddleware>();
-app.UseAuthorization();
-
-app.MapControllerRoute(
-	name: "default",
-	pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.MapPost("/shopify/orderCreated", async (ShopifyWebhookService ws, HttpContext context) => await ws.AcceptOrderCreatedNotification(context));
 

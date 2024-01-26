@@ -19,7 +19,6 @@ public class SanMarInventoryService : IInventoryService
 	private readonly IProductSkuProxy productSkuProxy;
 	
 	private readonly SanMarServices services;
-	private string OSFA;
 
 	public SanMarInventoryService(IConfigurationLoader configurationLoader, IProductSkuProxy productSkuProxy, ILogger<SanMarInventoryService> logger)
 	{

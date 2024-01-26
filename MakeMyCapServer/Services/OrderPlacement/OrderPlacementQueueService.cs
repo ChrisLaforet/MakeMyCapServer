@@ -39,7 +39,6 @@ public class OrderPlacementQueueService : IOrderPlacementProcessingService
 	{
 		logger.LogInformation("{ServiceName} working", nameof(OrderPlacementQueueService));
 		
-		bool firstTime = true;
 		while (!stoppingToken.IsCancellationRequested)
 		{
 			if (!ProcessOrderQueue())

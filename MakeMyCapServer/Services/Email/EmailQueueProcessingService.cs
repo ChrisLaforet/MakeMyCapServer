@@ -28,7 +28,6 @@ public class EmailQueueProcessingService : IEmailQueueProcessingService
 	{
 		logger.LogInformation("{ServiceName} working", nameof(EmailQueueProcessingService));
 
-		bool firstTime = true;
 		while (!stoppingToken.IsCancellationRequested)
 		{
 			if (!ProcessEmailQueue())

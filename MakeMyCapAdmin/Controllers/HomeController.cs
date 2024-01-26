@@ -45,21 +45,16 @@ public class HomeController : Controller
 		CreateUserCommandHandler = ActivatorUtilities.CreateInstance<CreateUserCommandHandler>(serviceProvider);
 	}
 
-
+	[Authorize]
 	public IActionResult Index()
 	{
-		if (User.Identity.IsAuthenticated)
-		{
-			var serviceStatus = new ServiceStatus();
-			serviceStatus.EmailServiceStatus = ServiceStatusQueryHandler.Handle(new ServiceStatusQuery("EmailQueueProcessingService"));
-			serviceStatus.FulfillmentServiceStatus = ServiceStatusQueryHandler.Handle(new ServiceStatusQuery("FulfillmentUpdateService"));
-			serviceStatus.InventoryServiceStatus = ServiceStatusQueryHandler.Handle(new ServiceStatusQuery("InventoryUpdateService"));
-			serviceStatus.OrderPlacementServiceStatus = ServiceStatusQueryHandler.Handle(new ServiceStatusQuery("OrderPlacementQueueService"));
+		var serviceStatus = new ServiceStatus();
+		serviceStatus.EmailServiceStatus = ServiceStatusQueryHandler.Handle(new ServiceStatusQuery("EmailQueueProcessingService"));
+		serviceStatus.FulfillmentServiceStatus = ServiceStatusQueryHandler.Handle(new ServiceStatusQuery("FulfillmentUpdateService"));
+		serviceStatus.InventoryServiceStatus = ServiceStatusQueryHandler.Handle(new ServiceStatusQuery("InventoryUpdateService"));
+		serviceStatus.OrderPlacementServiceStatus = ServiceStatusQueryHandler.Handle(new ServiceStatusQuery("OrderPlacementQueueService"));
 
-			return View("StatusIndex", serviceStatus);
-		}
-
-		return View("Index");
+		return View("Index", serviceStatus);
 	}
 	
 	[Authorize]

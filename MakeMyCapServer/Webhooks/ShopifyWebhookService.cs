@@ -21,8 +21,15 @@ public class ShopifyWebhookService
 	public async Task AcceptOrderCreatedNotification(HttpContext context)
 	{
 		var requestBody = await context.Request.ReadFromJsonAsync<MakeMyCapServer.Shopify.Dtos.Fulfillment.Order>();
-		logger.LogInformation($"Received webhook notification of Order Creation for Order Id {requestBody.Id} - requesting immediate processing of Orders.");
-		context.Response.StatusCode = 200;
+		if (requestBody != null)
+		{
+			logger.LogInformation($"Received webhook notification of Order Creation for Order Id {requestBody.Id} - requesting immediate processing of Orders.");
+		}
+		else
+		{
+            logger.LogInformation($"Received webhook notification of Order Creation without defined Order Id - still requesting immediate processing of Orders.");
+        }
+        context.Response.StatusCode = 200;
 		await context.Response.WriteAsync("ACK");
 		
 		fulfillmentUpdateService.ResumeProcessingNow();

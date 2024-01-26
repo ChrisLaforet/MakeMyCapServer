@@ -153,12 +153,12 @@ public class SanMarOrderService : IOrderService
 		notificationProxy.SendCriticalErrorNotification(subject, body.ToString());
 	}
 
-	private static string SanitizeString(string value)
+	private static string SanitizeString(string? value)
 	{
 		// SanMar states: Please Note: Do Not Use Additional Commas in any Field Due to the Comma being our Delimiter in order files.
 		if (string.IsNullOrEmpty(value))
 		{
-			return value;
+			return "";
 		}
 
 		if (value.Contains(COMMA))

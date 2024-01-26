@@ -131,7 +131,7 @@ namespace MakeMyCapServer.Shopify.Dtos.Fulfillment;
         public int Number { get; set; }
 
         [JsonPropertyName("order_number")]
-        public int OrderNumber { get; set; }
+        public int? OrderNumber { get; set; }
 
         [JsonPropertyName("order_status_url")]
         public string OrderStatusUrl { get; set; }

@@ -8,8 +8,6 @@ public class OrderPlacementScopedBackgroundService : BackgroundService
 	private readonly IServiceProvider serviceProvider;
 	private readonly ILogger<OrderPlacementScopedBackgroundService> logger;
 
-	private ServiceLog serviceLog;
-
 	public OrderPlacementScopedBackgroundService(IServiceProvider serviceProvider, ILogger<OrderPlacementScopedBackgroundService> logger)
 	{
 		this.serviceProvider = serviceProvider;

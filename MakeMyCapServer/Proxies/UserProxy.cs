@@ -16,7 +16,6 @@ public class UserProxy : IUserProxy
     
     private readonly MakeMyCapServerContext context;
     private readonly PasswordProcessor passwordProcessor;
-    private readonly string emailSender;
     private readonly INotificationProxy notificationProxy;
     
     public UserProxy(MakeMyCapServerContext context,
