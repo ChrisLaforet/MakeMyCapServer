@@ -22,6 +22,7 @@ public class OrderPlacementScopedBackgroundService : BackgroundService
 
 	private async Task DoWorkAsync(CancellationToken stoppingToken)
 	{
+		await Task.Yield();
 		logger.LogInformation($"{nameof(OrderPlacementScopedBackgroundService)} is working.");
 		
 		using (IServiceScope scope = serviceProvider.CreateScope())

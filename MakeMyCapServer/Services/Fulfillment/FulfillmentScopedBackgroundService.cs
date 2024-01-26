@@ -33,6 +33,7 @@ public class FulfillmentScopedBackgroundService : BackgroundService, IInterrupta
 
 	private async Task DoWorkAsync(CancellationToken stoppingToken)
 	{
+		await Task.Yield();
 		logger.LogInformation($"{nameof(FulfillmentScopedBackgroundService)} is working.");
 
 		using (IServiceScope scope = serviceProvider.CreateScope())

@@ -26,6 +26,7 @@ public class EmailQueueProcessingService : IEmailQueueProcessingService
 
 	public async Task DoWorkAsync(CancellationToken stoppingToken)
 	{
+		await Task.Yield();
 		logger.LogInformation("{ServiceName} working", nameof(EmailQueueProcessingService));
 
 		while (!stoppingToken.IsCancellationRequested)

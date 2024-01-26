@@ -25,4 +25,10 @@
     <ProjectReference Include="..\SanMarWebService\SanMarWebService.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <AdditionalFiles Include="Views\Shared\Error.cshtml" />
+    <AdditionalFiles Include="Views\Shared\_Layout.cshtml" />
+    <AdditionalFiles Include="Views\Shared\_ValidationScriptsPartial.cshtml" />
+  </ItemGroup>
+
 </Project>

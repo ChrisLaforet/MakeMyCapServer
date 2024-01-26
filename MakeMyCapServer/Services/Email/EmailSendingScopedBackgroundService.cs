@@ -24,6 +24,7 @@ public class EmailSendingScopedBackgroundService : BackgroundService
 
 	private async Task DoWorkAsync(CancellationToken stoppingToken)
 	{
+		await Task.Yield();
 		logger.LogInformation($"{nameof(EmailSendingScopedBackgroundService)} is working.");
 
 		using (IServiceScope scope = serviceProvider.CreateScope())

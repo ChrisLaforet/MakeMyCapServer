@@ -83,6 +83,10 @@ app.UseHttpsRedirection();
 
 app.UseRouting();
 
+app.MapControllerRoute(
+	name: "default",
+	pattern: "{controller=Home}/{action=Index}/{id?}");
+
 app.MapPost("/shopify/orderCreated", async (ShopifyWebhookService ws, HttpContext context) => await ws.AcceptOrderCreatedNotification(context));
 
 app.Run();
