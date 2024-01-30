@@ -228,7 +228,7 @@ public class UserProxy : IUserProxy
         contents.Append("\r\n\r\nYour login username is: ");
         contents.Append(user.Username);
         contents.Append("\r\n\r\nGo to the following link to Change Password: ");
-        contents.Append("Your normal server path + /Login/ChangePassword or follow the link at the bottom of the Login page.");
+        contents.Append("https://status.makemycap.com/Login/ChangePassword or follow the link at the bottom of the Login page.");
         contents.Append("\r\n\r\nUse the following for the ResetKey: ");
         contents.Append(resetKey);
         contents.Append("\r\n");
