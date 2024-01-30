@@ -37,10 +37,6 @@ public class SandSInventoryService : IInventoryService
 	
 	public List<InStockInventory> GetInStockInventoryFor(List<string> skus)
 	{
-if (skus.Contains("SSB18095480") || skus.Contains("B18095500") || skus.Contains("B18095501"))
-{
-	Console.WriteLine("HERE");
-}
 
 		var lookup = productSkuProxy.GetSkuMapsFor(S_AND_S_DISTRIBUTOR_CODE);
 		var maps = MapSkusFrom(skus);

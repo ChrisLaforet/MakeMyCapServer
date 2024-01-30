@@ -218,11 +218,15 @@ public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 
 	private void PrepareAndOrderLineItem(LineItem shopifyLineItem, FulfillmentOrder fulfillmentOrder, int poSequence, DistributorSkuMap? skuMap)
 	{
+		if (shopifyLineItem.ProductId == null || shopifyLineItem.VariantId == null)
+		{
+            logger.LogError($"Unable to find productId or variantId in Shopify Order {fulfillmentOrder.OrderId} for automated ordering");
+		}
 		var lineItem = new OrderLineItem();
 		lineItem.LineItemId = shopifyLineItem.Id;
 		lineItem.FulfillmentOrderId = fulfillmentOrder.FulfillmentOrderId;
-		lineItem.ProductId = shopifyLineItem.ProductId;
-		lineItem.VariantId = shopifyLineItem.VariantId;
+		lineItem.ProductId = (long)shopifyLineItem.ProductId;
+		lineItem.VariantId = (long)shopifyLineItem.VariantId;
 		lineItem.Sku = shopifyLineItem.Sku;
 		lineItem.Name = shopifyLineItem.Name;
 		lineItem.Quantity = shopifyLineItem.Quantity;

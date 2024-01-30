@@ -2,6 +2,7 @@
 using MakeMyCapServer.Proxies;
 using MakeMyCapServer.Services.Background;
 using MakeMyCapServer.Services.Email;
+using MakeMyCapServer.Services.Notification;
 
 namespace MakeMyCapServer.Services.Inventory;
 
@@ -27,11 +28,18 @@ public class EmailSendingScopedBackgroundService : BackgroundService
 		await Task.Yield();
 		logger.LogInformation($"{nameof(EmailSendingScopedBackgroundService)} is working.");
 
+
 		using (IServiceScope scope = serviceProvider.CreateScope())
 		{
+			IStatusNotificationService statusNotificationService = scope.ServiceProvider.GetRequiredService<IStatusNotificationService>();
+			statusNotificationService.SendServiceStartupStatus(nameof(EmailSendingScopedBackgroundService));
+
 			IEmailQueueProcessingService scopedQueueProcessingService = scope.ServiceProvider.GetRequiredService<IEmailQueueProcessingService>();
 			await scopedQueueProcessingService.DoWorkAsync(stoppingToken);
+			
+			statusNotificationService.SendServiceShutdownStatus(nameof(EmailSendingScopedBackgroundService));
 		}
+		
 	}
 
 	public override async Task StopAsync(CancellationToken stoppingToken)

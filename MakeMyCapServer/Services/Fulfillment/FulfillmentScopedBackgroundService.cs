@@ -39,12 +39,13 @@ public class FulfillmentScopedBackgroundService : BackgroundService, IInterrupta
 		using (IServiceScope scope = serviceProvider.CreateScope())
 		{
 			IStatusNotificationService statusNotificationService = scope.ServiceProvider.GetRequiredService<IStatusNotificationService>();
+
 			statusNotificationService.SendServiceStartupStatus(nameof(FulfillmentScopedBackgroundService));
 
 			IFulfillmentProcessingService scopedProcessingService = scope.ServiceProvider.GetRequiredService<IFulfillmentProcessingService>();
 			await scopedProcessingService.DoWorkAsync(stoppingToken);
-						
-			statusNotificationService.SendServiceStartupStatus(nameof(FulfillmentScopedBackgroundService));
+			
+			statusNotificationService.SendServiceShutdownStatus(nameof(FulfillmentScopedBackgroundService));
 		}
 	}
 

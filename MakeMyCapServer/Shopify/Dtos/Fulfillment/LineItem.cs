@@ -43,7 +43,7 @@ namespace MakeMyCapServer.Shopify.Dtos.Fulfillment;
         public bool ProductExists { get; set; }
 
         [JsonPropertyName("product_id")]
-        public long ProductId { get; set; }
+        public long? ProductId { get; set; }
 
         [JsonPropertyName("properties")]
         public List<Property> Properties { get; set; }
@@ -70,7 +70,7 @@ namespace MakeMyCapServer.Shopify.Dtos.Fulfillment;
         public AmountSet TotalDiscountSet { get; set; }
 
         [JsonPropertyName("variant_id")]
-        public long VariantId { get; set; }
+        public long? VariantId { get; set; }
 
         [JsonPropertyName("variant_inventory_management")]
         public string VariantInventoryManagement { get; set; }
