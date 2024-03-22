@@ -24,6 +24,16 @@ public static class OrderWriter
 		{
 			output.Append($"{orders.ShopifyOrderId.ToString()}\r\n");
 		}
+		output.Append("Order #: ");
+		if (string.IsNullOrEmpty(orders.ShopifyOrderNumber))
+		{
+			output.Append("Not provided\r\n");
+		}
+		else
+		{
+			output.Append($"{orders.ShopifyOrderNumber}\r\n");
+		}
+
 		output.Append("\r\nLine items:\r\n\r\n");
 		foreach (var group in GroupAndSortOrders(orders.PurchaseOrders))
 		{

@@ -1,10 +1,8 @@
-﻿using System.Security.Cryptography.Pkcs;
-using System.Text;
+﻿using System.Text;
 using MakeMyCapServer.Lookup;
 using MakeMyCapServer.Model;
 using MakeMyCapServer.Orders;
 using MakeMyCapServer.Proxies;
-using MakeMyCapServer.Services.Email;
 
 namespace MakeMyCapServer.Services.OrderPlacement;
 
@@ -109,12 +107,15 @@ public class OrderPlacementQueueService : IOrderPlacementProcessingService
 			bool isFirst = true;
 			foreach (var order in matcher[key])
 			{
+				var orderDetail = order.ShopifyOrderId == null ? null : orderingProxy.GetOrderById((long)order.ShopifyOrderId);
+
 				if (isFirst)
 				{
 					assembly.DistributorName = order.DistributorName;
 					assembly.DistributorLookupCode = order.Distributor.LookupCode;
 					assembly.OrderDate = order.OrderDate;
 					assembly.ShopifyOrderId = order.ShopifyOrderId;
+					assembly.ShopifyOrderNumber = orderDetail == null ? "" : orderDetail.OrderNumber;
 					isFirst = false;
 				}
 				assembly.PurchaseOrders.Add(order);

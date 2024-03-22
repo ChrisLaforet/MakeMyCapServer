@@ -4,6 +4,7 @@ public class DistributorOrders
 {
 	public DateTime OrderDate { get; set; }
 	public string PoNumber { get; set; }
+	public string ShopifyOrderNumber { get; set; }
 	public long? ShopifyOrderId { get; set; }
 	public string DistributorName { get; set; }
 	public string DistributorLookupCode { get; set; }
