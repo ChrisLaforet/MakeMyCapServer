@@ -69,10 +69,10 @@ public class CapAmericaOrderService : IOrderService
 			output.Append($"{orders.ShopifyOrderId.ToString()}\r\n");
 		}
 
-		output.Append("Line items:\r\n");
+		output.Append("\r\nLine items:\r\n\r\n");
 		foreach (var order in orders.PurchaseOrders)
 		{
-			output.Append($"{order.Quantity}   Style: {order.Style}");
+			output.Append($"{order.Quantity}x   Style: {order.Style}");
 
 			if (!string.IsNullOrEmpty(order.Color))
 			{

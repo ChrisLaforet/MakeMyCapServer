@@ -20,7 +20,6 @@ public class MakeMyCapOrderService : IOrderService
 	
 	public bool PlaceOrder(DistributorOrders orders)
 	{
-// TODO: CML - determine what additional formatting is needed here		
 		var subject = $"Notification of sent PO {orders.PoNumber}";
 		var body = new StringBuilder();
 		body.Append($"The following order has been sent to {orders.DistributorName}\r\n\r\n");

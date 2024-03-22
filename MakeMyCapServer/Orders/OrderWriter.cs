@@ -5,6 +5,8 @@ namespace MakeMyCapServer.Orders;
 
 public static class OrderWriter
 {
+	public const string CAP_MONIKER = "Cap";
+	
 	public static string FormatOrder(DistributorOrders orders)
 	{
 		var output = new StringBuilder();
@@ -22,71 +24,100 @@ public static class OrderWriter
 		{
 			output.Append($"{orders.ShopifyOrderId.ToString()}\r\n");
 		}
-		output.Append("Line items:\r\n");
-		foreach (var order in orders.PurchaseOrders)
+		output.Append("\r\nLine items:\r\n\r\n");
+		foreach (var group in GroupAndSortOrders(orders.PurchaseOrders))
 		{
-			output.Append($"{order.Quantity}");
-			if (!string.IsNullOrEmpty(order.Sku))
+			foreach (var order in group)
 			{
-				output.Append($"  Sku: {order.Sku}");
-			}
-			else if (!string.IsNullOrEmpty(order.Name))
-			{
-				output.Append($"  Name: {order.Name}");
-			}
-
-			if (order.Style != null)
-			{
-				output.Append($"  Style: {order.Style}");
-			}
-
-			if (order.Color != null)
-			{
-				output.Append($"  Color: {order.Color}");
-			}
-
-			if (order.Size != null)
-			{
-				output.Append($"  Size: {order.Size}");
-			}
-			output.Append("\r\n");
-
-			if (!string.IsNullOrEmpty(order.ImageOrText))
-			{
-				if (!string.IsNullOrEmpty(order.Position))
+				output.Append($"{order.Quantity}x");
+				if (!string.IsNullOrEmpty(order.Sku))
 				{
-					output.Append($"   Position: {order.Position}");
+					output.Append($"  Sku: {order.Sku}");
 				}
-				
-				if (order.ImageOrText.StartsWith("http"))
+				else if (!string.IsNullOrEmpty(order.Name))
 				{
-					output.Append($"  Image URL: {order.ImageOrText}");
+					output.Append($"  Name: {order.Name}");
 				}
-				else
+
+				if (!string.IsNullOrEmpty(order.Style))
 				{
-					output.Append($"  Text: {order.ImageOrText}");
+					output.Append($"  Style: {order.Style}");
 				}
+
+				if (!string.IsNullOrEmpty(order.Color))
+				{
+					output.Append($"  Color: {order.Color}");
+				}
+
+				if (!string.IsNullOrEmpty(order.Size))
+				{
+					output.Append($"  Size: {order.Size}");
+				}
+
+				output.Append("\r\n");
+
+				if (!string.IsNullOrEmpty(order.ImageOrText))
+				{
+					if (!string.IsNullOrEmpty(order.Position))
+					{
+						output.Append($"   Position: {order.Position}");
+					}
+
+					if (order.ImageOrText.StartsWith("http"))
+					{
+						output.Append($"  Image URL: {order.ImageOrText}");
+					}
+					else
+					{
+						output.Append($"  Text: {order.ImageOrText}");
+					}
+
+					output.Append("\r\n");
+				}
+
+				if (!string.IsNullOrEmpty(order.Correlation))
+				{
+					output.Append($"   Correlation: {order.Correlation}");
+					output.Append("\r\n");
+				}
+
+				if (!string.IsNullOrEmpty(order.SpecialInstructions))
+				{
+					output.Append($"   Special Instructions: {order.SpecialInstructions}");
+					output.Append("\r\n");
+				}
+
 				output.Append("\r\n");
 			}
-			
-			if (!string.IsNullOrEmpty(order.Correlation))
-			{
-				output.Append($"   Correlation: {order.Correlation}");
-				output.Append("\r\n");
-			}
-			
-			if (!string.IsNullOrEmpty(order.SpecialInstructions))
-			{
-				output.Append($"   Special Instructions: {order.SpecialInstructions}");
-				output.Append("\r\n");
-			}
-			
-			output.Append("\r\n");
 		}
 
 		return output.ToString();
 	}
 
+	private static List<List<IDistributorOrder>> GroupAndSortOrders(List<IDistributorOrder> orders)
+	{
+		var groups = new List<List<IDistributorOrder>>();
+
+		var correlations = orders.Select(o => o.Correlation).ToHashSet();
+		foreach (var correlation in correlations)
+		{
+			var matches = orders.FindAll(o => o.Correlation == correlation).ToList();
+			var group = new List<IDistributorOrder>();
+			
+			// output order is Cap, Front, Left, Right, Back, Anything else
+			group.AddRange(matches.FindAll(o => o.Name == CAP_MONIKER).ToList());
+			group.AddRange(matches.FindAll(o => o.Position.ToUpper().StartsWith("FRONT")).ToList());
+			group.AddRange(matches.FindAll(o => o.Position.ToUpper().StartsWith("LEFT")).ToList());
+			group.AddRange(matches.FindAll(o => o.Position.ToUpper().StartsWith("RIGHT")).ToList());
+			group.AddRange(matches.FindAll(o => o.Position.ToUpper().StartsWith("BACK")).ToList());
+			group.AddRange(matches.Where(o => !group.Contains(o)).ToList());
+
+			groups.Add(group);
+		}
+		
+		return groups;
+	}
+	
 	public static string FormatOrder(IDistributorOrder order)
 	{
 		var output = new StringBuilder();

@@ -189,7 +189,6 @@ public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 
 	private void PrepareFulfillment(List<LineItem> lineItems, DbOrder order)
 	{
-	
 		var poLookup = new Dictionary<string, int>();		// ensures that each distributor reuses the same PO for multiple line items in the same order
 		foreach (var lineItem in lineItems)
 		{
@@ -214,20 +213,20 @@ public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 				logger.LogInformation($"Using PO {poSequence} for ordering {lineItem.Quantity} of SKU {lineItem.Sku} in Shopify Order {order.OrderId}");
 				PrepareAndOrderLineItem(lineItem, lineItemProperties, order, poSequence, skuMap.DistributorCode, skuMap);
 			}
+			
+			// always duplicate caps to MMC and all non-cap items go to MMC
+			if (poLookup.ContainsKey(MMC_DISTRIBUTOR_CODE))
+			{
+				poSequence = poLookup[MMC_DISTRIBUTOR_CODE];
+			}
 			else
 			{
-				if (poLookup.ContainsKey(MMC_DISTRIBUTOR_CODE))
-				{
-					poSequence = poLookup[MMC_DISTRIBUTOR_CODE];
-				}
-				else
-				{
-					poSequence = orderGenerator.GetNextPOSequence();
-					poLookup[MMC_DISTRIBUTOR_CODE] = poSequence;
-				}
-				
-				PrepareAndOrderLineItem(lineItem, lineItemProperties, order, poSequence, MMC_DISTRIBUTOR_CODE, null);
+				poSequence = orderGenerator.GetNextPOSequence();
+				poLookup[MMC_DISTRIBUTOR_CODE] = poSequence;
+				logger.LogInformation($"Using PO {poSequence} for ordering for MMC in Shopify Order {order.OrderId}");
 			}
+			
+			PrepareAndOrderLineItem(lineItem, lineItemProperties, order, poSequence, MMC_DISTRIBUTOR_CODE, skuMap);
 		}
 	}
 
@@ -267,10 +266,7 @@ public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 
 	private void PrepareAndOrderLineItem(LineItem shopifyLineItem, ItemProperties lineItemProperties, DbOrder order, int poSequence, string distributorCode, DistributorSkuMap? skuMap)
 	{
-		// if (shopifyLineItem.ProductId == null || shopifyLineItem.VariantId == null)
-		// {
-  //           logger.LogError($"Unable to find productId or variantId in Shopify Order {order.OrderId} for automated ordering");
-		// }
+		var mmcCapCopy = false;
 		var lineItem = new OrderLineItem();
 		lineItem.LineItemId = shopifyLineItem.Id;
 		lineItem.OrderId = order.OrderId;
@@ -278,6 +274,15 @@ public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 		lineItem.VariantId = shopifyLineItem.VariantId == null ? 0 : (long)shopifyLineItem.VariantId;
 		lineItem.Sku = shopifyLineItem.Sku == null ? "" : shopifyLineItem.Sku;
 		lineItem.Name = skuMap == null ? shopifyLineItem.Name : "";
+		if (distributorCode == MMC_DISTRIBUTOR_CODE)
+		{
+			mmcCapCopy = skuMap != null;
+			lineItem.Name = skuMap == null ? shopifyLineItem.Name : "Cap";		// "Cap" or actual name is used later to sort items for MMC order
+		}
+		else
+		{
+			lineItem.Name = skuMap == null ? shopifyLineItem.Name : "";
+		}
 		if (lineItem.Name.Length > 50)
 		{
 			lineItem.Name = lineItem.Name.Substring(0, 50);
@@ -291,18 +296,26 @@ public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 		{
 			lineItem.SpecialInstructions = lineItem.SpecialInstructions.Substring(0, 4000);
 		}
-		
-		order.OrderLineItems.Add(lineItem);
-		
-		if (skuMap == null && !string.IsNullOrEmpty(lineItem.Sku))
-		{
-			logger.LogError($"Unable to match SKU {shopifyLineItem.Sku} in Shopify Order {order.OrderId} for automated ordering");
-			TransmitSkuNotFoundErrorMessage(shopifyLineItem, order);
-		}
-		else
+
+		if (mmcCapCopy)
 		{
 			orderGenerator.GenerateOrderFor(distributorCode, skuMap, order.OrderId, shopifyLineItem.Quantity, poSequence, 
 				lineItem.Name, lineItem.Correlation, lineItem.ImageOrText, lineItem.Position, lineItem.SpecialInstructions);
+		}
+		else
+		{
+			order.OrderLineItems.Add(lineItem);
+
+			if (skuMap == null && !string.IsNullOrEmpty(lineItem.Sku))
+			{
+				logger.LogError($"Unable to match SKU {shopifyLineItem.Sku} in Shopify Order {order.OrderId} for automated ordering");
+				TransmitSkuNotFoundErrorMessage(shopifyLineItem, order);
+			}
+			else
+			{
+				orderGenerator.GenerateOrderFor(distributorCode, skuMap, order.OrderId, shopifyLineItem.Quantity, poSequence,
+					lineItem.Name, lineItem.Correlation, lineItem.ImageOrText, lineItem.Position, lineItem.SpecialInstructions);
+			}
 		}
 	}
 	
