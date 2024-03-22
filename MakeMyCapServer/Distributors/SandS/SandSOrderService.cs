@@ -131,46 +131,11 @@ public class SandSOrderService : IOrderService
 
 		orderDto.TestOrder = IS_TEST_MODE;
 		
-		var lookup = productSkuProxy.GetSkuMapsFor(SandSInventoryService.S_AND_S_DISTRIBUTOR_CODE);
-		var notFoundSkus = new List<IDistributorOrder>();
 		foreach (var order in orders.PurchaseOrders)
 		{
-			var map = lookup.SingleOrDefault(map => string.Compare(map.Sku, order.Sku, true) == 0);
-			if (map == null)
-			{
-				logger.LogError($"Unable to map sku {order.Sku} to place order for S&S!");
-				notFoundSkus.Add(order);
-				continue;
-			}
-			
-			orderDto.Lines.Add(new Line() { Identifier = map.DistributorSku, Qty = order.Quantity });
-		}
-
-		if (notFoundSkus.Count > 0)
-		{
-			NotifyOfMissingSkuMatches(notFoundSkus);
+			orderDto.Lines.Add(new Line() { Identifier = order.Sku, Qty = order.Quantity });
 		}
 
 		return orderDto;
-	}
-	
-	private void NotifyOfMissingSkuMatches(List<IDistributorOrder> notFoundSkus)
-	{
-		var subject = $"Urgent! Order SKUs for S&S cannot be found for sending PO {notFoundSkus[0].PoNumber}";
-
-		var body = new StringBuilder();
-		body.Append($"The following Line Items for PO {notFoundSkus[0].PoNumber} cannot be found in our mappings.\r\n");
-		body.Append($"PLEASE ORDER THESE ITEMS MANUALLY NOW.  Once done, the SKU(s) need to be mapped in our mapping table.\r\n\r\n");
-		foreach (var notFoundSku in notFoundSkus)
-		{
-			body.Append($"   Our SKU: {notFoundSku.Sku}\r\n  Style: {notFoundSku.Style}\r\n  Color: {notFoundSku.Color}\r\n  Size: {notFoundSku.Size}\r\n  Quantity: {notFoundSku.Quantity}\r\n");
-		}
-
-		body.Append("\r\n");
-		body.Append("Any other items on this PO that were located will be ordered electronically.");
-		body.Append("\r\n\r\n");
-
-		logger.LogInformation($"Transmitting critical message concerning inability to map all SKUs in PO {notFoundSkus[0].PoNumber}.");
-		notificationProxy.SendCriticalErrorNotification(subject, body.ToString());
 	}
 }

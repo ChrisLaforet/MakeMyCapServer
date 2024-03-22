@@ -3,8 +3,8 @@
 public partial class OrderLineItem
 {
     public long LineItemId { get; set; }
-
-    public long FulfillmentOrderId { get; set; }
+    
+    public long OrderId { get; set; }
 
     public int Quantity { get; set; }
 
@@ -17,6 +17,14 @@ public partial class OrderLineItem
     public long VariantId { get; set; }
 
     public string? Ponumber { get; set; }
+    
+    public string? Correlation { get; set; }
+    
+    public string? ImageOrText { get; set; }
+    
+    public string? SpecialInstructions { get; set; }
+    
+    public string? Position { get; set; }
 
-    public virtual FulfillmentOrder FulfillmentOrder { get; set; } = null!;
+    public virtual Order Order { get; set; } = null!;
 }

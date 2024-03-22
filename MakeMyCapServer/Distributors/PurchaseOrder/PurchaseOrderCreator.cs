@@ -49,13 +49,14 @@ public class PurchaseOrderCreator : IOrderGenerator
 		return poNumberSequence;
 	}
 	
-	public Model.PurchaseDistributorOrder? GenerateOrderFor(DistributorSkuMap skuMap, long shopifyOrderId, int quantity, int poSequence)
+	public Model.PurchaseDistributorOrder? GenerateOrderFor(string distributorCode, DistributorSkuMap? skuMap, long shopifyOrderId, int quantity, int poSequence,
+		string name, string correlation, string imageOrText, string position, string specialInstructions)
 	{
-		var distributor = orderingProxy.GetDistributorByCode(skuMap.DistributorCode);
+		var distributor = orderingProxy.GetDistributorByCode(distributorCode);
 		if (distributor == null)
 		{
-			logger.LogError($"Cannot locate a distributor with code {skuMap.DistributorCode} for generating an order on Shopify Order Id {shopifyOrderId}!");
-			TransmitErrorMessage(skuMap, shopifyOrderId, quantity);
+			logger.LogError($"Cannot locate a distributor with code {distributorCode} for generating an order on Shopify Order Id {shopifyOrderId}!");
+			TransmitErrorMessage(distributorCode, shopifyOrderId, quantity);
 			return null;
 		}
 		
@@ -67,35 +68,40 @@ public class PurchaseOrderCreator : IOrderGenerator
 		purchaseOrder.PoNumberSequence = poSequence;
 		purchaseOrder.CreateDate = DateTime.Now;
 		purchaseOrder.ShopifyOrderId = shopifyOrderId;
-		purchaseOrder.Sku = skuMap.DistributorSku;
+		purchaseOrder.Sku = skuMap == null || string.IsNullOrEmpty(skuMap.DistributorSku) ? "" : skuMap.DistributorSku;
 		purchaseOrder.Quantity = quantity;
-		purchaseOrder.Style = skuMap.StyleCode;
-		purchaseOrder.Color = skuMap.Color;
-		purchaseOrder.Size = skuMap.SizeCode;
+		purchaseOrder.Style = skuMap != null ? skuMap.StyleCode : "";
+		purchaseOrder.Color = skuMap != null ? skuMap.Color : "";
+		purchaseOrder.Size = skuMap != null ? skuMap.SizeCode : "";
+		purchaseOrder.Name = name;
+		purchaseOrder.Correlation = correlation;
+		purchaseOrder.ImageOrText = imageOrText;
+		purchaseOrder.Position = position;
+		purchaseOrder.SpecialInstructions = specialInstructions;
 		purchaseOrder.SubmittedDateTime = DateTime.Now;
 		
 		orderingProxy.SavePurchaseOrder(purchaseOrder);
 		return purchaseOrder;
 	}
 	
-	private void TransmitErrorMessage(DistributorSkuMap skuMap, long shopifyOrderId, int quantity)
+	private void TransmitErrorMessage(string distributorCode, long shopifyOrderId, int quantity)
 	{
 		try
 		{
 			var subject = $"ERROR: Cannot find distributor - manual order is needed";
 			
 			var body = new StringBuilder();
-			body.Append($"ERROR: CANNOT FIND DISTRIBUTOR CODE {skuMap.DistributorCode} TO ORDER {skuMap.Sku} IN SHOPIFY ORDER {shopifyOrderId}!  Manual intervention is needed!!\r\n\r\n");
-			body.Append($"This order requires an order of {quantity} of SKU {skuMap.DistributorCode}.\r\n");
+			body.Append($"ERROR: CANNOT FIND DISTRIBUTOR CODE {distributorCode} IN SHOPIFY ORDER {shopifyOrderId}!  Manual intervention is needed!!\r\n\r\n");
+			body.Append($"This order requires an order of {quantity} of SKU {distributorCode}.\r\n");
 			body.Append("\r\n");
 			body.Append("The service cannot order this product.  It requires human intervention to send the order.\r\n\r\n");
 
-			logger.LogInformation($"Transmitting ERROR message that cannot find distributor code {skuMap.DistributorCode} in Shopify Order {shopifyOrderId}.");
+			logger.LogInformation($"Transmitting ERROR message that cannot find distributor code {distributorCode} in Shopify Order {shopifyOrderId}.");
 			notificationProxy.SendCriticalErrorNotification(subject, body.ToString());
 		}
 		catch (Exception ex)
 		{
-			logger.LogCritical($"Error transmitting ERROR message that distributor code {skuMap.DistributorCode} cannot be found in Shopify Order {shopifyOrderId}: {ex}");
+			logger.LogCritical($"Error transmitting ERROR message that distributor code {distributorCode} cannot be found in Shopify Order {shopifyOrderId}: {ex}");
 		}
 	}
 }

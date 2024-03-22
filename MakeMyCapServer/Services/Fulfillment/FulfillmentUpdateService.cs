@@ -6,7 +6,6 @@ using MakeMyCapServer.Proxies;
 using MakeMyCapServer.Services.Background;
 using MakeMyCapServer.Shopify.Dtos.Fulfillment;
 using ShopifyOrder = MakeMyCapServer.Shopify.Dtos.Fulfillment.Order;
-using ShopifyFulfillment = MakeMyCapServer.Shopify.Dtos.Fulfillment.Fulfillment;
 using DbOrder = MakeMyCapServer.Model.Order;
 using IOrderService = MakeMyCapServer.Shopify.Services.IOrderService;
 
@@ -16,10 +15,13 @@ public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 {
 	private const int DEFAULT_DELAY_TIMEOUT_HOURS = 2;
 	private const int ONE_MINUTE_IN_MSEC = 60 * 1000;
-
+	
+	private const string MMC_DISTRIBUTOR_CODE = "MMC";
+	private const string MMC_INTERNAL_SKU = "INTERNAL";
+	
 	private readonly IOrderService orderService;
 	private readonly IProductSkuProxy productSkuProxy;
-	private readonly IFulfillmentProxy fulfillmentProxy;
+	private readonly IOrderingProxy orderingProxy;
 	private readonly IServiceProxy serviceProxy;
 	private readonly INotificationProxy notificationProxy;
 	private readonly ILogger<FulfillmentUpdateService> logger;
@@ -32,7 +34,7 @@ public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 
 	public FulfillmentUpdateService(IOrderService orderService, 
 									IProductSkuProxy productSkuProxy,
-									IFulfillmentProxy fulfillmentProxy,
+									IOrderingProxy orderingProxy,
 									IOrderGenerator orderGenerator,
 									IServiceProxy serviceProxy, 
 									INotificationProxy notificationProxy, 
@@ -41,7 +43,7 @@ public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 	{
 		this.orderService = orderService;
 		this.productSkuProxy = productSkuProxy;
-		this.fulfillmentProxy = fulfillmentProxy;
+		this.orderingProxy = orderingProxy;
 		this.orderService = orderService;
 		this.serviceProxy = serviceProxy;
 		this.orderGenerator = orderGenerator;
@@ -138,7 +140,7 @@ public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 	{
 		foreach (var shopifyOrder in orderService.GetOpenOrders())
 		{
-			if (fulfillmentProxy.DoesOrderExist(shopifyOrder.Id))
+			if (orderingProxy.DoesOrderExist(shopifyOrder.Id))
 			{
 				continue;
 			}
@@ -149,7 +151,8 @@ public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 
 	private void ProcessFulfillmentFor(ShopifyOrder shopifyOrder)
 	{
-		logger.LogInformation($"New order in Shopify with Id {shopifyOrder.Id} with {shopifyOrder.LineItems} line items needing processing.");
+		var totalLineItems = shopifyOrder.LineItems == null ? 0 : shopifyOrder.LineItems.Count;
+		logger.LogInformation($"New order in Shopify with Id {shopifyOrder.Id} with {totalLineItems} line items needing processing.");
 		PrepareOrder(shopifyOrder);
 	}
 
@@ -169,12 +172,11 @@ public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 			order.CreatedDateTime = shopifyOrder.CreatedAt;
 			order.ProcessStartDateTime = DateTime.Now;
 
-			foreach (var shopifyFulfillment in shopifyOrder.Fulfillments)
-			{
-				PrepareFulfillment(shopifyFulfillment, order);
+			if (shopifyOrder.LineItems.Count > 0) {
+				PrepareFulfillment(shopifyOrder.LineItems, order);
 			}
 
-			fulfillmentProxy.SaveOrder(order);
+			orderingProxy.SaveOrder(order);
 			return order;
 		}
 		catch (Exception ex)
@@ -185,19 +187,18 @@ public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 		return null;
 	}
 
-	private void PrepareFulfillment(ShopifyFulfillment shopifyFulfillment, DbOrder order)
+	private void PrepareFulfillment(List<LineItem> lineItems, DbOrder order)
 	{
-		var fulfillment = new FulfillmentOrder();
-		fulfillment.FulfillmentOrderId = shopifyFulfillment.Id;
-		fulfillment.OrderId = order.OrderId;
-		fulfillment.Status = shopifyFulfillment.Status;
-		order.FulfillmentOrders.Add(fulfillment);
-		
+	
 		var poLookup = new Dictionary<string, int>();		// ensures that each distributor reuses the same PO for multiple line items in the same order
-		foreach (var shopifyLineItem in shopifyFulfillment.LineItems)
+		foreach (var lineItem in lineItems)
 		{
-			var skuMap = productSkuProxy.GetSkuMapFor(shopifyLineItem.Sku);
+			var sku = lineItem.Sku;
 			var poSequence = 0;
+
+			var lineItemProperties = ExtractLineItemProperties(lineItem);
+
+			var skuMap = string.IsNullOrEmpty(sku) ? null : productSkuProxy.GetSkuMapFor(sku);
 			if (skuMap != null)
 			{
 				if (poLookup.ContainsKey(skuMap.DistributorCode))
@@ -209,61 +210,131 @@ public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 					poSequence = orderGenerator.GetNextPOSequence();
 					poLookup[skuMap.DistributorCode] = poSequence;
 				}
-				
-				logger.LogInformation($"Using PO {poSequence} for ordering {shopifyLineItem.Quantity} of SKU {shopifyLineItem.Sku} in Shopify Order {fulfillment.OrderId}");
+			
+				logger.LogInformation($"Using PO {poSequence} for ordering {lineItem.Quantity} of SKU {lineItem.Sku} in Shopify Order {order.OrderId}");
+				PrepareAndOrderLineItem(lineItem, lineItemProperties, order, poSequence, skuMap.DistributorCode, skuMap);
 			}
-			PrepareAndOrderLineItem(shopifyLineItem, fulfillment, poSequence, skuMap);
+			else
+			{
+				if (poLookup.ContainsKey(MMC_DISTRIBUTOR_CODE))
+				{
+					poSequence = poLookup[MMC_DISTRIBUTOR_CODE];
+				}
+				else
+				{
+					poSequence = orderGenerator.GetNextPOSequence();
+					poLookup[MMC_DISTRIBUTOR_CODE] = poSequence;
+				}
+				
+				PrepareAndOrderLineItem(lineItem, lineItemProperties, order, poSequence, MMC_DISTRIBUTOR_CODE, null);
+			}
 		}
 	}
 
-	private void PrepareAndOrderLineItem(LineItem shopifyLineItem, FulfillmentOrder fulfillmentOrder, int poSequence, DistributorSkuMap? skuMap)
+	private ItemProperties ExtractLineItemProperties(LineItem lineItem)
 	{
-		if (shopifyLineItem.ProductId == null || shopifyLineItem.VariantId == null)
+		var result = new ItemProperties();
+		if (lineItem.Properties == null || lineItem.Properties.Count == 0)
 		{
-            logger.LogError($"Unable to find productId or variantId in Shopify Order {fulfillmentOrder.OrderId} for automated ordering");
+			return result;
 		}
+
+		foreach (var property in lineItem.Properties)
+		{
+			var value = property.Value == null ? "" : property.Value.Trim();
+			switch (property.Name.ToUpper())
+			{
+				case "_SPECIAL INSTRUCTIONS":
+					result.SpecialInstructions = value;
+					break;
+				case "TEXT":
+					result.Text = value;
+					break;
+				case "POSITION":
+					result.Position = value;
+					break;
+				case "_ADDONID":
+					result.Correlation = value;
+					break;
+				case "UPLOAD IMAGE":
+					result.ImageUrl = value;
+					break;
+			}
+		}
+
+		return result;
+	}
+
+	private void PrepareAndOrderLineItem(LineItem shopifyLineItem, ItemProperties lineItemProperties, DbOrder order, int poSequence, string distributorCode, DistributorSkuMap? skuMap)
+	{
+		// if (shopifyLineItem.ProductId == null || shopifyLineItem.VariantId == null)
+		// {
+  //           logger.LogError($"Unable to find productId or variantId in Shopify Order {order.OrderId} for automated ordering");
+		// }
 		var lineItem = new OrderLineItem();
 		lineItem.LineItemId = shopifyLineItem.Id;
-		lineItem.FulfillmentOrderId = fulfillmentOrder.FulfillmentOrderId;
-		lineItem.ProductId = (long)shopifyLineItem.ProductId;
-		lineItem.VariantId = (long)shopifyLineItem.VariantId;
-		lineItem.Sku = shopifyLineItem.Sku;
-		lineItem.Name = shopifyLineItem.Name;
-		lineItem.Quantity = shopifyLineItem.Quantity;
-		
-		fulfillmentOrder.OrderLineItems.Add(lineItem);
-		
-		if (skuMap == null)
+		lineItem.OrderId = order.OrderId;
+		lineItem.ProductId = shopifyLineItem.ProductId == null ? 0 : (long)shopifyLineItem.ProductId;
+		lineItem.VariantId = shopifyLineItem.VariantId == null ? 0 : (long)shopifyLineItem.VariantId;
+		lineItem.Sku = shopifyLineItem.Sku == null ? "" : shopifyLineItem.Sku;
+		lineItem.Name = skuMap == null ? shopifyLineItem.Name : "";
+		if (lineItem.Name.Length > 50)
 		{
-			logger.LogError($"Unable to match SKU {shopifyLineItem.Sku} in Shopify Order {fulfillmentOrder.OrderId} for automated ordering");
-			TransmitSkuNotFoundErrorMessage(shopifyLineItem, fulfillmentOrder);
+			lineItem.Name = lineItem.Name.Substring(0, 50);
+		}
+		lineItem.Quantity = shopifyLineItem.Quantity;
+		lineItem.Correlation = lineItemProperties.Correlation;
+		lineItem.ImageOrText = string.IsNullOrEmpty(lineItemProperties.ImageUrl) ? lineItemProperties.Text : lineItemProperties.ImageUrl;
+		lineItem.Position = lineItemProperties.Position;
+		lineItem.SpecialInstructions = lineItemProperties.SpecialInstructions;
+		if (lineItem.SpecialInstructions.Length > 4000)
+		{
+			lineItem.SpecialInstructions = lineItem.SpecialInstructions.Substring(0, 4000);
+		}
+		
+		order.OrderLineItems.Add(lineItem);
+		
+		if (skuMap == null && !string.IsNullOrEmpty(lineItem.Sku))
+		{
+			logger.LogError($"Unable to match SKU {shopifyLineItem.Sku} in Shopify Order {order.OrderId} for automated ordering");
+			TransmitSkuNotFoundErrorMessage(shopifyLineItem, order);
 		}
 		else
 		{
-			orderGenerator.GenerateOrderFor(skuMap, fulfillmentOrder.OrderId, shopifyLineItem.Quantity, poSequence);
+			orderGenerator.GenerateOrderFor(distributorCode, skuMap, order.OrderId, shopifyLineItem.Quantity, poSequence, 
+				lineItem.Name, lineItem.Correlation, lineItem.ImageOrText, lineItem.Position, lineItem.SpecialInstructions);
 		}
 	}
 	
-	private void TransmitSkuNotFoundErrorMessage(LineItem shopifyLineItem, FulfillmentOrder fulfillmentOrder)
+	private void TransmitSkuNotFoundErrorMessage(LineItem shopifyLineItem, DbOrder order)
 	{
 		try
 		{
 			var subject = $"ERROR: Cannot find SKU - manual order is needed";
 			
 			var body = new StringBuilder();
-			body.Append($"ERROR: CANNOT FIND SKU {shopifyLineItem.Sku} IN SHOPIFY ORDER {fulfillmentOrder.OrderId}!  Manual intervention is needed!!\r\n\r\n");
+			body.Append($"ERROR: CANNOT FIND SKU {shopifyLineItem.Sku} IN SHOPIFY ORDER {order.OrderNumber}!  Manual intervention is needed!!\r\n\r\n");
 			body.Append($"This SKU references an item called {shopifyLineItem.Name}.\r\n");
 			body.Append($"Product Id in Shopify is {shopifyLineItem.ProductId}.\r\n");
 			body.Append($"Variant Id in Shopify is {shopifyLineItem.VariantId}.\r\n");
 			body.Append("\r\n");
 			body.Append("The service cannot order this product.  It requires human intervention to send the order.\r\n\r\n");
 
-			logger.LogInformation($"Transmitting ERROR message that cannot find SKU in Shopify Order {fulfillmentOrder.OrderId}.");
+			logger.LogInformation($"Transmitting ERROR message that cannot find SKU in Shopify Order {order.OrderId}.");
 			notificationProxy.SendCriticalErrorNotification(subject, body.ToString());
 		}
 		catch (Exception ex)
 		{
-			logger.LogCritical($"Error transmitting ERROR message that SKU cannot be found in Shopify Order {fulfillmentOrder.OrderId}: {ex}");
+			logger.LogCritical($"Error transmitting ERROR message that SKU cannot be found in Shopify Order {order.OrderId}: {ex}");
 		}
+	}
+
+	internal class ItemProperties
+	{
+		public string Correlation { get; set; } = "";
+		public string ImageUrl { get; set; } = "";
+		public string Text { get; set; } = "";
+		public string Position { get; set; } = "";
+		public string SpecialInstructions { get; set; } = "";
 	}
 }

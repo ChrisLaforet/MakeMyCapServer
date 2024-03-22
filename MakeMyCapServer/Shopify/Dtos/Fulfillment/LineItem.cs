@@ -55,13 +55,13 @@ namespace MakeMyCapServer.Shopify.Dtos.Fulfillment;
         public bool RequiresShipping { get; set; }
 
         [JsonPropertyName("sku")]
-        public string Sku { get; set; }
+        public string? Sku { get; set; }
 
         [JsonPropertyName("taxable")]
         public bool Taxable { get; set; }
 
         [JsonPropertyName("title")]
-        public string Title { get; set; }
+        public string? Title { get; set; }
 
         [JsonPropertyName("total_discount")]
         public string TotalDiscount { get; set; }
@@ -76,7 +76,7 @@ namespace MakeMyCapServer.Shopify.Dtos.Fulfillment;
         public string VariantInventoryManagement { get; set; }
 
         [JsonPropertyName("variant_title")]
-        public string VariantTitle { get; set; }
+        public string? VariantTitle { get; set; }
 
         [JsonPropertyName("vendor")]
         public object Vendor { get; set; }

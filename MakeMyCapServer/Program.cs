@@ -50,7 +50,6 @@ builder.Services.AddScoped<IServiceProxy, ServiceProxy>();
 builder.Services.AddScoped<IProductSkuProxy, ProductSkuProxy>();
 builder.Services.AddScoped<IEmailProxy, EmailProxy>();
 builder.Services.AddScoped<IOrderingProxy, OrderingProxy>();
-builder.Services.AddScoped<IFulfillmentProxy, FulfillmentProxy>();
 builder.Services.AddScoped<INotificationProxy, NotificationProxy>();
 builder.Services.AddScoped<IUserProxy, UserProxy>();
 

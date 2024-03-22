@@ -83,31 +83,20 @@ public class SanMarOrderService : IOrderService
 			request.Email = SanitizeString(shipping.ShipEmail);
 		}
 
-		var lookup = productSkuProxy.GetSkuMapsFor(SanMarInventoryService.SANMAR_DISTRIBUTOR_CODE);
-
 		var details = new List<SanMarOrderDetail>();
-		var notFoundSkus = new List<IDistributorOrder>();
 		foreach (var order in orders.PurchaseOrders)
 		{
-			var map = lookup.SingleOrDefault(map => string.Compare(map.Sku, order.Sku, true) == 0);
-			if (map == null)
-			{
-				logger.LogError($"Unable to map sku {order.Sku} to place order for SanMar!");
-				notFoundSkus.Add(order);
-				continue;
-			}
-
 			var detail = new SanMarOrderDetail();
 			detail.Quantity = order.Quantity;
-			detail.Style = map.StyleCode;
-			if (!string.IsNullOrEmpty(map.Color))
+			detail.Style = order.Style;
+			if (!string.IsNullOrEmpty(order.Color))
 			{
-				detail.Color = map.Color;
+				detail.Color = order.Color;
 			}
 
-			if (!string.IsNullOrEmpty(map.SizeCode))
+			if (!string.IsNullOrEmpty(order.Size))
 			{
-				detail.Size = map.SizeCode;
+				detail.Size = order.Size;
 			}
 			else
 			{
@@ -118,11 +107,6 @@ public class SanMarOrderService : IOrderService
 		}
 		request.Details = details;
 		
-		if (notFoundSkus.Count > 0)
-		{
-			NotifyOfMissingSkuMatches(notFoundSkus);
-		}
-		
 		return request;
 	}
 
@@ -131,27 +115,7 @@ public class SanMarOrderService : IOrderService
 	// var ms = new MemoryStream();
 	// serxml.Serialize(ms, request);
 	// string xml = Encoding.UTF8.GetString(ms.ToArray());
-
 	
-	private void NotifyOfMissingSkuMatches(List<IDistributorOrder> notFoundSkus)
-	{
-		var subject = $"Urgent! Order SKUs for SanMar cannot be found for sending PO {notFoundSkus[0].PoNumber}";
-
-		var body = new StringBuilder();
-		body.Append($"The following Line Items for PO {notFoundSkus[0].PoNumber} cannot be found in our mappings.\r\n");
-		body.Append($"PLEASE ORDER THESE ITEMS MANUALLY NOW.  Once done, the SKU(s) need to be mapped in our mapping table.\r\n\r\n");
-		foreach (var notFoundSku in notFoundSkus)
-		{
-			body.Append($"   Our SKU: {notFoundSku.Sku}\r\n  Style: {notFoundSku.Style}\r\n  Color: {notFoundSku.Color}\r\n  Size: {notFoundSku.Size}\r\n  Quantity: {notFoundSku.Quantity}\r\n");
-		}
-
-		body.Append("\r\n");
-		body.Append("Any other items on this PO that were located will be ordered electronically.");
-		body.Append("\r\n\r\n");
-
-		logger.LogInformation($"Transmitting critical message concerning inability to map all SKUs in PO {notFoundSkus[0].PoNumber}.");
-		notificationProxy.SendCriticalErrorNotification(subject, body.ToString());
-	}
 
 	private static string SanitizeString(string? value)
 	{

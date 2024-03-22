@@ -24,7 +24,20 @@ public class OrderService : IOrderService
 		if (response.IsSuccessStatusCode)
 		{
 			var content = response.Content.ReadFromJsonAsync<ShopifyOrders>().Result;
-			return content == null ? new List<Order>() : new List<Order>(content.Items);
+			if (content == null)
+			{
+				return new List<Order>();
+			}
+
+			var orders = new List<Order>(content.Items);
+			orders.Sort((a,b) =>
+			{
+				var aValue = a.OrderNumber == null ? 0 : (int)a.OrderNumber;
+				var bValue = b.OrderNumber == null ? 0 : (int)b.OrderNumber;
+				return aValue - bValue;
+			});
+			
+			return orders;
 		}
 		else
 		{

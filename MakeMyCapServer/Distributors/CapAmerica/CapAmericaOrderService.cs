@@ -53,8 +53,6 @@ public class CapAmericaOrderService : IOrderService
 
 	public string? FormatOrder(DistributorOrders orders)
 	{
-		var lookup = productSkuProxy.GetSkuMapsFor(CapAmericaInventoryService.CAPAMERICA_DISTRIBUTOR_CODE);
-
 		var output = new StringBuilder();
 
 		output.Append("Order Details\r\n");
@@ -71,68 +69,24 @@ public class CapAmericaOrderService : IOrderService
 			output.Append($"{orders.ShopifyOrderId.ToString()}\r\n");
 		}
 
-		var notFoundSkus = new List<IDistributorOrder>();
-
 		output.Append("Line items:\r\n");
 		foreach (var order in orders.PurchaseOrders)
 		{
-			var map = lookup.SingleOrDefault(map => string.Compare(map.Sku, order.Sku, true) == 0);
-			if (map == null)
-			{
-				logger.LogError($"Unable to map sku {order.Sku} to place order for CapAmerica!");
-				notFoundSkus.Add(order);
-				continue;
-			}
-			
-			output.Append($"{order.Quantity}   Style: {map.StyleCode}");
-			if (!string.IsNullOrEmpty(map.PartId))
-			{
-				output.Append($"  Part Id: {map.PartId}");
-			}
+			output.Append($"{order.Quantity}   Style: {order.Style}");
 
-			if (!string.IsNullOrEmpty(map.Color))
+			if (!string.IsNullOrEmpty(order.Color))
 			{
-				output.Append($"  Color: {map.Color}");
+				output.Append($"  Color: {order.Color}");
 			}
 			
-			if (!string.IsNullOrEmpty(map.SizeCode))
+			if (!string.IsNullOrEmpty(order.Size))
 			{
-				output.Append($"  Size: {map.SizeCode}");
+				output.Append($"  Size: {order.Size}");
 			}
 
 			output.Append("\r\n");
 		}
 
-		if (notFoundSkus.Count > 0)
-		{
-			NotifyOfMissingSkuMatches(notFoundSkus);
-		}
-
-		if (notFoundSkus.Count == orders.PurchaseOrders.Count)
-		{
-			return null;
-		}
-		
 		return output.ToString();
-	}
-	
-	private void NotifyOfMissingSkuMatches(List<IDistributorOrder> notFoundSkus)
-	{
-		var subject = $"Urgent! Order SKUs for CapAmerica cannot be found for sending PO {notFoundSkus[0].PoNumber}";
-
-		var body = new StringBuilder();
-		body.Append($"The following Line Items for PO {notFoundSkus[0].PoNumber} cannot be found in our mappings.\r\n");
-		body.Append($"PLEASE ORDER THESE ITEMS MANUALLY NOW.  Once done, the SKU(s) need to be mapped in our mapping table.\r\n\r\n");
-		foreach (var notFoundSku in notFoundSkus)
-		{
-			body.Append($"   Our SKU: {notFoundSku.Sku}\r\n  Style: {notFoundSku.Style}\r\n  Color: {notFoundSku.Color}\r\n  Size: {notFoundSku.Size}\r\n  Quantity: {notFoundSku.Quantity}\r\n");
-		}
-
-		body.Append("\r\n");
-		body.Append("Any other items on this PO that were located will be ordered electronically.");
-		body.Append("\r\n\r\n");
-
-		logger.LogInformation($"Transmitting critical message concerning inability to map all SKUs in PO {notFoundSkus[0].PoNumber}.");
-		notificationProxy.SendCriticalErrorNotification(subject, body.ToString());
 	}
 }

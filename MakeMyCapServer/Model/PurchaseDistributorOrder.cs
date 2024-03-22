@@ -27,6 +27,16 @@ public partial class PurchaseDistributorOrder
 
     public string? Size { get; set; }
 
+    public string? Name { get; set; }
+
+    public string? Correlation { get; set; }
+    
+    public string? ImageOrText { get; set; }
+    
+    public string? SpecialInstructions { get; set; }
+    
+    public string? Position { get; set; }
+    
     public DateTime SubmittedDateTime { get; set; }
 
     public DateTime? LastAttemptDateTime { get; set; }

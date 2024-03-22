@@ -21,8 +21,6 @@ public partial class MakeMyCapServerContext : DbContext
 
     public virtual DbSet<EmailQueue> EmailQueues { get; set; }
 
-    public virtual DbSet<FulfillmentOrder> FulfillmentOrders { get; set; }
-
     public virtual DbSet<Order> Orders { get; set; }
 
     public virtual DbSet<OrderLineItem> OrderLineItems { get; set; }
@@ -132,21 +130,6 @@ public partial class MakeMyCapServerContext : DbContext
                 .IsUnicode(false);
         });
 
-        modelBuilder.Entity<FulfillmentOrder>(entity =>
-        {
-            entity.ToTable("FulfillmentOrder");
-
-            entity.Property(e => e.FulfillmentOrderId).ValueGeneratedNever();
-            entity.Property(e => e.Status)
-                .HasMaxLength(50)
-                .IsUnicode(false);
-
-            entity.HasOne(d => d.Order).WithMany(p => p.FulfillmentOrders)
-                .HasForeignKey(d => d.OrderId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_FulfillmentOrder_Order");
-        });
-
         modelBuilder.Entity<Order>(entity =>
         {
             entity.HasKey(e => e.OrderId).HasName("PK_Order_1");
@@ -178,14 +161,30 @@ public partial class MakeMyCapServerContext : DbContext
                 .HasMaxLength(25)
                 .IsUnicode(false)
                 .HasColumnName("PONumber");
+            entity.Property(e => e.Correlation)
+                .HasMaxLength(100)
+                .IsUnicode(false)
+                .HasColumnName("Correlation");
+            entity.Property(e => e.ImageOrText)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("ImageOrText");
+            entity.Property(e => e.Position)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("Position");
+            entity.Property(e => e.SpecialInstructions)
+                .HasMaxLength(4000)
+                .IsUnicode(false)
+                .HasColumnName("SpecialInstructions");
             entity.Property(e => e.Sku)
                 .HasMaxLength(50)
                 .IsUnicode(false);
 
-            entity.HasOne(d => d.FulfillmentOrder).WithMany(p => p.OrderLineItems)
-                .HasForeignKey(d => d.FulfillmentOrderId)
+            entity.HasOne(d => d.Order).WithMany(p => p.OrderLineItems)
+                .HasForeignKey(d => d.OrderId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_OrderLineItem_FulfillmentOrder");
+                .HasConstraintName("FK_OrderLineItem_Order");
         });
 
         modelBuilder.Entity<Product>(entity =>
@@ -227,7 +226,27 @@ public partial class MakeMyCapServerContext : DbContext
             entity.Property(e => e.Style)
                 .HasMaxLength(50)
                 .IsUnicode(false);
-
+            entity.Property(e => e.Name)
+                .HasMaxLength(100)
+                .IsUnicode(false)
+                .HasColumnName("Name");
+            entity.Property(e => e.Correlation)
+                .HasMaxLength(100)
+                .IsUnicode(false)
+                .HasColumnName("Correlation");
+            entity.Property(e => e.ImageOrText)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("ImageOrText");
+            entity.Property(e => e.Position)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("Position");
+            entity.Property(e => e.SpecialInstructions)
+                .HasMaxLength(4000)
+                .IsUnicode(false)
+                .HasColumnName("SpecialInstructions");
+            
             entity.HasOne(d => d.Distributor).WithMany(p => p.PurchaseOrders)
                 .HasForeignKey(d => d.DistributorId)
                 .OnDelete(DeleteBehavior.ClientSetNull)

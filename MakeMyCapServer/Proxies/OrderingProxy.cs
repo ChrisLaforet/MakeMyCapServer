@@ -59,4 +59,32 @@ public class OrderingProxy : IOrderingProxy
 			.Max(val => val == null ? 0 : val);
 		return max == null ? 0 : (int)max;
 	}
+	
+	public Order? GetOrderById(long orderId)
+	{
+		return context.Orders.Find(orderId);
+	}
+
+	public bool DoesOrderExist(long orderId)
+	{
+		return context.Orders.Any(order => order.OrderId == orderId);
+	}
+
+	public void SaveOrder(Order order)
+	{
+		if (!context.Orders.Contains(order))
+		{
+			context.Orders.Add(order);
+		}
+		context.SaveChanges();
+	}
+
+	public void SaveOrderLineItem(OrderLineItem orderLineItem)
+	{
+		if (!context.OrderLineItems.Contains(orderLineItem))
+		{
+			context.OrderLineItems.Add(orderLineItem);
+		}
+		context.SaveChanges();
+	}
 }

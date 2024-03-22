@@ -13,6 +13,6 @@ public partial class Order
     public DateTime CreatedDateTime { get; set; }
 
     public DateTime ProcessStartDateTime { get; set; }
-
-    public virtual ICollection<FulfillmentOrder> FulfillmentOrders { get; set; } = new List<FulfillmentOrder>();
+    
+    public virtual ICollection<OrderLineItem> OrderLineItems { get; set; } = new List<OrderLineItem>();
 }

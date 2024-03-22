@@ -26,9 +26,13 @@ public static class OrderWriter
 		foreach (var order in orders.PurchaseOrders)
 		{
 			output.Append($"{order.Quantity}");
-			if (order.Sku != null)
+			if (!string.IsNullOrEmpty(order.Sku))
 			{
 				output.Append($"  Sku: {order.Sku}");
+			}
+			else if (!string.IsNullOrEmpty(order.Name))
+			{
+				output.Append($"  Name: {order.Name}");
 			}
 
 			if (order.Style != null)
@@ -45,6 +49,38 @@ public static class OrderWriter
 			{
 				output.Append($"  Size: {order.Size}");
 			}
+			output.Append("\r\n");
+
+			if (!string.IsNullOrEmpty(order.ImageOrText))
+			{
+				if (!string.IsNullOrEmpty(order.Position))
+				{
+					output.Append($"   Position: {order.Position}");
+				}
+				
+				if (order.ImageOrText.StartsWith("http"))
+				{
+					output.Append($"  Image URL: {order.ImageOrText}");
+				}
+				else
+				{
+					output.Append($"  Text: {order.ImageOrText}");
+				}
+				output.Append("\r\n");
+			}
+			
+			if (!string.IsNullOrEmpty(order.Correlation))
+			{
+				output.Append($"   Correlation: {order.Correlation}");
+				output.Append("\r\n");
+			}
+			
+			if (!string.IsNullOrEmpty(order.SpecialInstructions))
+			{
+				output.Append($"   Special Instructions: {order.SpecialInstructions}");
+				output.Append("\r\n");
+			}
+			
 			output.Append("\r\n");
 		}
 

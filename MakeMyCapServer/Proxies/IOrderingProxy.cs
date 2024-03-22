@@ -17,4 +17,10 @@ public interface IOrderingProxy
 	List<PurchaseDistributorOrder> GetPendingPurchaseOrders();
 
 	int GetMaxPoNumberSequence();
+	
+	Order? GetOrderById(long orderId);
+	bool DoesOrderExist(long orderId);
+	void SaveOrder(Order order);
+
+	void SaveOrderLineItem(OrderLineItem orderLineItem);
 }

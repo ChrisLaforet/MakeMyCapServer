@@ -21,6 +21,16 @@ public interface IDistributorOrder
 	string? Size { get; }
 	
 	string DistributorName { get; }
+	
+	string Name { get; }
+	
+	string Correlation { get; }
+	
+	string ImageOrText { get; }
+	
+	string Position { get; }
+	
+	string SpecialInstructions { get; }
 
 	DateTime CreateDate { get; }
 	
