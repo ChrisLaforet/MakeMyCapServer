@@ -167,6 +167,13 @@ CREATE TABLE [dbo].[Order](
 	[CheckoutToken] [varchar](255) NULL,
 	[CreatedDateTime] [datetime2](7) NOT NULL,
 	[ProcessStartDateTime] [datetime2](7) NOT NULL,
+	[DeliverToName] [varchar](255) NULL,
+	[DeliverToAddress1] [varchar](255) NULL,
+	[DeliverToAddress2] [varchar](255) NULL,
+	[DeliverToCity] [varchar](255) NULL,
+	[DeliverToStateProv] [varchar](10) NULL,
+	[DeliverToZipPC] [varchar](20) NULL,
+	[DeliverToCountry] [varchar](10) NULL,
  CONSTRAINT [PK_Order_1] PRIMARY KEY CLUSTERED 
 (
 	[OrderId] ASC
@@ -229,6 +236,11 @@ CREATE TABLE [dbo].[PurchaseOrder](
 	[Style] [varchar](50) NULL,
 	[Color] [varchar](50) NULL,
 	[Size] [varchar](50) NULL,
+	[Name] [varchar](50) NULL,
+	[Correlation] [varchar](100) NULL,
+	[ImageOrText] [varchar](255) NULL,
+	[Position] [varchar](50) NULL,
+	[SpecialInstructions] [varchar](4000) NULL,
 	[SubmittedDateTime] [datetime2](7) NOT NULL,
 	[LastAttemptDateTime] [datetime2](7) NULL,
 	[SuccessDateTime] [datetime2](7) NULL,
