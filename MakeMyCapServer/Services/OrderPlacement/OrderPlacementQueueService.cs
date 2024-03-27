@@ -116,11 +116,19 @@ public class OrderPlacementQueueService : IOrderPlacementProcessingService
 					assembly.OrderDate = order.OrderDate;
 					assembly.ShopifyOrderId = order.ShopifyOrderId;
 					assembly.ShopifyOrderNumber = orderDetail == null ? "" : orderDetail.OrderNumber;
+
+					assembly.DeliverToName = orderDetail?.DeliverToName;
+					assembly.DeliverToAddress1 = orderDetail?.DeliverToAddress1;
+					assembly.DeliverToAddress2 = orderDetail?.DeliverToAddress2;
+					assembly.DeliverToCity = orderDetail?.DeliverToCity;
+					assembly.DeliverToStateProv = orderDetail?.DeliverToStateProv;
+					assembly.DeliverToZipPC = orderDetail?.DeliverToZipPC;
+					assembly.DeliverToCountry = orderDetail?.DeliverToCountry;
+
 					isFirst = false;
 				}
 				assembly.PurchaseOrders.Add(order);
 			}
-			
 		}
 
 		return assemblies;

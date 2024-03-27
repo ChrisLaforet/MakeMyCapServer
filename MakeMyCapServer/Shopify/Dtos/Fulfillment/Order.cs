@@ -260,7 +260,7 @@ namespace MakeMyCapServer.Shopify.Dtos.Fulfillment;
         public List<Refund> Refunds { get; set; }
 
         [JsonPropertyName("shipping_address")]
-        public ShippingAddress ShippingAddress { get; set; }
+        public ShippingAddress? ShippingAddress { get; set; }
 
         [JsonPropertyName("shipping_lines")]
         public List<ShippingLine> ShippingLines { get; set; }

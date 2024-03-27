@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace MakeMyCapAdmin.Model;
+﻿namespace MakeMyCapAdmin.Model;
 
 public partial class PurchaseDistributorOrder
 {

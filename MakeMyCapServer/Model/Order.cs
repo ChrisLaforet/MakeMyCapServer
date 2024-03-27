@@ -14,5 +14,19 @@ public partial class Order
 
     public DateTime ProcessStartDateTime { get; set; }
     
+    public string? DeliverToName { get; set; }
+    
+    public string? DeliverToAddress1 { get; set; }
+    
+    public string? DeliverToAddress2 { get; set; }
+    
+    public string? DeliverToCity { get; set; }
+    
+    public string? DeliverToStateProv { get; set; }
+    
+    public string? DeliverToZipPC { get; set; }
+
+    public string? DeliverToCountry { get; set; }
+
     public virtual ICollection<OrderLineItem> OrderLineItems { get; set; } = new List<OrderLineItem>();
 }

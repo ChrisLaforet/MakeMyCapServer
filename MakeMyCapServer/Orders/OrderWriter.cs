@@ -33,6 +33,21 @@ public static class OrderWriter
 		{
 			output.Append($"{orders.ShopifyOrderNumber}\r\n");
 		}
+		
+		output.Append("\r\nDelivery to:\r\n\r\n");
+		if (!string.IsNullOrEmpty(orders.DeliverToName))
+		{
+			output.Append($"{orders.DeliverToName}\r\n");
+		}
+		if (!string.IsNullOrEmpty(orders.DeliverToAddress1))
+		{
+			output.Append($"{orders.DeliverToAddress1}\r\n");
+		}
+		if (!string.IsNullOrEmpty(orders.DeliverToAddress2))
+		{
+			output.Append($"{orders.DeliverToAddress2}\r\n");
+		}
+		output.Append($"{orders.DeliverToCity}, {orders.DeliverToStateProv} {orders.DeliverToZipPC}  {orders.DeliverToCountry}\r\n");
 
 		output.Append("\r\nLine items:\r\n\r\n");
 		foreach (var group in GroupAndSortOrders(orders.PurchaseOrders))

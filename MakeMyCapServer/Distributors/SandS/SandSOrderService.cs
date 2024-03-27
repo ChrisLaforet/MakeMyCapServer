@@ -16,7 +16,7 @@ public class SandSOrderService : IOrderService
 	
 	public const string ORDER_ENDPOINT = "https://api.ssactivewear.com/v2/orders/";
 
-	public const bool IS_TEST_MODE = true;
+	public const bool IS_TEST_MODE = false;
 	
 	public const string SHIPPING_CODE = "1";
 	// 1 = S&S decides - preferred by CapAmerica

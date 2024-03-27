@@ -172,6 +172,17 @@ public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 			order.CreatedDateTime = shopifyOrder.CreatedAt;
 			order.ProcessStartDateTime = DateTime.Now;
 
+			if (shopifyOrder.ShippingAddress != null)
+			{
+				order.DeliverToName = shopifyOrder.ShippingAddress?.Name;
+				order.DeliverToAddress1 = shopifyOrder.ShippingAddress?.Address1;
+				order.DeliverToAddress2 = shopifyOrder.ShippingAddress?.Address2;
+				order.DeliverToCity = shopifyOrder.ShippingAddress?.City;
+				order.DeliverToStateProv = shopifyOrder.ShippingAddress?.ProvinceCode;
+				order.DeliverToZipPC = shopifyOrder.ShippingAddress?.Zip;
+				order.DeliverToCountry = shopifyOrder.ShippingAddress?.CountryCode;
+			}
+
 			if (shopifyOrder.LineItems.Count > 0) {
 				PrepareFulfillment(shopifyOrder.LineItems, order);
 			}

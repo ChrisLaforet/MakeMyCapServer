@@ -145,6 +145,27 @@ public partial class MakeMyCapServerContext : DbContext
             entity.Property(e => e.OrderNumber)
                 .HasMaxLength(50)
                 .IsUnicode(false);
+            entity.Property(e => e.DeliverToName)
+                .HasMaxLength(255)
+                .IsUnicode(false);
+            entity.Property(e => e.DeliverToAddress1)
+                .HasMaxLength(255)
+                .IsUnicode(false);
+            entity.Property(e => e.DeliverToAddress2)
+                .HasMaxLength(255)
+                .IsUnicode(false);
+            entity.Property(e => e.DeliverToCity)
+                .HasMaxLength(255)
+                .IsUnicode(false);
+            entity.Property(e => e.DeliverToStateProv)
+                .HasMaxLength(10)
+                .IsUnicode(false);
+            entity.Property(e => e.DeliverToZipPC)
+                .HasMaxLength(20)
+                .IsUnicode(false);
+            entity.Property(e => e.DeliverToCountry)
+                .HasMaxLength(10)
+                .IsUnicode(false);
         });
 
         modelBuilder.Entity<OrderLineItem>(entity =>
