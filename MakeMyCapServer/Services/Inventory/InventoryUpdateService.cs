@@ -254,9 +254,22 @@ public sealed class InventoryUpdateService : IInventoryProcessingService
 				}
 
 				var inStockInventories = inventoryService.GetInStockInventoryFor(variants.Select(v => v.Sku).ToList());
+				AdjustInStockInventoriesWithInHouseQuantities(inStockInventories);
 				AdjustInventoryLevelsFor(inStockInventories, variants);
 			}
 		}
+	}
+
+	private void AdjustInStockInventoriesWithInHouseQuantities(List<InStockInventory> inStockInventories)
+	{
+		inStockInventories.ForEach(inventory =>
+		{
+			var inHouse = productSkuProxy.GetInHouseInventoryFor(inventory.Sku);
+			if (inHouse != null && inHouse.OnHand > 0)
+			{
+				inventory.Quantity += inHouse.OnHand;
+			}
+		});
 	}
 
 	private void AdjustInventoryLevelsFor(List<InStockInventory> inStockInventories, List<SaleProduct> variants)

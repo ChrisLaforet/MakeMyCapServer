@@ -16,4 +16,8 @@ public interface IProductSkuProxy
 
 	DistributorSkuMap CreateSkuMap(string sku, string distributorCode, string? distributorSku, string? brand,
 		string styleCode, string? partId, string? color, string? colorCode, string? sizeCode);
+
+	List<InHouseInventory> GetInHouseInventories();
+	InHouseInventory? GetInHouseInventoryFor(string sku);
+	void SaveInHouseInventory(InHouseInventory inHouseInventory);
 }

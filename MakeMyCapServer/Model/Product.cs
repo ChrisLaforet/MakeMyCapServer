@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace MakeMyCapServer.Model;
+﻿namespace MakeMyCapServer.Model;
 
 public partial class Product
 {

@@ -287,6 +287,26 @@ CREATE TABLE [dbo].[Settings](
 	[CriticalEmailRecipient3] [varchar](120) NULL
 ) ON [PRIMARY]
 GO
+/****** Object:  Table [dbo].[InHouseInventory]    Script Date: 3/28/2024 2:05:24 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[InHouseInventory](
+	[Sku] [varchar](30) NOT NULL,
+	[OnHand] [int] NOT NULL,
+	[LastUsage] [int] NOT NULL,
+ CONSTRAINT [PK_InHouseInventory] PRIMARY KEY CLUSTERED 
+(
+	[Sku] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+ALTER TABLE [dbo].[InHouseInventory] ADD  CONSTRAINT [DF_InHouseInventory_LastUsage]  DEFAULT ((0)) FOR [LastUsage]
+GO
 /****** Object:  Table [dbo].[Shipping]    Script Date: 11/22/2023 8:55:08 AM ******/
 SET ANSI_NULLS ON
 GO

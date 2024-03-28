@@ -21,6 +21,8 @@ public partial class MakeMyCapServerContext : DbContext
 
     public virtual DbSet<EmailQueue> EmailQueues { get; set; }
 
+    public virtual DbSet<InHouseInventory> InHouseInventories { get; set; }
+
     public virtual DbSet<Order> Orders { get; set; }
 
     public virtual DbSet<OrderLineItem> OrderLineItems { get; set; }
@@ -127,6 +129,15 @@ public partial class MakeMyCapServerContext : DbContext
                 .IsUnicode(false);
             entity.Property(e => e.Subject)
                 .HasMaxLength(250)
+                .IsUnicode(false);
+        });
+        
+        modelBuilder.Entity<InHouseInventory>(entity =>
+        {
+            entity.ToTable("InHouseInventory");
+
+            entity.Property(e => e.Sku)
+                .HasMaxLength(20)
                 .IsUnicode(false);
         });
 

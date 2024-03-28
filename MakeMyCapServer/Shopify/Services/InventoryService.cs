@@ -23,10 +23,6 @@ public class InventoryService : IInventoryService
 		var response = task.Result; 
 		if (response.IsSuccessStatusCode)
 		{
-			//Console.WriteLine(response.Content.ReadAsStringAsync().Result);
-			// var s = response.Content.ReadAsStringAsync().Result;
-			// var content = JsonSerializer.Deserialize<InventoryItemWrapper>(s);
-
 			var content = response.Content.ReadFromJsonAsync<InventoryItemWrapper>().Result;
 			return content == null ? null : content.InventoryItem;
 		}

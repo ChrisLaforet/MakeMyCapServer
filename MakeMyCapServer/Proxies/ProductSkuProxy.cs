@@ -65,4 +65,23 @@ public class ProductSkuProxy : IProductSkuProxy
 		context.SaveChanges();
 		return map;
 	}
+
+	public List<InHouseInventory> GetInHouseInventories()
+	{
+		return context.InHouseInventories.ToList();
+	}
+
+	public InHouseInventory? GetInHouseInventoryFor(string sku)
+	{
+		return context.InHouseInventories.FirstOrDefault(rec => rec.Sku == sku);
+	}
+
+	public void SaveInHouseInventory(InHouseInventory inHouseInventory)
+	{
+		if (!context.InHouseInventories.Contains(inHouseInventory))
+		{
+			context.InHouseInventories.Add(inHouseInventory);
+		}
+		context.SaveChanges();
+	}
 }
