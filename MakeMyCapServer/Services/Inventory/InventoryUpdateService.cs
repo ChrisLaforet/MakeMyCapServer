@@ -267,6 +267,7 @@ public sealed class InventoryUpdateService : IInventoryProcessingService
 			var inHouse = productSkuProxy.GetInHouseInventoryFor(inventory.Sku);
 			if (inHouse != null && inHouse.OnHand > 0)
 			{
+				logger.LogInformation($"In-house on-hand quantity of {inHouse.OnHand} added to supplier quantity {inventory.Quantity} for {inventory.Sku}");
 				inventory.Quantity += inHouse.OnHand;
 			}
 		});

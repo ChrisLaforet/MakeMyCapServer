@@ -222,7 +222,13 @@ public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 				}
 			
 				logger.LogInformation($"Using PO {poSequence} for ordering {lineItem.Quantity} of SKU {lineItem.Sku} in Shopify Order {order.OrderId}");
-				PrepareAndOrderLineItem(lineItem, lineItemProperties, order, poSequence, skuMap.DistributorCode, skuMap);
+				
+				// Question pending with Cory: Do we need to send an order to CapAmerica indicating we are fulfilling this item from in-house quantities
+				var remaining = RemainingAfterFulfillingFromInHouseInventory(skuMap, lineItem);
+				if (remaining > 0)
+				{
+					PrepareAndOrderLineItem(lineItem, remaining, lineItemProperties, order, poSequence, skuMap.DistributorCode, skuMap);
+				}
 			}
 			
 			// always duplicate caps to MMC and all non-cap items go to MMC
@@ -237,7 +243,7 @@ public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 				logger.LogInformation($"Using PO {poSequence} for ordering for MMC in Shopify Order {order.OrderId}");
 			}
 			
-			PrepareAndOrderLineItem(lineItem, lineItemProperties, order, poSequence, MMC_DISTRIBUTOR_CODE, skuMap);
+			PrepareAndOrderLineItem(lineItem, lineItem.Quantity, lineItemProperties, order, poSequence, MMC_DISTRIBUTOR_CODE, skuMap);
 		}
 	}
 
@@ -275,7 +281,22 @@ public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 		return result;
 	}
 
-	private void PrepareAndOrderLineItem(LineItem shopifyLineItem, ItemProperties lineItemProperties, DbOrder order, int poSequence, string distributorCode, DistributorSkuMap? skuMap)
+	private int RemainingAfterFulfillingFromInHouseInventory(DistributorSkuMap skuMap, LineItem shopifyLineItem)
+	{
+		var remaining = shopifyLineItem.Quantity;
+		var inHouse = productSkuProxy.GetInHouseInventoryFor(skuMap.Sku);
+		if (inHouse != null && inHouse.OnHand > 0)
+		{
+			var toPick = inHouse.OnHand >= remaining ? remaining : inHouse.OnHand;
+			remaining -= toPick;
+			inHouse.OnHand -= toPick;
+			inHouse.LastUsage = toPick;
+			productSkuProxy.SaveInHouseInventory(inHouse);
+		}
+		return remaining;
+	}
+
+	private void PrepareAndOrderLineItem(LineItem shopifyLineItem, int quantity, ItemProperties lineItemProperties, DbOrder order, int poSequence, string distributorCode, DistributorSkuMap? skuMap)
 	{
 		var mmcCapCopy = false;
 		var lineItem = new OrderLineItem();
@@ -298,7 +319,7 @@ public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 		{
 			lineItem.Name = lineItem.Name.Substring(0, 50);
 		}
-		lineItem.Quantity = shopifyLineItem.Quantity;
+		lineItem.Quantity = quantity;
 		lineItem.Correlation = lineItemProperties.Correlation;
 		lineItem.ImageOrText = string.IsNullOrEmpty(lineItemProperties.ImageUrl) ? lineItemProperties.Text : lineItemProperties.ImageUrl;
 		lineItem.Position = lineItemProperties.Position;
