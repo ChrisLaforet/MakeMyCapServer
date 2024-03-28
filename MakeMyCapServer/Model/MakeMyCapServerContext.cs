@@ -134,6 +134,8 @@ public partial class MakeMyCapServerContext : DbContext
         
         modelBuilder.Entity<InHouseInventory>(entity =>
         {
+            entity.HasKey(e => e.Sku).HasName("PK_InHouseInventory");
+            
             entity.ToTable("InHouseInventory");
 
             entity.Property(e => e.Sku)
