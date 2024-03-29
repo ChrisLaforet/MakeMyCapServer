@@ -5,7 +5,7 @@ namespace MakeMyCapServer.Shopify.Dtos.Fulfillment;
 public class Refund
 {
 	[JsonPropertyName("id")]
-	public int Id { get; set; }
+	public long Id { get; set; }
 
 	[JsonPropertyName("admin_graphql_api_id")]
 	public string AdminGraphqlApiId { get; set; }
@@ -17,7 +17,7 @@ public class Refund
 	public string Note { get; set; }
 
 	[JsonPropertyName("order_id")]
-	public int OrderId { get; set; }
+	public long OrderId { get; set; }
 
 	[JsonPropertyName("processed_at")]
 	public DateTime ProcessedAt { get; set; }
@@ -32,7 +32,7 @@ public class Refund
 	public AmountSet TotalDutiesSet { get; set; }
 
 	[JsonPropertyName("user_id")]
-	public int UserId { get; set; }
+	public long UserId { get; set; }
 
 	[JsonPropertyName("order_adjustments")]
 	public List<object> OrderAdjustments { get; set; }

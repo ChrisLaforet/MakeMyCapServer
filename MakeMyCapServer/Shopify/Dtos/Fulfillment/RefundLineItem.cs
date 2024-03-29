@@ -5,13 +5,13 @@ namespace MakeMyCapServer.Shopify.Dtos.Fulfillment;
 public class RefundLineItem
 {
 	[JsonPropertyName("id")]
-	public int Id { get; set; }
+	public long Id { get; set; }
 
 	[JsonPropertyName("line_item_id")]
-	public int LineItemId { get; set; }
+	public long LineItemId { get; set; }
 
 	[JsonPropertyName("location_id")]
-	public int LocationId { get; set; }
+	public long LocationId { get; set; }
 
 	[JsonPropertyName("quantity")]
 	public int Quantity { get; set; }
