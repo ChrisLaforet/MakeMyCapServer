@@ -194,6 +194,7 @@ CREATE TABLE [dbo].[OrderLineItem](
 	[ProductId] [bigint] NOT NULL,
 	[VariantId] [bigint] NOT NULL,
 	[PONumber] [varchar](25) NULL,
+	[ShopifyName] [varchar](1024) NULL,
  CONSTRAINT [PK_OrderLineItem] PRIMARY KEY CLUSTERED 
 (
 	[LineItemId] ASC
@@ -247,6 +248,9 @@ CREATE TABLE [dbo].[PurchaseOrder](
 	[Attempts] [int] NOT NULL,
 	[WarningNotificationCount] [int] NOT NULL,
 	[FailureNotificationDateTime] [datetime2](7) NULL,
+	[ShopifyName] [varchar](1024) NULL,
+	[Supplier] [varchar](50) NULL,
+	[SupplierPoNumber] [varchar](25) NULL,
  CONSTRAINT [PK_PurchaseOrder] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
