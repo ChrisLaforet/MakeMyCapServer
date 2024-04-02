@@ -99,13 +99,25 @@ public static class OrderWriter
 
 					output.Append("\r\n");
 				}
+				
+				if (!string.IsNullOrEmpty(order.ShopifyName))
+				{
+					output.Append($"   Shopify Name: {order.ShopifyName}");
+					output.Append("\r\n");
+				}
 
+				if (!string.IsNullOrEmpty(order.SupplierPoNumber))
+				{
+					output.Append($"   Supplier/Supplier PO: {order.Supplier} {order.SupplierPoNumber}");
+					output.Append("\r\n");
+				}
+				
 				if (!string.IsNullOrEmpty(order.Correlation))
 				{
 					output.Append($"   Correlation: {order.Correlation}");
 					output.Append("\r\n");
 				}
-
+				
 				if (!string.IsNullOrEmpty(order.SpecialInstructions))
 				{
 					output.Append($"   Special Instructions: {order.SpecialInstructions}");

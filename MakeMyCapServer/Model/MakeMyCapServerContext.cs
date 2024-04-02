@@ -214,7 +214,11 @@ public partial class MakeMyCapServerContext : DbContext
             entity.Property(e => e.Sku)
                 .HasMaxLength(50)
                 .IsUnicode(false);
-
+            entity.Property(e => e.ShopifyName)
+                .HasMaxLength(4000)
+                .IsUnicode(false)
+                .HasColumnName("ShopifyName");
+            
             entity.HasOne(d => d.Order).WithMany(p => p.OrderLineItems)
                 .HasForeignKey(d => d.OrderId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
@@ -280,7 +284,18 @@ public partial class MakeMyCapServerContext : DbContext
                 .HasMaxLength(4000)
                 .IsUnicode(false)
                 .HasColumnName("SpecialInstructions");
-            
+            entity.Property(e => e.ShopifyName)
+                .HasMaxLength(1024)
+                .IsUnicode(false)
+                .HasColumnName("ShopifyName");
+            entity.Property(e => e.Supplier)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("Supplier");
+            entity.Property(e => e.SupplierPoNumber)
+                .HasMaxLength(25)
+                .IsUnicode(false)
+                .HasColumnName("SupplierPoNumber");
             entity.HasOne(d => d.Distributor).WithMany(p => p.PurchaseOrders)
                 .HasForeignKey(d => d.DistributorId)
                 .OnDelete(DeleteBehavior.ClientSetNull)

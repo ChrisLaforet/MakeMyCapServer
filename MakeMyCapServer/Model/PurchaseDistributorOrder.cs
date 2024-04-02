@@ -48,6 +48,12 @@ public partial class PurchaseDistributorOrder
     public int WarningNotificationCount { get; set; }
 
     public DateTime? FailureNotificationDateTime { get; set; }
+    
+    public string? ShopifyName { get; set; }
+    
+    public string? Supplier { get; set; }
+    
+    public string? SupplierPoNumber { get; set; }
 
     public virtual Distributor Distributor { get; set; } = null!;
 }

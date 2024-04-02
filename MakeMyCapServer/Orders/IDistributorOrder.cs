@@ -43,4 +43,10 @@ public interface IDistributorOrder
 	int WarningNotificationCount { get; set; }
 
 	DateTime? FailureNotificationDateTime { get; set; }
+	
+	string? ShopifyName { get; set; }
+	
+	string? Supplier { get; set; }
+	
+	string? SupplierPoNumber { get; set; }
 }

@@ -49,8 +49,10 @@ public class PurchaseOrderCreator : IOrderGenerator
 		return poNumberSequence;
 	}
 	
-	public Model.PurchaseDistributorOrder? GenerateOrderFor(string distributorCode, DistributorSkuMap? skuMap, long shopifyOrderId, int quantity, int poSequence,
-		string name, string correlation, string imageOrText, string position, string specialInstructions)
+	public Model.PurchaseDistributorOrder? GenerateOrderFor(string distributorCode, DistributorSkuMap? skuMap, long shopifyOrderId, 
+															int quantity, int poSequence, string name, string correlation, string imageOrText, 
+															string position, string specialInstructions, string? shopifyName,
+															int? distributorPo)
 	{
 		var distributor = orderingProxy.GetDistributorByCode(distributorCode);
 		if (distributor == null)
@@ -60,7 +62,7 @@ public class PurchaseOrderCreator : IOrderGenerator
 			return null;
 		}
 		
-		var poNumber = $"MMC{poSequence.ToString("D9")}";
+		var poNumber = GeneratePONumber(poSequence);
 		
 		var purchaseOrder = new Model.PurchaseDistributorOrder();
 		purchaseOrder.DistributorId = distributor.Id;
@@ -78,10 +80,21 @@ public class PurchaseOrderCreator : IOrderGenerator
 		purchaseOrder.ImageOrText = imageOrText;
 		purchaseOrder.Position = position;
 		purchaseOrder.SpecialInstructions = specialInstructions;
+		purchaseOrder.ShopifyName = shopifyName;
+		if (skuMap != null && distributorPo != null)
+		{
+			purchaseOrder.Supplier = skuMap.DistributorCode;
+			purchaseOrder.SupplierPoNumber = GeneratePONumber((int)distributorPo);
+		}
 		purchaseOrder.SubmittedDateTime = DateTime.Now;
 		
 		orderingProxy.SavePurchaseOrder(purchaseOrder);
 		return purchaseOrder;
+	}
+
+	private string GeneratePONumber(int sequence)
+	{
+		return $"MMC{sequence.ToString("D9")}";
 	}
 	
 	private void TransmitErrorMessage(string distributorCode, long shopifyOrderId, int quantity)

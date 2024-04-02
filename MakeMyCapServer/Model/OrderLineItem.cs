@@ -25,6 +25,8 @@ public partial class OrderLineItem
     public string? SpecialInstructions { get; set; }
     
     public string? Position { get; set; }
+    
+    public string? ShopifyName { get; set; }
 
     public virtual Order Order { get; set; } = null!;
 }

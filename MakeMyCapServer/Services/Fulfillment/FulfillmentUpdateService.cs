@@ -205,6 +205,7 @@ public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 		{
 			var sku = lineItem.Sku;
 			var poSequence = 0;
+			int? distributorPO = null;
 
 			var lineItemProperties = ExtractLineItemProperties(lineItem);
 
@@ -220,6 +221,8 @@ public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 					poSequence = orderGenerator.GetNextPOSequence();
 					poLookup[skuMap.DistributorCode] = poSequence;
 				}
+
+				distributorPO = poSequence;
 			
 				logger.LogInformation($"Using PO {poSequence} for ordering {lineItem.Quantity} of SKU {lineItem.Sku} in Shopify Order {order.OrderId}");
 				
@@ -227,7 +230,7 @@ public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 				var remaining = RemainingAfterFulfillingFromInHouseInventory(skuMap, lineItem);
 				if (remaining > 0)
 				{
-					PrepareAndOrderLineItem(lineItem, remaining, lineItemProperties, order, poSequence, skuMap.DistributorCode, skuMap);
+					PrepareAndOrderLineItem(lineItem, remaining, lineItemProperties, order, poSequence, skuMap.DistributorCode, skuMap, null);
 				}
 			}
 			
@@ -243,7 +246,7 @@ public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 				logger.LogInformation($"Using PO {poSequence} for ordering for MMC in Shopify Order {order.OrderId}");
 			}
 			
-			PrepareAndOrderLineItem(lineItem, lineItem.Quantity, lineItemProperties, order, poSequence, MMC_DISTRIBUTOR_CODE, skuMap);
+			PrepareAndOrderLineItem(lineItem, lineItem.Quantity, lineItemProperties, order, poSequence, MMC_DISTRIBUTOR_CODE, skuMap, distributorPO);
 		}
 	}
 
@@ -296,7 +299,9 @@ public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 		return remaining;
 	}
 
-	private void PrepareAndOrderLineItem(LineItem shopifyLineItem, int quantity, ItemProperties lineItemProperties, DbOrder order, int poSequence, string distributorCode, DistributorSkuMap? skuMap)
+	private void PrepareAndOrderLineItem(LineItem shopifyLineItem, int quantity, ItemProperties lineItemProperties, 
+										DbOrder order, int poSequence, string distributorCode, 
+										DistributorSkuMap? skuMap, int? distributorPO)
 	{
 		var mmcCapCopy = false;
 		var lineItem = new OrderLineItem();
@@ -324,6 +329,7 @@ public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 		lineItem.ImageOrText = string.IsNullOrEmpty(lineItemProperties.ImageUrl) ? lineItemProperties.Text : lineItemProperties.ImageUrl;
 		lineItem.Position = lineItemProperties.Position;
 		lineItem.SpecialInstructions = lineItemProperties.SpecialInstructions;
+		lineItem.ShopifyName = shopifyLineItem.Name;
 		if (lineItem.SpecialInstructions.Length > 4000)
 		{
 			lineItem.SpecialInstructions = lineItem.SpecialInstructions.Substring(0, 4000);
@@ -332,7 +338,8 @@ public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 		if (mmcCapCopy)
 		{
 			orderGenerator.GenerateOrderFor(distributorCode, skuMap, order.OrderId, shopifyLineItem.Quantity, poSequence, 
-				lineItem.Name, lineItem.Correlation, lineItem.ImageOrText, lineItem.Position, lineItem.SpecialInstructions);
+				lineItem.Name, lineItem.Correlation, lineItem.ImageOrText, lineItem.Position, 
+				lineItem.SpecialInstructions, lineItem.ShopifyName, distributorPO);
 		}
 		else
 		{
@@ -346,7 +353,7 @@ public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 			else
 			{
 				orderGenerator.GenerateOrderFor(distributorCode, skuMap, order.OrderId, shopifyLineItem.Quantity, poSequence,
-					lineItem.Name, lineItem.Correlation, lineItem.ImageOrText, lineItem.Position, lineItem.SpecialInstructions);
+					lineItem.Name, lineItem.Correlation, lineItem.ImageOrText, lineItem.Position, lineItem.SpecialInstructions, lineItem.ShopifyName, null);
 			}
 		}
 	}
