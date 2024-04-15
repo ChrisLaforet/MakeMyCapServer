@@ -51,7 +51,7 @@ public class CapAmericaOrderService : IOrderService
 		return true;
 	}
 
-	public string? FormatOrder(DistributorOrders orders)
+	private string? FormatOrder(DistributorOrders orders)
 	{
 		var output = new StringBuilder();
 

@@ -226,7 +226,7 @@ public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 			
 				logger.LogInformation($"Using PO {poSequence} for ordering {lineItem.Quantity} of SKU {lineItem.Sku} in Shopify Order {order.OrderId}");
 				
-				// Question pending with Cory: Do we need to send an order to CapAmerica indicating we are fulfilling this item from in-house quantities
+// Question pending with Cory: Do we need to send an order to CapAmerica indicating we are fulfilling this item from in-house quantities
 				var remaining = RemainingAfterFulfillingFromInHouseInventory(skuMap, lineItem);
 				if (remaining > 0)
 				{
