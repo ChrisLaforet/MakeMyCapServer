@@ -16,7 +16,7 @@ public class SanMarOrderService : IOrderService
 
 	private const char COMMA = ',';
 	private const string OSFA = "OSFA";
-	private const string SHIPPING_CODE = "UPS";
+	private const string SHIPPING_CODE = "PSST";
 	
 	private readonly SanMarOrderServices services;
 	private readonly IProductSkuProxy productSkuProxy;
