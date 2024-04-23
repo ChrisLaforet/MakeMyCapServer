@@ -179,6 +179,9 @@ public partial class MakeMyCapServerContext : DbContext
             entity.Property(e => e.DeliverToCountry)
                 .HasMaxLength(10)
                 .IsUnicode(false);
+            entity.Property(e => e.OrderNotes)
+                .HasMaxLength(4096)
+                .IsUnicode(false);
         });
 
         modelBuilder.Entity<OrderLineItem>(entity =>

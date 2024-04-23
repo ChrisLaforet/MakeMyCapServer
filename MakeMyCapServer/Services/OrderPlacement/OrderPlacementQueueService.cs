@@ -97,7 +97,7 @@ public class OrderPlacementQueueService : IOrderPlacementProcessingService
 			}
 		}
 
-		var assemblies = new List<DistributorOrders>();
+		var assemblies = new System.Collections.Generic.List<DistributorOrders>();
 		foreach (var key in matcher.Keys)
 		{
 			var assembly = new DistributorOrders();
@@ -124,6 +124,8 @@ public class OrderPlacementQueueService : IOrderPlacementProcessingService
 					assembly.DeliverToStateProv = orderDetail?.DeliverToStateProv;
 					assembly.DeliverToZipPC = orderDetail?.DeliverToZipPC;
 					assembly.DeliverToCountry = orderDetail?.DeliverToCountry;
+
+					assembly.OrderNotes = orderDetail?.OrderNotes;
 
 					isFirst = false;
 				}

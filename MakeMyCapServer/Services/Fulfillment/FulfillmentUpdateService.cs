@@ -183,6 +183,11 @@ public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 				order.DeliverToCountry = shopifyOrder.ShippingAddress?.CountryCode;
 			}
 
+			if (!string.IsNullOrEmpty(shopifyOrder.Note))
+			{
+				order.OrderNotes = shopifyOrder.Note.Trim();
+			}
+
 			if (shopifyOrder.LineItems.Count > 0) {
 				PrepareFulfillment(shopifyOrder.LineItems, order);
 			}

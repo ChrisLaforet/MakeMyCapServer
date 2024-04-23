@@ -27,6 +27,8 @@ public partial class Order
     public string? DeliverToZipPC { get; set; }
 
     public string? DeliverToCountry { get; set; }
+    
+    public string? OrderNotes { get; set; }
 
     public virtual ICollection<OrderLineItem> OrderLineItems { get; set; } = new List<OrderLineItem>();
 }

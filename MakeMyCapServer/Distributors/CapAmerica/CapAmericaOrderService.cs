@@ -68,6 +68,11 @@ public class CapAmericaOrderService : IOrderService
 		{
 			output.Append($"{orders.ShopifyOrderId.ToString()}\r\n");
 		}
+		
+		if (!string.IsNullOrEmpty(orders.OrderNotes))
+		{
+			output.Append($"Shopify Order Notes: {orders.OrderNotes}\r\n");
+		}
 
 		output.Append("\r\nLine items:\r\n\r\n");
 		foreach (var order in orders.PurchaseOrders)

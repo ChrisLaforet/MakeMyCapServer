@@ -49,6 +49,11 @@ public static class OrderWriter
 		}
 		output.Append($"{orders.DeliverToCity}, {orders.DeliverToStateProv} {orders.DeliverToZipPC}  {orders.DeliverToCountry}\r\n");
 
+		if (!string.IsNullOrEmpty(orders.OrderNotes))
+		{
+			output.Append($"Shopify Order Notes: {orders.OrderNotes}\r\n");
+		}
+		
 		output.Append("\r\nLine items:\r\n\r\n");
 		foreach (var group in GroupAndSortOrders(orders.PurchaseOrders))
 		{

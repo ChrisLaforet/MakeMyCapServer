@@ -17,5 +17,7 @@ public class DistributorOrders
 	public string? DeliverToZipPC { get; set; }
 	public string? DeliverToCountry { get; set; }
 	
+	public string? OrderNotes { get; set; }
+	
 	public List<IDistributorOrder> PurchaseOrders { get; } = new List<IDistributorOrder>();
 }
