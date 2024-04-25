@@ -2,14 +2,14 @@
 using System.Text;
 using MakeMyCapServer.Orders;
 
-namespace MakeMyCapServer.Distributors.MakeMyCap;
+namespace MakeMyCapServer.Distributors.MakeMyCapInStock;
 
 
 public class MakeMyCapInStockOrderService : IOrderService
 {
 	public const string ORDER_EMAIL_ADDRESS = "orders@makemycap.com";
 
-	private IEmailQueueService emailQueueService;
+	private readonly IEmailQueueService emailQueueService;
 	private ILogger<MakeMyCapInStockOrderService> logger;
 	
 	public MakeMyCapInStockOrderService(IEmailQueueService emailQueueService, ILogger<MakeMyCapInStockOrderService> logger)

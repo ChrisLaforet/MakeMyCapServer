@@ -1,6 +1,7 @@
 ﻿using MakeMyCapServer.Distributors;
 using MakeMyCapServer.Distributors.CapAmerica;
 using MakeMyCapServer.Distributors.MakeMyCap;
+using MakeMyCapServer.Distributors.MakeMyCapInStock;
 using MakeMyCapServer.Distributors.SandS;
 using MakeMyCapServer.Distributors.SanMar;
 using MakeMyCapServer.Lookup.Exceptions;

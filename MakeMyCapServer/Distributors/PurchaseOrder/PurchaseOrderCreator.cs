@@ -52,7 +52,7 @@ public class PurchaseOrderCreator : IOrderGenerator
 	public Model.PurchaseDistributorOrder? GenerateOrderFor(string distributorCode, DistributorSkuMap? skuMap, long shopifyOrderId, 
 															int quantity, int poSequence, string name, string correlation, string imageOrText, 
 															string position, string specialInstructions, string? shopifyName,
-															int? distributorPo)
+															List<int> otherPoNumbers)
 	{
 		var distributor = orderingProxy.GetDistributorByCode(distributorCode);
 		if (distributor == null)
@@ -62,7 +62,7 @@ public class PurchaseOrderCreator : IOrderGenerator
 			return null;
 		}
 		
-		var poNumber = GeneratePONumber(poSequence);
+		var poNumber = GeneratePoNumber(poSequence);
 		
 		var purchaseOrder = new Model.PurchaseDistributorOrder();
 		purchaseOrder.DistributorId = distributor.Id;
@@ -81,10 +81,26 @@ public class PurchaseOrderCreator : IOrderGenerator
 		purchaseOrder.Position = position;
 		purchaseOrder.SpecialInstructions = specialInstructions;
 		purchaseOrder.ShopifyName = shopifyName;
-		if (skuMap != null && distributorPo != null)
+		if (skuMap != null && otherPoNumbers.Count > 0)
 		{
 			purchaseOrder.Supplier = skuMap.DistributorCode;
-			purchaseOrder.SupplierPoNumber = GeneratePONumber((int)distributorPo);
+			var index = 0;
+			foreach (var distributorPo in otherPoNumbers)
+			{
+				if (index == 0)
+				{
+					purchaseOrder.SupplierPoNumber = GeneratePoNumber(distributorPo);
+				} 
+				else if (index == 1)
+				{
+					purchaseOrder.SupplierPoNumber2 = GeneratePoNumber(distributorPo);
+				}
+				else if (index == 2)
+				{
+					purchaseOrder.SupplierPoNumber3 = GeneratePoNumber(distributorPo);
+				}
+				++index;
+			}
 		}
 		purchaseOrder.SubmittedDateTime = DateTime.Now;
 		
@@ -92,7 +108,7 @@ public class PurchaseOrderCreator : IOrderGenerator
 		return purchaseOrder;
 	}
 
-	private string GeneratePONumber(int sequence)
+	private string GeneratePoNumber(int sequence)
 	{
 		return $"MMC{sequence.ToString("D9")}";
 	}

@@ -299,6 +299,14 @@ public partial class MakeMyCapServerContext : DbContext
                 .HasMaxLength(25)
                 .IsUnicode(false)
                 .HasColumnName("SupplierPoNumber");
+            entity.Property(e => e.SupplierPoNumber2)
+                .HasMaxLength(25)
+                .IsUnicode(false)
+                .HasColumnName("SupplierPoNumber2");
+            entity.Property(e => e.SupplierPoNumber3)
+                .HasMaxLength(25)
+                .IsUnicode(false)
+                .HasColumnName("SupplierPoNumber3");
             entity.HasOne(d => d.Distributor).WithMany(p => p.PurchaseOrders)
                 .HasForeignKey(d => d.DistributorId)
                 .OnDelete(DeleteBehavior.ClientSetNull)

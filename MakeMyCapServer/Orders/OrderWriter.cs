@@ -116,6 +116,16 @@ public static class OrderWriter
 					output.Append($"   Supplier/Supplier PO: {order.Supplier} {order.SupplierPoNumber}");
 					output.Append("\r\n");
 				}
+				if (!string.IsNullOrEmpty(order.SupplierPoNumber2))
+				{
+					output.Append($"   Supplier/Supplier PO: {order.Supplier} {order.SupplierPoNumber2}");
+					output.Append("\r\n");
+				}
+				if (!string.IsNullOrEmpty(order.SupplierPoNumber3))
+				{
+					output.Append($"   Supplier/Supplier PO: {order.Supplier} {order.SupplierPoNumber3}");
+					output.Append("\r\n");
+				}
 				
 				if (!string.IsNullOrEmpty(order.Correlation))
 				{

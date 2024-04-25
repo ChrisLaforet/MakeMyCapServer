@@ -18,6 +18,7 @@ public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 	
 	private const string MMC_DISTRIBUTOR_CODE = "MMC";
 	private const string MMC_INTERNAL_SKU = "INTERNAL";
+	private const string MMC_INSTOCK_DISTRIBUTOR_CODE = "INSTK";
 	
 	private readonly IOrderService orderService;
 	private readonly IProductSkuProxy productSkuProxy;
@@ -209,49 +210,20 @@ public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 		foreach (var lineItem in lineItems)
 		{
 			var sku = lineItem.Sku;
-			var poSequence = 0;
-			int? distributorPO = null;
-
 			var lineItemProperties = ExtractLineItemProperties(lineItem);
 
 			var skuMap = string.IsNullOrEmpty(sku) ? null : productSkuProxy.GetSkuMapFor(sku);
 			if (skuMap != null)
 			{
-				if (poLookup.ContainsKey(skuMap.DistributorCode))
-				{
-					poSequence = poLookup[skuMap.DistributorCode];
-				}
-				else
-				{
-					poSequence = orderGenerator.GetNextPOSequence();
-					poLookup[skuMap.DistributorCode] = poSequence;
-				}
-
-				distributorPO = poSequence;
-			
-				logger.LogInformation($"Using PO {poSequence} for ordering {lineItem.Quantity} of SKU {lineItem.Sku} in Shopify Order {order.OrderId}");
-				
-// Question pending with Cory: Do we need to send an order to CapAmerica indicating we are fulfilling this item from in-house quantities
-				var remaining = RemainingAfterFulfillingFromInHouseInventory(skuMap, lineItem);
+				var totalQuantity = lineItem.Quantity;
+				var remaining = AttemptToOrderItemsFromInHouseInventory(lineItem, totalQuantity, lineItemProperties, order, poLookup, skuMap);
 				if (remaining > 0)
 				{
-					PrepareAndOrderLineItem(lineItem, remaining, lineItemProperties, order, poSequence, skuMap.DistributorCode, skuMap, null);
+					PrepareAndOrderLineItem(lineItem, remaining, lineItemProperties, order, poLookup, skuMap.DistributorCode, skuMap, false);
 				}
 			}
 			
-			// always duplicate caps to MMC and all non-cap items go to MMC
-			if (poLookup.ContainsKey(MMC_DISTRIBUTOR_CODE))
-			{
-				poSequence = poLookup[MMC_DISTRIBUTOR_CODE];
-			}
-			else
-			{
-				poSequence = orderGenerator.GetNextPOSequence();
-				poLookup[MMC_DISTRIBUTOR_CODE] = poSequence;
-				logger.LogInformation($"Using PO {poSequence} for ordering for MMC in Shopify Order {order.OrderId}");
-			}
-			
-			PrepareAndOrderLineItem(lineItem, lineItem.Quantity, lineItemProperties, order, poSequence, MMC_DISTRIBUTOR_CODE, skuMap, distributorPO);
+			PrepareAndOrderLineItem(lineItem, lineItem.Quantity, lineItemProperties, order, poLookup, MMC_DISTRIBUTOR_CODE, skuMap, true);
 		}
 	}
 
@@ -304,9 +276,39 @@ public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 		return remaining;
 	}
 
+	private int AttemptToOrderItemsFromInHouseInventory(LineItem shopifyLineItem, int quantity, ItemProperties lineItemProperties, 
+		DbOrder order, Dictionary<string, int> poLookup, DistributorSkuMap? skuMap)
+	{
+		var remaining = RemainingAfterFulfillingFromInHouseInventory(skuMap, shopifyLineItem);
+		var inStockQuantity = quantity - remaining;
+		if (inStockQuantity > 0)
+		{
+			PrepareAndOrderLineItem(shopifyLineItem, inStockQuantity, lineItemProperties, order, poLookup, MMC_INSTOCK_DISTRIBUTOR_CODE, skuMap, false);
+		}
+
+		return remaining;
+	}
+
+	private int GetPurchaseOrderFor(string distributorCode, Dictionary<string, int> poLookup)
+	{
+		int poSequence;
+		
+		if (poLookup.ContainsKey(distributorCode))
+		{
+			poSequence = poLookup[distributorCode];
+		}
+		else
+		{
+			poSequence = orderGenerator.GetNextPOSequence();
+			poLookup[distributorCode] = poSequence;
+		}
+
+		return poSequence;
+	}
+	
 	private void PrepareAndOrderLineItem(LineItem shopifyLineItem, int quantity, ItemProperties lineItemProperties, 
-										DbOrder order, int poSequence, string distributorCode, 
-										DistributorSkuMap? skuMap, int? distributorPO)
+										DbOrder order, Dictionary<string, int> poLookup, string distributorCode, 
+										DistributorSkuMap? skuMap, bool isMMCOrder)
 	{
 		var mmcCapCopy = false;
 		var lineItem = new OrderLineItem();
@@ -340,11 +342,30 @@ public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 			lineItem.SpecialInstructions = lineItem.SpecialInstructions.Substring(0, 4000);
 		}
 
+		var poSequence = GetPurchaseOrderFor(distributorCode, poLookup);
+		if (isMMCOrder)
+		{
+			logger.LogInformation($"Using PO {poSequence} for ordering for MMC in Shopify Order {order.OrderId}");
+		}
+		else
+		{
+			logger.LogInformation($"Using PO {poSequence} for ordering {lineItem.Quantity} of SKU {lineItem.Sku} in Shopify Order {order.OrderId} from {distributorCode}");
+		}
+
+		var otherPoNumbers = new List<int>();
 		if (mmcCapCopy)
 		{
+			foreach (var key in poLookup.Keys)
+			{
+				if (key != MMC_DISTRIBUTOR_CODE)
+				{
+					otherPoNumbers.Add(poLookup[key]);
+				}
+			}
+			
 			orderGenerator.GenerateOrderFor(distributorCode, skuMap, order.OrderId, shopifyLineItem.Quantity, poSequence, 
 				lineItem.Name, lineItem.Correlation, lineItem.ImageOrText, lineItem.Position, 
-				lineItem.SpecialInstructions, lineItem.ShopifyName, distributorPO);
+				lineItem.SpecialInstructions, lineItem.ShopifyName, otherPoNumbers);
 		}
 		else
 		{
@@ -358,7 +379,8 @@ public sealed class FulfillmentUpdateService : IFulfillmentProcessingService
 			else
 			{
 				orderGenerator.GenerateOrderFor(distributorCode, skuMap, order.OrderId, shopifyLineItem.Quantity, poSequence,
-					lineItem.Name, lineItem.Correlation, lineItem.ImageOrText, lineItem.Position, lineItem.SpecialInstructions, lineItem.ShopifyName, null);
+					lineItem.Name, lineItem.Correlation, lineItem.ImageOrText, lineItem.Position, lineItem.SpecialInstructions, 
+					lineItem.ShopifyName, otherPoNumbers);
 			}
 		}
 	}

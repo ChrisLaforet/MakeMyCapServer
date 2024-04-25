@@ -55,5 +55,9 @@ public partial class PurchaseDistributorOrder
     
     public string? SupplierPoNumber { get; set; }
 
+    public string? SupplierPoNumber2 { get; set; }
+    
+    public string? SupplierPoNumber3 { get; set; }
+    
     public virtual Distributor Distributor { get; set; } = null!;
 }

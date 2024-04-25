@@ -27,7 +27,6 @@ public class OrderingProxy : IOrderingProxy
 		return context.Distributors.ToList();
 	}
 
-
 	public void SavePurchaseOrder(PurchaseDistributorOrder purchaseDistributorOrder)
 	{
 		if (purchaseDistributorOrder.Id <= 0)

@@ -1,8 +1,6 @@
-﻿using CapAmericaInventory;
-using MakeMyCapServer.Configuration;
-using MakeMyCapServer.Proxies;
+﻿using MakeMyCapServer.Proxies;
 
-namespace MakeMyCapServer.Distributors.MakeMyCap;
+namespace MakeMyCapServer.Distributors.MakeMyCapInStock;
 
 public class MakeMyCapInStockInventoryService : IInventoryService
 {

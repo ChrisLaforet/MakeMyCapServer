@@ -47,6 +47,10 @@ public interface IDistributorOrder
 	string? ShopifyName { get; set; }
 	
 	string? Supplier { get; set; }
-	
+
 	string? SupplierPoNumber { get; set; }
+
+	string? SupplierPoNumber2 { get; set; }
+
+	string? SupplierPoNumber3 { get; set; }
 }
