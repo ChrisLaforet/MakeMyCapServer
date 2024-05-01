@@ -15,6 +15,8 @@ public interface IDistributorOrder
 	int Quantity { get; }
 
 	string? Style { get; }
+	
+	string? Brand { get; }
 
 	string? Color { get; }
 

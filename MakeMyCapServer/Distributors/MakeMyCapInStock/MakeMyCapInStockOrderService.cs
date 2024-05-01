@@ -53,6 +53,11 @@ public class MakeMyCapInStockOrderService : IOrderService
 		{
 			output.Append($"{order.Quantity}x   Style: {order.Style}");
 
+			if (!string.IsNullOrEmpty(order.Brand))
+			{
+				output.Append($"  Brand: {order.Brand}");
+			}
+			
 			if (!string.IsNullOrEmpty(order.Color))
 			{
 				output.Append($"  Color: {order.Color}");

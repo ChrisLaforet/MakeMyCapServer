@@ -267,6 +267,9 @@ public partial class MakeMyCapServerContext : DbContext
             entity.Property(e => e.Style)
                 .HasMaxLength(50)
                 .IsUnicode(false);
+            entity.Property(e => e.Brand)
+                .HasMaxLength(100)
+                .IsUnicode(false);
             entity.Property(e => e.Name)
                 .HasMaxLength(100)
                 .IsUnicode(false)

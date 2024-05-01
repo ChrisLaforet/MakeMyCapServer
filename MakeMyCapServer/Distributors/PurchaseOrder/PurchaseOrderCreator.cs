@@ -73,6 +73,7 @@ public class PurchaseOrderCreator : IOrderGenerator
 		purchaseOrder.Sku = skuMap == null || string.IsNullOrEmpty(skuMap.DistributorSku) ? "" : skuMap.DistributorSku;
 		purchaseOrder.Quantity = quantity;
 		purchaseOrder.Style = skuMap != null ? skuMap.StyleCode : "";
+		purchaseOrder.Brand = skuMap != null ? skuMap.Brand : "";
 		purchaseOrder.Color = skuMap != null ? skuMap.Color : "";
 		purchaseOrder.Size = skuMap != null ? skuMap.SizeCode : "";
 		purchaseOrder.Name = name;
