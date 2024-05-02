@@ -2,3 +2,7 @@
 .vs/*
 MakeMyCapServer.sln.DotSettings.user
 /MakeMyCapAdmin/obj
+/MakeMyCapAdmin/bin/Debug/net6.0
+/SanMarOrderWebService/bin
+/SanMarOrderWebService/obj/Debug/net6.0
+/SanMarOrderWebService/obj/Release/net6.0

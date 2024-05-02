@@ -8,13 +8,13 @@ public class RefundLineItem
 	public long Id { get; set; }
 
 	[JsonPropertyName("line_item_id")]
-	public long LineItemId { get; set; }
+	public long? LineItemId { get; set; }
 
 	[JsonPropertyName("location_id")]
-	public long LocationId { get; set; }
+	public long? LocationId { get; set; }
 
 	[JsonPropertyName("quantity")]
-	public int Quantity { get; set; }
+	public int? Quantity { get; set; }
 
 	[JsonPropertyName("restock_type")]
 	public string RestockType { get; set; }
