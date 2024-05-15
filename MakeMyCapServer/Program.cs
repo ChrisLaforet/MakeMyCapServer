@@ -88,4 +88,13 @@ app.MapControllerRoute(
 
 app.MapPost("/shopify/orderCreated", async (ShopifyWebhookService ws, HttpContext context) => await ws.AcceptOrderCreatedNotification(context));
 
-app.Run();
+try
+{
+	app.Run();
+}
+catch (Exception ex)
+{
+	Console.WriteLine("Exception caught running MMC:");
+	Console.WriteLine(ex);
+	Console.WriteLine(ex.StackTrace);
+}
