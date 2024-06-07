@@ -142,7 +142,15 @@ public class SandSInventoryService : IInventoryService
 			}
 
 			var warehouses = map[key];
-			warehouses.AddRange(response.Warehouses);
+			foreach (var warehouse in response.Warehouses)
+			{
+				// Remove DS (DropShip) warehouse counts since these only fulfill in case-unit increments!
+				if (string.Compare(warehouse.WarehouseAbbreviation, "DS", StringComparison.CurrentCultureIgnoreCase) == 0)
+				{
+					continue;
+				}
+				warehouses.Add(warehouse);
+			}
 		}
 
 		return map;
