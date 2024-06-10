@@ -225,11 +225,12 @@ public class OrderPlacementQueueService : IOrderPlacementProcessingService
 
 			int expectedAlertCount = difference.Hours / WARNING_HOURS;
 
-			if (expectedAlertCount < order.Attempts)
+			if (expectedAlertCount < order.WarningNotificationCount)
 			{
 				logger.LogWarning(
 					$"PO {order.PoNumber} in record ID {order.Id} has not transmitted after {order.Attempts} attempts to deliver!");
 				TransmitWarningMessage(order, Convert.ToInt32(difference.TotalHours));
+				order.WarningNotificationCount = expectedAlertCount;
 			}
 		}
 	}
@@ -273,7 +274,7 @@ public class OrderPlacementQueueService : IOrderPlacementProcessingService
 			
 			logger.LogInformation($"Transmitting warning message concerning retries for PO {order.PoNumber} in record ID {order.Id} after {order.Attempts} attempts to deliver.");
 			notificationProxy.SendWarningErrorNotification(subject, body.ToString());
-			
+
 			order.FailureNotificationDateTime = DateTime.Now;
 		}
 		catch (Exception ex)
