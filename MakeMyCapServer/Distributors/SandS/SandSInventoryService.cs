@@ -1,11 +1,9 @@
 ﻿using System.Net.Http.Headers;
 using System.Text;
-using System.Text.Json;
 using MakeMyCapServer.Distributors.SandS.Dtos;
 using MakeMyCapServer.Configuration;
 using MakeMyCapServer.Model;
 using MakeMyCapServer.Proxies;
-using MakeMyCapServer.Services;
 
 namespace MakeMyCapServer.Distributors.SandS;
 
@@ -15,6 +13,8 @@ public class SandSInventoryService : IInventoryService
 	public const string API_KEY = "SandSApiKey";
 	
 	public const string S_AND_S_DISTRIBUTOR_CODE = "SS";
+	
+	public const string DROP_SHIP_WAREHOUSE_CODE = "DS";
 
 	public const string INVENTORY_ENDPOINT = "https://api.ssactivewear.com/v2/inventory/";
 	
@@ -37,8 +37,7 @@ public class SandSInventoryService : IInventoryService
 	
 	public List<InStockInventory> GetInStockInventoryFor(List<string> skus)
 	{
-
-		var lookup = productSkuProxy.GetSkuMapsFor(S_AND_S_DISTRIBUTOR_CODE);
+		//var lookup = productSkuProxy.GetSkuMapsFor(S_AND_S_DISTRIBUTOR_CODE);
 		var maps = MapSkusFrom(skus);
 		
 		var accountNumber = configurationLoader.GetKeyValueFor(ACCOUNT_NUMBER);
@@ -145,7 +144,7 @@ public class SandSInventoryService : IInventoryService
 			foreach (var warehouse in response.Warehouses)
 			{
 				// Remove DS (DropShip) warehouse counts since these only fulfill in case-unit increments!
-				if (string.Compare(warehouse.WarehouseAbbreviation, "DS", StringComparison.CurrentCultureIgnoreCase) == 0)
+				if (string.Compare(warehouse.WarehouseAbbreviation, DROP_SHIP_WAREHOUSE_CODE, StringComparison.CurrentCultureIgnoreCase) == 0)
 				{
 					continue;
 				}

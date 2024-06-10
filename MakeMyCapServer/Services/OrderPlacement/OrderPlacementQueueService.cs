@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using MakeMyCapServer.Distributors;
 using MakeMyCapServer.Lookup;
 using MakeMyCapServer.Model;
 using MakeMyCapServer.Orders;
@@ -59,15 +60,20 @@ public class OrderPlacementQueueService : IOrderPlacementProcessingService
 			serviceProxy.CloseServiceLogFor(serviceLog);
 			return false;
 		}
-		
+
+		var manualOrders = new List<ManualOrder>();
 		foreach (var orders in CreateDistributorOrdersFrom(pendingPurchaseOrders))
 		{
-			var success = AttemptToTransmitPurchaseOrder(orders);
+			var orderStatus = AttemptToTransmitPurchaseOrder(orders);
 			foreach (var order in orders.PurchaseOrders)
 			{
-				if (success)
+				if (orderStatus.Successful)
 				{
 					order.SuccessDateTime = DateTime.Now;
+				}
+				else
+				{
+					UpdateOrderWithOutOfStockValues(order, orderStatus.OutOfStockItems, orderingProxy.GetDistributorByCode(orders.DistributorLookupCode), manualOrders);
 				}
 				
 				order.Attempts++;
@@ -76,8 +82,59 @@ public class OrderPlacementQueueService : IOrderPlacementProcessingService
 			}
 		}
 
+		NotifyConcerningOutOfStockOrders(manualOrders);
+
 		serviceProxy.CloseServiceLogFor(serviceLog);
 		return false;
+	}
+
+	private void UpdateOrderWithOutOfStockValues(IDistributorOrder order, List<IOutOfStockItem> outOfStockItems, Distributor? distributor, List<ManualOrder> manualOrders)
+	{
+		foreach (var outOfStockItem in outOfStockItems)
+		{
+			if (outOfStockItem.DistributorSkuMap == null)
+			{
+				continue;
+			}
+
+			if (order.Quantity < outOfStockItem.AvailableQuantity)
+			{
+				// split the order to retrieve as many as possible
+				var poLine = CloneForSplit(order, distributor!);
+				poLine.Quantity = outOfStockItem.AvailableQuantity;
+				order.Quantity -= poLine.Quantity;
+				
+				manualOrders.Add(new ManualOrder(outOfStockItem, order.PoNumber, order.ShopifyOrderId, distributor.Name));
+				logger.LogInformation($"PO# {order.PoNumber} to {order.DistributorName} for Shopify order {order.ShopifyOrderId} line item for {order.Quantity} item(s) has been split and an order for {outOfStockItem.AvailableQuantity} created while marking the rest Out of Stock");
+				order.FailureNotificationDateTime = DateTime.Now;
+
+				orderingProxy.SavePurchaseOrder(poLine);
+			}
+			else
+			{
+				manualOrders.Add(new ManualOrder(outOfStockItem, order.PoNumber, order.ShopifyOrderId, distributor.Name));
+				logger.LogInformation($"PO# {order.PoNumber} to {order.DistributorName} for Shopify order {order.ShopifyOrderId} line item for {order.Quantity} item(s) has been marked as failed since it is Out of Stock");
+				order.FailureNotificationDateTime = DateTime.Now;
+			}
+		}
+	}
+	
+	private static PurchaseDistributorOrder CloneForSplit(IDistributorOrder source, Distributor distributor)
+	{
+		var clone = new PurchaseDistributorOrder();
+		clone.Distributor = distributor;
+		clone.CreateDate = source.CreateDate;
+		clone.Ponumber = source.PoNumber;
+		clone.PoNumberSequence = source.PoNumberSequence;
+		clone.ShopifyOrderId = source.ShopifyOrderId;
+		clone.Sku = source.Sku;
+		clone.Quantity = source.Quantity;
+		clone.Style = source.Style;
+		clone.Color = source.Color;
+		clone.Size = source.Size;
+		clone.SubmittedDateTime = source.CreateDate;
+		clone.ShopifyName = source.ShopifyName;
+		return clone;
 	}
 
 	private List<DistributorOrders> CreateDistributorOrdersFrom(List<PurchaseDistributorOrder> orders)
@@ -97,7 +154,7 @@ public class OrderPlacementQueueService : IOrderPlacementProcessingService
 			}
 		}
 
-		var assemblies = new System.Collections.Generic.List<DistributorOrders>();
+		var assemblies = new List<DistributorOrders>();
 		foreach (var key in matcher.Keys)
 		{
 			var assembly = new DistributorOrders();
@@ -136,7 +193,7 @@ public class OrderPlacementQueueService : IOrderPlacementProcessingService
 		return assemblies;
 	}
 
-	private bool AttemptToTransmitPurchaseOrder(DistributorOrders orders)
+	private OrderStatus AttemptToTransmitPurchaseOrder(DistributorOrders orders)
 	{
 		try
 		{
@@ -149,7 +206,7 @@ public class OrderPlacementQueueService : IOrderPlacementProcessingService
 			HandleNotificationsFor(orders);
 		}
 
-		return false;
+		return new OrderStatus(false);
 	}
 
 	private void HandleNotificationsFor(DistributorOrders orders)
@@ -222,6 +279,36 @@ public class OrderPlacementQueueService : IOrderPlacementProcessingService
 		catch (Exception ex)
 		{
 			logger.LogError($"Error transmitting WARNING message concerning retries for PO {order.PoNumber} in record ID {order.Id} after {order.Attempts} attempts to deliver: {ex}");
+		}
+	}
+	
+	private void NotifyConcerningOutOfStockOrders(List<ManualOrder> manualOrders)
+	{
+		if (manualOrders.Count == 0)
+		{
+			return;
+		}
+		
+		try
+		{
+			var subject = "NOTICE: OUT OF STOCK: Please review and replace/order manually";
+			
+			var body = new StringBuilder();
+			body.Append($"ERROR: The following item(s) have Out of Stock alerts!  Manual intervention is needed!!\r\n\r\n");
+
+			foreach (var order in manualOrders)
+			{
+				body.Append($"PO: {order.PoNumber} to distributor: {order.DistributorName}     Shopify Id: {order.ShopifyOrderId}\r\n");
+				body.Append($"    MMC Item Sku: {order.DistributorSkuMap.Sku}  ({order.Description})\r\n");
+				var needsAttention = order.OrderedQuantity - order.AvailableQuantity;
+				body.Append($"    Originally ordered: {order.OrderedQuantity}   Available/Reordered: {order.AvailableQuantity}   Needs Attention: {(needsAttention > 0 ? needsAttention : 0)}\r\n\r\n");
+			}
+
+			notificationProxy.SendCriticalErrorNotification(subject, body.ToString());
+		}
+		catch (Exception ex)
+		{
+			logger.LogCritical($"Error transmitting OutOfStock message: {ex}");
 		}
 	}
 }

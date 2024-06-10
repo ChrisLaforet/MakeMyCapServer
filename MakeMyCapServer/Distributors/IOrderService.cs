@@ -4,5 +4,5 @@ namespace MakeMyCapServer.Distributors;
 
 public interface IOrderService
 {
-	bool PlaceOrder(DistributorOrders orders);
+	OrderStatus PlaceOrder(DistributorOrders orders);
 }

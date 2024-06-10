@@ -18,7 +18,7 @@ public class MakeMyCapOrderService : IOrderService
 		this.logger = logger;
 	} 
 	
-	public bool PlaceOrder(DistributorOrders orders)
+	public OrderStatus PlaceOrder(DistributorOrders orders)
 	{
 		var subject = $"Notification of sent PO {orders.PoNumber}";
 		var body = new StringBuilder();
@@ -27,6 +27,6 @@ public class MakeMyCapOrderService : IOrderService
 		body.Append("\r\n");
 			
 		emailQueueService.Add(ORDER_EMAIL_ADDRESS, subject, body.ToString());
-		return true;
+		return new OrderStatus(true);
 	}
 }

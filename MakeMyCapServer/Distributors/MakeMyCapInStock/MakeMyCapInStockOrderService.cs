@@ -18,7 +18,7 @@ public class MakeMyCapInStockOrderService : IOrderService
 		this.logger = logger;
 	} 
 	
-	public bool PlaceOrder(DistributorOrders orders)
+	public OrderStatus PlaceOrder(DistributorOrders orders)
 	{
 		var subject = $"MMC Internal Inventory Pull Request (PO {orders.PoNumber})";
 		var body = new StringBuilder();
@@ -27,7 +27,7 @@ public class MakeMyCapInStockOrderService : IOrderService
 		body.Append("\r\n");
 			
 		emailQueueService.Add(ORDER_EMAIL_ADDRESS, subject, body.ToString());
-		return true;
+		return new OrderStatus(true);
 	}
 	
 	private string? FormatOrder(DistributorOrders orders)

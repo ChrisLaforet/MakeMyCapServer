@@ -26,7 +26,7 @@ public class CapAmericaOrderService : IOrderService
 		this.logger = logger;
 	} 
 	
-	public bool PlaceOrder(DistributorOrders orders)
+	public OrderStatus PlaceOrder(DistributorOrders orders)
 	{
 // TODO: CML - determine what additional formatting is needed here		
 
@@ -34,7 +34,7 @@ public class CapAmericaOrderService : IOrderService
 		if (orderBody == null)
 		{
 			logger.LogError($"No line items remain in PO {orders.PoNumber} so there is nothing to transmit to CapAmerica.");
-			return true;
+			return new OrderStatus(true);
 		}
 		var subject = $"MMC Purchase Order - PO {orders.PoNumber}";
 		var body = new StringBuilder();
@@ -48,7 +48,7 @@ public class CapAmericaOrderService : IOrderService
 		{
 			order.SuccessDateTime = DateTime.Now;
 		}
-		return true;
+		return new OrderStatus(true);
 	}
 
 	private string? FormatOrder(DistributorOrders orders)

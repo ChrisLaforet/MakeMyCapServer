@@ -41,7 +41,7 @@ public class SanMarOrderService : IOrderService
 		services = new SanMarOrderServices(customerNumber, userName, password);
 	}
 	
-	public bool PlaceOrder(DistributorOrders orders)
+	public OrderStatus PlaceOrder(DistributorOrders orders)
 	{
 		var shipping = orderingProxy.GetShipping();
 		if (shipping == null)
@@ -53,7 +53,7 @@ public class SanMarOrderService : IOrderService
 		if (request.Details.Count == 0) 
 		{
 			logger.LogError($"No line items remain in PO {orders.PoNumber} so there is nothing to transmit to SanMar.");
-			return true;
+			return new OrderStatus(true);
 		}
 
 		var task = services.SubmitPurchaseOrder(request);
@@ -64,7 +64,7 @@ public class SanMarOrderService : IOrderService
 		{
 			logger.LogInformation($"Error transmitting order for PO {orders.PoNumber} with reason: {response.Message}");
 		}
-		return response.Success;
+		return new OrderStatus(response.Success);
 	}
 
 	private SanMarOrderRequest PrepareOrderRequest(DistributorOrders orders, Shipping shipping)

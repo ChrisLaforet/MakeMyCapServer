@@ -7,12 +7,14 @@ public interface IDistributorOrder
 	DateTime OrderDate { get; }
 
 	string PoNumber { get; }
+	
+	int? PoNumberSequence { get; }
 
 	long? ShopifyOrderId { get; }
 	
 	string Sku { get; }
 
-	int Quantity { get; }
+	int Quantity { get; set; }
 
 	string? Style { get; }
 	

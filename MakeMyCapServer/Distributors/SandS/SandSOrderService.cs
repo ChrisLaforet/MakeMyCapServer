@@ -4,8 +4,11 @@ using System.Text.Json;
 using MakeMyCapServer.Configuration;
 using MakeMyCapServer.Distributors.Exceptions;
 using MakeMyCapServer.Distributors.SandS.Dtos;
+using MakeMyCapServer.Model;
 using MakeMyCapServer.Orders;
 using MakeMyCapServer.Proxies;
+using MakeMyCapServer.Services.OrderPlacement;
+using Order = MakeMyCapServer.Distributors.SandS.Dtos.Order;
 
 namespace MakeMyCapServer.Distributors.SandS;
 
@@ -50,7 +53,7 @@ public class SandSOrderService : IOrderService
 		client.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "application/json; charset=utf-8");
 	}
 
-	public bool PlaceOrder(DistributorOrders orders)
+	public OrderStatus PlaceOrder(DistributorOrders orders)
 	{
 		var accountNumber = configurationLoader.GetKeyValueFor(SandSInventoryService.ACCOUNT_NUMBER);
 		var apiKey = configurationLoader.GetKeyValueFor(SandSInventoryService.API_KEY);
@@ -72,14 +75,14 @@ public class SandSOrderService : IOrderService
 			if (orderDto.Lines.Count == 0)
 			{
 				logger.LogError($"No line items remain in PO {orders.PoNumber} so there is nothing to transmit to S&S.");
-				return true;
+				return new OrderStatus(true);
 			}
 			jsonBodyContent = JsonSerializer.Serialize(orderDto);
 		}
 		catch (Exception ex)
 		{
 			logger.LogError($"Error preparing payload: {ex}");
-			return false;
+			return new OrderStatus(false);
 		}
 
 		var request = new HttpRequestMessage(HttpMethod.Post, ORDER_ENDPOINT);
@@ -93,12 +96,66 @@ public class SandSOrderService : IOrderService
 		if (!response.IsSuccessStatusCode)
 		{
 			logger.LogError($"Error in S&S Order: {(int)response.StatusCode} ({response.ReasonPhrase})");
-			return false;
+			var outOfStockItems = DetermineOutOfStockItems(response);
+
+			return new OrderStatus(false, outOfStockItems);
 		}
 
-		return true;
+		return new OrderStatus(true);
 	}
 
+	private List<IOutOfStockItem> DetermineOutOfStockItems(HttpResponseMessage response)
+	{
+		var outOfStockItems = new List<IOutOfStockItem>();
+		List<DistributorSkuMap> lookup = null;
+		try
+		{
+			var contents = GetResponseContents(response);
+			using (JsonDocument doc = JsonDocument.Parse(contents))
+			{
+				var root = doc.RootElement;
+				var errors = root.GetProperty("errors");
+				for (var index = 0; index < errors.GetArrayLength(); index++)
+				{
+					var element = errors[index];
+//					var field = element.GetProperty("field");
+					var message = element.GetProperty("message");
+					if (message.ToString().ToUpper().Contains(" OUT OF STOCK "))
+					{
+						var item = OutOfStockItem.ParseOutOfStockError(message.ToString().Trim());
+						if (item != null)
+						{
+							if (lookup == null)
+							{
+								lookup = productSkuProxy.GetSkuMapsFor(SandSInventoryService.S_AND_S_DISTRIBUTOR_CODE);
+							}
+							// local mapping to system-level SKU
+							var match = lookup.SingleOrDefault(map => string.Compare(item.VendorSku, map.DistributorSku, true) == 0);
+							if (match != null)
+							{
+								item.DistributorSkuMap = match;
+							}
+							outOfStockItems.Add(item);
+						}
+					}
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+			logger.LogError($"Caught error while attempting to extract Out Of Stock from S&S: {ex}");
+		}
+
+		return outOfStockItems;
+	}
+
+	private static string GetResponseContents(HttpResponseMessage response)
+	{
+		var task = response.Content.ReadAsStringAsync();
+		task.Wait();
+		return task.Result;
+	}
+		
 	public Order PrepareOrderFrom(DistributorOrders orders)
 	{
 		var shipping = orderingProxy.GetShipping();
