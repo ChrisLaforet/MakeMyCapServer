@@ -1,0 +1,18 @@
+.file-select-wrapper {
+	padding: 0 0 0 0 !important;
+	margin: 0 0 0 0 !important;
+
+	width: 100%;
+	display: flex !important;
+	border: 0 !important;
+}
+
+.file-select-button {
+	float: left;
+	max-width: 8rem;
+	margin-right: 0.5rem;
+}
+
+.file-select-value {
+	float: right;
+}

@@ -1,0 +1,62 @@
+.customOverlay {
+	background: gray;
+}
+
+.customPasswordModal {
+	background: white;
+	max-width: 600px;
+	width: 100%;
+	max-height: 260px;
+	height: 100%;
+}
+
+.customUserModal {
+	background: white;
+	max-width: 600px;
+	width: 100%;
+	max-height: 625px;
+	height: 100%;
+}
+
+.customCloneRequestModal {
+	background: white;
+	max-width: 500px;
+	min-width: 400px;
+	width: 100%;
+	max-height: 260px;
+	height: 100%;
+}
+
+.fixedElement {
+	position: sticky;
+	top: 0;
+	width: 100%;
+	max-height: 3rem;
+	margin-bottom: 1rem;
+}
+
+.modal-navigation-row {
+	display: flex;
+	flex-direction: row;
+}
+
+.customCapModal {
+	background: white;
+	max-width: 800px;
+	width: 100%;
+	max-height: 450px;
+	height: 100%;
+}
+
+.modal-checkbox-title {
+	margin-left: 0.5rem;
+	margin-right: 2rem;
+}
+
+.customStyleModal {
+	background: white;
+	max-width: 800px;
+	width: 100%;
+	max-height: 500px;
+	height: 100%;
+}

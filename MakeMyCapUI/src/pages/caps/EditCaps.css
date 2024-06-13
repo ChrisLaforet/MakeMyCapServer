@@ -1,0 +1,21 @@
+thead th
+{
+	position: sticky;
+	top: 0;
+}
+
+.cap-label-header {
+	margin-top: 1.5rem;
+	display: flex;
+	flex-direction: row;
+	margin-bottom: 1rem;
+}
+
+.cap-label {
+	font-weight: bold;
+	margin-right: 0.5rem;
+}
+
+.cap-value {
+	margin-right: 2rem;
+}
