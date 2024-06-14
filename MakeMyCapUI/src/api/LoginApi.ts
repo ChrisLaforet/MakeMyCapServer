@@ -9,7 +9,7 @@ export class LoginApi {
             password
         };
 // console.log(JSON.stringify(credentials))
-        return fetch(ApiHelper.CreateApiUrl('login'), {
+        return fetch(ApiHelper.CreateApiUrl('User', 'login'), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -24,13 +24,7 @@ export class LoginApi {
                         return new AuthenticatedUser(
                             Object(response)["token"],
                             Object(response)["username"],
-                            Object(response)["code"],
                             Object(response)["email"],
-                            Object(response)["name"],
-                            Object(response)["artboardPath"],
-                            Object(response)["artifactPath"],
-                            Object(response)["outputPath"],
-                            Object(response)["nextSequence"],
                         );
                     }
                 }
@@ -47,7 +41,7 @@ export class LoginApi {
 
     public static async logoutUser(authenticatedUser: AuthenticatedUser): Promise<any> {
 
-        return fetch(ApiHelper.CreateApiUrl('logout'), {
+        return fetch(ApiHelper.CreateApiUrl('User','logout'), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -69,7 +63,7 @@ export class LoginApi {
 
     public static async validateToken(token: string): Promise<boolean> {
 
-        return fetch(ApiHelper.CreateApiUrl('validate_token'), {
+        return fetch(ApiHelper.CreateApiUrl('User','validate_token'), {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

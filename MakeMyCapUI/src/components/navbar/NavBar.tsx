@@ -23,13 +23,6 @@ const NavBar = () => {
         return user != null;
     }
 
-    function isAdministrator() {
-        if (!sharedContextData) {
-            return false;
-        }
-
-        return isLoggedIn() && sharedContextData.isUserAnAdministrator();
-    }
 
     function onDropdown() {
         console.log("Dropdown")
@@ -66,21 +59,14 @@ const NavBar = () => {
     return (
         <Navbar bg="light" expand="lg" className="navbarBar">
             <Container className="navbarContainer">
-                <Navbar.Brand className="navbar-brand"><span className="ca-red">Artwork</span> <span className="ca-blue">Generator</span></Navbar.Brand>
+                <Navbar.Brand className="navbar-brand"><span className="ca-red">Make My Cap Tools</span></Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="navbar-menu">
                     <Nav className="">
                         <Nav.Link as={NavLink} to="/" className="navbarLink">Home</Nav.Link>
                         <Nav.Link as={NavLink} to="/RequestNewJob" className="navbarLink">New Job</Nav.Link>
                         <Nav.Link as={NavLink} to="/MyJobs" className="navbarLink">My Jobs</Nav.Link>
-                        {
-                            isAdministrator() &&
-                            <Nav.Link as={NavLink} to="/EditCaps" className="navbarLink">Edit Caps</Nav.Link>
-                        }
-                        {
-                            isAdministrator() &&
-                            <Nav.Link as={NavLink} to="/Users" className="navbarLink">Users</Nav.Link>
-                        }
+                        <Nav.Link as={NavLink} to="/Users" className="navbarLink">Users</Nav.Link>
                     </Nav>
                     <Nav className="navbar-force-right">
                         <Dropdown className="navbar-nav">

@@ -4,6 +4,7 @@ using MakeMyCapServer.Distributors;
 using MakeMyCapServer.Distributors.PurchaseOrder;
 using MakeMyCapServer.Lookup;
 using MakeMyCapServer.Proxies;
+using MakeMyCapServer.Security;
 using MakeMyCapServer.Services.Email;
 using MakeMyCapServer.Services.Fulfillment;
 using MakeMyCapServer.Services.Inventory;
@@ -55,10 +56,11 @@ builder.Services.AddScoped<IUserProxy, UserProxy>();
 
 builder.Services.AddScoped<IStatusNotificationService, StatusNotificationService>();
 
-builder.Services.AddHostedService<InventoryScopedBackgroundService>();
-builder.Services.AddHostedService<FulfillmentScopedBackgroundService>();
-builder.Services.AddHostedService<OrderPlacementScopedBackgroundService>();
-builder.Services.AddHostedService<EmailSendingScopedBackgroundService>();
+// TODO: CML - uncomment once finished development testing with React UI!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// builder.Services.AddHostedService<InventoryScopedBackgroundService>();
+// builder.Services.AddHostedService<FulfillmentScopedBackgroundService>();
+// builder.Services.AddHostedService<OrderPlacementScopedBackgroundService>();
+// builder.Services.AddHostedService<EmailSendingScopedBackgroundService>();
 
 builder.Services.AddHttpClient();
 
@@ -81,6 +83,17 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseRouting();
+
+app.UseCors(builder =>
+{
+	builder
+		.AllowAnyOrigin()
+		.AllowAnyMethod()
+		.AllowAnyHeader();
+});
+
+app.UseMiddleware<ValidateClientMiddleware>();
+app.UseMiddleware<TokenValidationMiddleware>();
 
 app.MapControllerRoute(
 	name: "default",

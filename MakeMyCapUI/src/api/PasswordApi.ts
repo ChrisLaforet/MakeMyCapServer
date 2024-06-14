@@ -2,12 +2,12 @@ import { ApiHelper } from './ApiHelper';
 
 export class PasswordApi {
 
-    public static async requestPasswordReset(username: string): Promise<boolean> {
+    public static async requestPasswordReset(username: string): Promise<null> {
         const body = {
             username
         };
 
-        return fetch(ApiHelper.CreateApiUrl('request_password_reset'), {
+        return fetch(ApiHelper.CreateApiUrl('User', 'request_password_reset'), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -18,12 +18,12 @@ export class PasswordApi {
             .then(() => {
                 console.log(`Password reset request completed for ${username}`)
                 Promise.resolve();
-                return true;
+                return null;
             })
             .catch(err => {
                 console.log(`Caught exception requesting password reset for ${username}, err`);
                 Promise.resolve();
-                return false;
+                return null;
             });
     }
 
@@ -34,7 +34,7 @@ export class PasswordApi {
             password
         };
 
-        return fetch(ApiHelper.CreateApiUrl('execute_password_reset'), {
+        return fetch(ApiHelper.CreateApiUrl('User', 'execute_password_reset'), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

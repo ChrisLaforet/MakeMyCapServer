@@ -81,7 +81,7 @@ public class UserProxy : IUserProxy
 
         var token = UpdateOrCreateUserToken(user);
 
-        return new AuthenticatedUser(user.Username, user.Email, token);
+        return new AuthenticatedUser(user.Username, user.Email, user.Id, token);
     }
 
     public void ValidateEmailForUser(string username, string password)

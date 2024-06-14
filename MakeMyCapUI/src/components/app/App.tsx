@@ -12,26 +12,21 @@ import NotFound from '../error/NotFound';
 import Login from '../../pages/login/Login';
 import Logoff from '../../pages/login/Logoff';
 import GuardedRoute from '../../security/route/GuardedRoute';
-import RequestNewJob from '../../pages/job/RequestNewJob';
-import MyJobs from '../../pages/job/MyJobs';
 import { LoginApi } from '../../api/LoginApi';
 import { SharedContextData } from '../../context/SharedContextData';
 import RootLayout from '../../layout/RootLayout';
 import { SharedContext } from '../../context/SharedContext';
-import Users from '../../pages/admin/Users';
-import GuardedAdministratorRoute from '../../security/route/GuardedAdministratorRoute';
-import EditSettings from '../../pages/user/EditSettings';
 import PasswordChangeInstructions from '../../pages/login/PasswordChangeInstructions';
 import ChangePassword from '../../pages/login/ChangePassword';
 import RequestPasswordChange from '../../pages/login/RequestPasswordChange';
-import EditCaps from '../../pages/caps/EditCaps';
+import LayoutSelector from '../../layout/LayoutSelector';
 
 
 // For Bootstrap: https://blog.logrocket.com/using-bootstrap-react-tutorial-examples/
 
 const router = createBrowserRouter (
     createRoutesFromElements (
-        <Route path="/" element={<RootLayout />}>
+        <Route path="/" element={<LayoutSelector />}>
             <Route path="/" element={<Home />} />
             <Route path="/Login" element={<Login />} />
             <Route path="/Logoff" element={<Logoff />} />
@@ -39,21 +34,15 @@ const router = createBrowserRouter (
             <Route path="/PasswordChangeInstructions" element={<PasswordChangeInstructions />} />
             <Route path="/ChangePassword" element={<ChangePassword />} />
 
-            <Route path="/RequestNewJob" element={<GuardedRoute />}>
-                <Route path="/RequestNewJob" element={<RequestNewJob />} />
-            </Route>
-            <Route path="/MyJobs" element={<GuardedRoute />}>
-                <Route path="/MyJobs" element={<MyJobs />} />
-            </Route>
-            <Route path="/EditSettings" element={<GuardedRoute />}>
-                <Route path="/EditSettings" element={<EditSettings />} />
-            </Route>
-            <Route path="/EditCaps" element={<GuardedAdministratorRoute />}>
-                <Route path="/EditCaps" element={<EditCaps />} />
-            </Route>
-            <Route path="/Users" element={<GuardedAdministratorRoute />}>
-                <Route path="/Users" element={<Users />} />
-            </Route>
+            {/*<Route path="/RequestNewJob" element={<GuardedRoute />}>*/}
+            {/*    <Route path="/RequestNewJob" element={<RequestNewJob />} />*/}
+            {/*</Route>*/}
+            {/*<Route path="/MyJobs" element={<GuardedRoute />}>*/}
+            {/*    <Route path="/MyJobs" element={<MyJobs />} />*/}
+            {/*</Route>*/}
+            {/*<Route path="/EditSettings" element={<GuardedRoute />}>*/}
+            {/*    <Route path="/EditSettings" element={<EditSettings />} />*/}
+            {/*</Route>*/}
 
             <Route path="/NotFound" element={<NotFound />} />
             <Route path="*" element={<Navigate to="/NotFound" />} />
@@ -107,7 +96,7 @@ export default function App() {
 
     return (
         <div>
-            {loadInProgress && <div className="ca-spinner-box"><h1><span className="ca-red">Preparing CapAmerica</span> <span className="ca-blue">artwork generator...</span>
+            {loadInProgress && <div className="ca-spinner-box"><h1><span className="ca-blue">Preparing Make My Cap Tools...</span>
             </h1><div className="spinner-border text-primary"><span className="sr-only"></span></div></div>}
             {!loadInProgress &&
                 <SharedContext.Provider value={sharedContextData}>

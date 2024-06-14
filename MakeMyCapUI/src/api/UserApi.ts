@@ -6,7 +6,7 @@ import { PasswordDto } from './dto/PasswordDto';
 export class UserApi {
 
     public static async loadUsers(authenticatedUser: AuthenticatedUser): Promise<UserDto[] | null> {
-        return fetch(ApiHelper.CreateApiUrl('get_users'), {
+        return fetch(ApiHelper.CreateApiUrl('Users', 'get_users'), {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -53,7 +53,7 @@ export class UserApi {
     }
 
     public static async createNewUser(user: UserDto, authenticatedUser: AuthenticatedUser): Promise<boolean> {
-        return fetch(ApiHelper.CreateApiUrl('create_user'), {
+        return fetch(ApiHelper.CreateApiUrl('Users', 'create_user'), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -79,7 +79,7 @@ export class UserApi {
 
     public static async updateUser(user: UserDto, authenticatedUser: AuthenticatedUser): Promise<boolean> {
 
-        return fetch(ApiHelper.CreateApiUrl('update_user'), {
+        return fetch(ApiHelper.CreateApiUrl('Users', 'update_user'), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -104,7 +104,7 @@ export class UserApi {
     }
 
     public static async setPassword(login: string, password: string, authenticatedUser: AuthenticatedUser): Promise<boolean> {
-        return fetch(ApiHelper.CreateApiUrl('admin_password_reset'), {
+        return fetch(ApiHelper.CreateApiUrl('Users', 'admin_password_reset'), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
