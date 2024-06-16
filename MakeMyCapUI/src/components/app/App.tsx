@@ -7,11 +7,9 @@ import {
     RouterProvider,
 } from 'react-router-dom';
 import './App.css';
-import Home from '../../pages/home/Home';
 import NotFound from '../error/NotFound';
 import Login from '../../pages/login/Login';
 import Logoff from '../../pages/login/Logoff';
-import GuardedRoute from '../../security/route/GuardedRoute';
 import { LoginApi } from '../../api/LoginApi';
 import { SharedContextData } from '../../context/SharedContextData';
 import RootLayout from '../../layout/RootLayout';
@@ -20,6 +18,7 @@ import PasswordChangeInstructions from '../../pages/login/PasswordChangeInstruct
 import ChangePassword from '../../pages/login/ChangePassword';
 import RequestPasswordChange from '../../pages/login/RequestPasswordChange';
 import LayoutSelector from '../../layout/LayoutSelector';
+import HomeSelector from '../../pages/HomeSelector';
 
 
 // For Bootstrap: https://blog.logrocket.com/using-bootstrap-react-tutorial-examples/
@@ -27,7 +26,7 @@ import LayoutSelector from '../../layout/LayoutSelector';
 const router = createBrowserRouter (
     createRoutesFromElements (
         <Route path="/" element={<LayoutSelector />}>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<HomeSelector />} />
             <Route path="/Login" element={<Login />} />
             <Route path="/Logoff" element={<Logoff />} />
             <Route path="/RequestPasswordChange" element={<RequestPasswordChange />} />
@@ -96,7 +95,7 @@ export default function App() {
 
     return (
         <div>
-            {loadInProgress && <div className="ca-spinner-box"><h1><span className="ca-blue">Preparing Make My Cap Tools...</span>
+            {loadInProgress && <div className="mmc-spinner-box"><h1><span className="mmc-blue">Preparing Make My Cap Tools...</span>
             </h1><div className="spinner-border text-primary"><span className="sr-only"></span></div></div>}
             {!loadInProgress &&
                 <SharedContext.Provider value={sharedContextData}>

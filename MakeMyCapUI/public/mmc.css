@@ -109,23 +109,23 @@ h2 {
 	width:40rem !important;
 }
 
-.ca-red {
+.mmc-red {
 	color: #a91f23;
 }
 
-.ca-blue {
+.mmc-blue {
 	color: #233071;
 }
 
-.ca-red-background {
+.mmc-red-background {
 	background-color: #fef9fa;
 }
 
-.ca-blue-background {
+.mmc-blue-background {
 	background-color: #f0f2fa;
 }
 
-.ca-main-container {
+.mmc-main-container {
 	margin-top: 2.5rem;
 }
 
@@ -156,25 +156,25 @@ h2 {
 	font-size: 13px;
 }
 
-.ca-spinner-box {
+.mmc-spinner-box {
 	margin-top: 8rem;
 	margin-left: 16rem;
 }
 
-.ca-form-button-row {
+.mmc-form-button-row {
 	margin-top: 1rem !important;
 }
 
-.ca-form-wide-button {
+.mmc-form-wide-button {
 	width:100%;
 	display:block
 }
 
-.ca-form-options-row {
+.mmc-form-options-row {
 	margin-top: 2rem !important;
 }
 
-.ca-form-options-label {
+.mmc-form-options-label {
 	font-family: Poppins, sans-serif;
 	font-weight: normal;
 	font-size: 13px;
@@ -182,72 +182,69 @@ h2 {
 	margin: 0.5rem;
 }
 
-.ca-form-instructions {
+.mmc-form-instructions {
 	font-family: Poppins, sans-serif;
 	font-weight: normal;
 }
 
-.ca-form-field-instructions {
+.mmc-form-field-instructions {
 	font-family: Poppins, sans-serif;
 	font-weight: normal;
 	font-size: 11px;
 }
 
-.ca-form-row {
+.mmc-form-row {
 	flex-wrap: nowrap !important;
 }
 
-.ca-form-row-extension {
+.mmc-form-row-extension {
 	display: flex;
 	flex-wrap: nowrap;
 }
 
-.ca-form-row-buttons {
+.mmc-form-row-buttons {
 	padding-left: 1rem;
 	display: flex;
 	flex-direction: column;
 	justify-content: flex-end;
 }
 
-.ca-form-start-row-buttons {
+.mmc-form-start-row-buttons {
 	padding-left: 1rem;
 	display: flex;
 	flex-direction: column;
 	justify-content: flex-end;
 }
 
-.ca-form-button {
+.mmc-form-button {
 	width: fit-content;
 }
 
-.ca-form-next-button {
+.mmc-form-next-button {
 	width: fit-content;
 	margin-left: 1rem;
 }
 
-.ca-button-box {
+.mmc-button-box {
 	display: flex;
 	flex-direction: row;
 }
 
-.ca-form-top-space {
+.mmc-form-top-space {
 	margin-top: 0.75rem !important;
 }
 
-.ca_tabular-data-container {
+.mmc-tabular-data-container {
 	margin-top: 1.25rem;
 }
 
-.ca-operation-primary-button {
+.mmc-operation-primary-button {
 	display: flex;
 	flex-direction: row;
 	justify-content: flex-end;
 }
 
-.ca-operation-buttons {
+.mmc-operation-buttons {
 	margin-left: 1rem;
 }
 
-.ca-form-button-row {
-	margin-top: 1rem !important;
-}

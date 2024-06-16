@@ -16,7 +16,7 @@ export default function RootLayout() {
             <header>
                 <NavBar />
             </header>
-            <main className="ca-main-container">
+            <main className="mmc-main-container">
                 <ToastContainer />
                 <Outlet />
 

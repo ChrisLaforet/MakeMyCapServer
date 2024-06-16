@@ -59,7 +59,7 @@ const NavBar = () => {
     return (
         <Navbar bg="light" expand="lg" className="navbarBar">
             <Container className="navbarContainer">
-                <Navbar.Brand className="navbar-brand"><span className="ca-red">Make My Cap Tools</span></Navbar.Brand>
+                <Navbar.Brand className="navbar-brand"><span className="mmc-red">Make My Cap Tools</span></Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="navbar-menu">
                     <Nav className="">
@@ -87,7 +87,7 @@ const NavBar = () => {
                                             <span>My Settings</span>
                                         </NavLink>
                                         <NavLink className="dropdown-item" to="/Logoff">
-                                            <span className="ca-blue">Log off</span>
+                                            <span className="mmc-blue">Log off</span>
                                         </NavLink>
                                     </>
                                 }

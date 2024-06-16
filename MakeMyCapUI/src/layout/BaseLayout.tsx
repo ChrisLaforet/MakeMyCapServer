@@ -8,15 +8,6 @@ import React from 'react';
 
 export default function BaseLayout() {
 
-    function showTerms() {
-
-    }
-
-    function showPrivacyPolicy() {
-
-    }
-
-
     return (
         <div className="base-layout">
             <div className="outlet-pane">

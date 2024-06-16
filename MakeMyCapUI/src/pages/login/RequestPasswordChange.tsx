@@ -27,37 +27,37 @@ export default function RequestPasswordChange() {
                 <div className="row da-form-row top-heading">
                     <div>
                         <h1 id="ScreenTitle" className="display-page-title">
-                            <span className="ca-red">Request a</span> <span className="ca-blue">Password Change</span>
+                            <span className="mmc-red">Request a</span> <span className="mmc-blue">Password Change</span>
                         </h1>
                     </div>
                 </div>
 
-                <div className='row ca-form-row'>
+                <div className='row mmc-form-row'>
                     <div>
-                        <p className="ca-form-options-label">Please enter your account username or email address in the
+                        <p className="mmc-form-options-label">Please enter your account username or email address in the
                             field below to request a password reset. An email will be sent to you with instructions to
                             reset your password.</p>
                     </div>
                 </div>
 
-                <div className='row ca-form-row'>
+                <div className='row mmc-form-row'>
                     <div>
                         <label htmlFor="name" className="col-form-label">Username or Email</label>
                         <input id="name" className="form-control" type="text" maxLength={100} required
                                onChange={e => setUserName(e.target.value)}/>
                     </div>
                 </div>
-                <div className='row ca-form-row ca-form-button-row'>
+                <div className='row mmc-form-row mmc-form-button-row'>
                     <div>
-                        <button type="submit" className="btn btn-primary ca-form-wide-button">Request password change
+                        <button type="submit" className="btn btn-primary mmc-form-wide-button">Request password change
                         </button>
                     </div>
                 </div>
 
-                <div className='row ca-form-row ca-form-options-row'>
+                <div className='row mmc-form-row mmc-form-options-row'>
                     <div>
-                        <div className="ca-form-options-label">Return to login? <Link to="/Login">Login here</Link></div>
-                        <div className="ca-form-options-label">Return to home page now? <Link to="/">Take me home</Link></div>
+                        <div className="mmc-form-options-label">Return to login? <Link to="/Login">Login here</Link></div>
+                        <div className="mmc-form-options-label">Return to home page now? <Link to="/">Take me home</Link></div>
                     </div>
                 </div>
             </form>

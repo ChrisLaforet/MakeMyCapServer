@@ -32,10 +32,10 @@ export default function Logoff() {
     return (
         <div>
             <form className="container login-form-container">
-                <div className="row ca-form-row col-12 top-heading">
+                <div className="row mmc-form-row col-12 top-heading">
                     <div>
                         <h1 id="ScreenTitle" className="display-page-title">
-                            <span className="ca-red">Logoff</span> <span className="ca-blue">Completed</span>
+                            <span className="mmc-red">Logoff</span> <span className="mmc-blue">Completed</span>
                         </h1>
                     </div>
                 </div>

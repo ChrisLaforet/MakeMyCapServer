@@ -186,15 +186,15 @@ export default function Users() {
 
     return (
         <div>
-            <h2><span className="ca-red">All</span> <span className="ca-blue">Users</span></h2>
+            <h2><span className="mmc-red">All</span> <span className="mmc-blue">Users</span></h2>
             {!users &&
-                <div className="ca-spinner-box spinner-border text-primary"><span className="sr-only"></span></div>}
+                <div className="mmc-spinner-box spinner-border text-primary"><span className="sr-only"></span></div>}
             {users &&
                 <div>
-                    <div className="ca-operation-primary-button">
+                    <div className="mmc-operation-primary-button">
                         <button className="btn btn-outline-primary" onClick={() => openEditUserModal(null)}>Add new user</button>
                     </div>
-                    <div className="ca_tabular-data-container">
+                    <div className="mmc-tabular-data-container">
                         <table className="table table-striped table-hover">
                             <thead>
                             <tr>
@@ -219,7 +219,7 @@ export default function Users() {
                                         <td>{user.admin ? "Y" : ""}</td>
                                         <td>
                                             <button className="btn btn-sm btn-outline-primary" onClick={() => openEditUserModal(user)}>Edit user</button>
-                                            <button className="btn btn-sm btn-outline-primary ca-operation-buttons" onClick={() => openPasswordModal(user)}>
+                                            <button className="btn btn-sm btn-outline-primary mmc-operation-buttons" onClick={() => openPasswordModal(user)}>
                                                 Set password
                                             </button>
                                         </td>
@@ -244,7 +244,7 @@ export default function Users() {
 
                             <form onSubmit={submitEditUser}>
                                 <div><h2>{title}</h2></div>
-                                <div className='row ca-form-row'>
+                                <div className='row mmc-form-row'>
                                     <div>
                                         <label htmlFor="login" className="col-form-label">Login:</label>
                                         <input type="text" id="login" className="form-control" name="login"
@@ -256,7 +256,7 @@ export default function Users() {
                                                onChange={e => setLogin(e.target.value)}/>
                                     </div>
                                 </div>
-                                <div className='row ca-form-row'>
+                                <div className='row mmc-form-row'>
                                     <div>
                                         <label htmlFor="code" className="col-form-label">Code/Initials:</label>
                                         <input type="text" id="code" className="form-control" name="code"
@@ -266,7 +266,7 @@ export default function Users() {
                                                onChange={e => setCode(e.target.value)}/>
                                     </div>
                                 </div>
-                                <div className='row ca-form-row'>
+                                <div className='row mmc-form-row'>
                                     <div>
                                         <label htmlFor="name" className="col-form-label">Name:</label>
                                         <input type="text" id="name" className="form-control" name="name"
@@ -276,7 +276,7 @@ export default function Users() {
                                                onChange={e => setName(e.target.value)}/>
                                     </div>
                                 </div>
-                                <div className='row ca-form-row'>
+                                <div className='row mmc-form-row'>
                                     <div>
                                         <label htmlFor="email" className="col-form-label">Email:</label>
                                         <input type="email" id="email" className="form-control" name="email"
@@ -286,7 +286,7 @@ export default function Users() {
                                                onChange={e => setEmail(e.target.value)}/>
                                     </div>
                                 </div>
-                                <div className='row ca-form-row'>
+                                <div className='row mmc-form-row'>
                                     <div>
                                         <label htmlFor="sequence" className="col-form-label">Next Sequence #:</label>
                                         <input type="number" id="sequence" className="form-control" name="sequence"
@@ -295,7 +295,7 @@ export default function Users() {
                                                onChange={e => updateSequence(e.target.value)}/>
                                     </div>
                                 </div>
-                                <div className='row ca-form-row'>
+                                <div className='row mmc-form-row'>
                                     <div>
                                         <label htmlFor="artworkpath" className="col-form-label">Default artwork path:</label>
                                         <input type="artworkpath" id="artworkpath" className="form-control" name="artworkpath"
@@ -305,7 +305,7 @@ export default function Users() {
                                                onChange={e => setArtboardPath(e.target.value)}/>
                                     </div>
                                 </div>
-                                <div className='row ca-form-row'>
+                                <div className='row mmc-form-row'>
                                     <div>
                                         <label htmlFor="artifactpath" className="col-form-label">Default artifact path:</label>
                                         <input type="artifactpath" id="artifactpath" className="form-control" name="artifactpath"
@@ -315,7 +315,7 @@ export default function Users() {
                                                onChange={e => setArtifactPath(e.target.value)}/>
                                     </div>
                                 </div>
-                                <div className='row ca-form-row'>
+                                <div className='row mmc-form-row'>
                                     <div>
                                         <label htmlFor="outputpath" className="col-form-label">Default output path:</label>
                                         <input type="outputpath" id="outputpath" className="form-control" name="outputpath"
@@ -325,7 +325,7 @@ export default function Users() {
                                                onChange={e => setOutputPath(e.target.value)}/>
                                     </div>
                                 </div>
-                                <div className='row ca-form-row'>
+                                <div className='row mmc-form-row'>
                                     <div>
                                         <br />
                                         <input type="checkbox" id="admin" name="admin" value="Admin"
@@ -334,7 +334,7 @@ export default function Users() {
                                             administrator?</label>
                                     </div>
                                 </div>
-                                <div className="row ca-form-button-row">
+                                <div className="row mmc-form-button-row">
                                     <div className='modal-navigation-row justify-content-end'>
                                         <button className="btn btn-outline-primary" type="submit">Save</button>
                                         &nbsp;
@@ -361,10 +361,10 @@ export default function Users() {
 
                             <form onSubmit={submitPassword}>
                                 <div><h2>{title}</h2></div>
-                                <div className='row ca-form-row'>
+                                <div className='row mmc-form-row'>
                                     <div>This permits you as administrator to reset a user's password immediately.</div>
                                 </div>
-                                <div className='row ca-form-row'>
+                                <div className='row mmc-form-row'>
                                     <div>
                                         <label htmlFor="password" className="col-form-label">New Password:</label>
                                         <input type="password" id="login" className="form-control" name="login"
@@ -374,7 +374,7 @@ export default function Users() {
                                                onChange={e => setPassword(e.target.value)}/>
                                     </div>
                                 </div>
-                                <div className="row ca-form-button-row">
+                                <div className="row mmc-form-button-row">
                                     <div className='modal-navigation-row justify-content-end'>
                                         <button className="btn btn-outline-primary" type="submit">Set password</button>
                                         &nbsp;
