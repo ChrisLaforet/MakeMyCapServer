@@ -23,7 +23,7 @@ public class LogoutCommandHandler : ICommandHandler<LogoutCommand, NothingnessRe
 			logger.LogInformation($"Request to log out {command.Username}");
 			userProxy.LogoutUser(command.Username);
 		}
-		catch (Exception ex)
+		catch (System.Exception ex)
 		{
 			logger.LogDebug($"Error while logging out {command.Username} due to {ex}");
 		}

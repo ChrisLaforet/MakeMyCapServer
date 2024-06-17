@@ -4,13 +4,13 @@
 public class ChangePasswordCommand : ICommand
 {
 	public string UserName { get; }
-	public string ResetKey { get; }
+	public string ConfirmationCode { get; }
 	public string NewPassword { get; }
 
-	public ChangePasswordCommand(string userName, string resetKey, string newPassword)
+	public ChangePasswordCommand(string userName, string confirmationCode, string newPassword)
 	{
 		UserName = userName;
-		ResetKey = resetKey;
+		ConfirmationCode = confirmationCode;
 		NewPassword = newPassword;
 	}
 }

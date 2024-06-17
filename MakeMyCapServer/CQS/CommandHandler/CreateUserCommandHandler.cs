@@ -25,7 +25,7 @@ public class CreateUserCommandHandler : ICommandHandler<CreateUserCommand, Nothi
 			var user = userProxy.CreateUser(command.UserName, command.UserEmail);
 			userProxy.ChangePasswordFor(user.Email);
 		}
-		catch (Exception ex)
+		catch (System.Exception ex)
 		{
 			logger.LogError($"Exception prevents creating new user: {ex}");
 		}

@@ -27,7 +27,7 @@ public class AuthenticateCommandHandler : ICommandHandler<AuthenticateCommand, U
 			logger.LogInformation($"Successful login of user {command.UserName}");
 			return new UserResponse(authenticatedUser.UserName, authenticatedUser.Email, authenticatedUser.UserId, authenticatedUser.Token);
 		}
-		catch (Exception ex)
+		catch (System.Exception ex)
 		{
 			logger.LogError($"Failure to log in {command.UserName} with exception: {ex}");
 			throw;

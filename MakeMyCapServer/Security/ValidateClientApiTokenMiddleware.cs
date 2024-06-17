@@ -2,15 +2,15 @@
 
 namespace MakeMyCapServer.Security;
 
-public class ValidateClientMiddleware
+public class ValidateClientApiTokenMiddleware
 {
 	private const string APIKEY_STRING_CONFIGURATION_KEY = "Apikey";
-	private const string APIKEY_HEADER_KEY = "apikey";
+	private const string APIKEY_HEADER_KEY = "X-Api-Key";
 	
 	private readonly RequestDelegate next;
 	private readonly string apikey;
 	
-	public ValidateClientMiddleware(RequestDelegate next, IConfigurationLoader configurationLoader)
+	public ValidateClientApiTokenMiddleware(RequestDelegate next, IConfigurationLoader configurationLoader)
 	{
 		this.next = next;
 		apikey = configurationLoader.GetKeyValueFor(APIKEY_STRING_CONFIGURATION_KEY);
@@ -42,7 +42,7 @@ public static class ValidateClientMiddlewareExtensions
 {
 	public static IApplicationBuilder UseValidateClient(this IApplicationBuilder builder)
 	{
-		return builder.UseMiddleware<ValidateClientMiddleware>();
+		return builder.UseMiddleware<ValidateClientApiTokenMiddleware>();
 	}
 }
 

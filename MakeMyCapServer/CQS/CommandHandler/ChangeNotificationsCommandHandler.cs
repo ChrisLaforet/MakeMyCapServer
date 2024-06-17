@@ -25,7 +25,7 @@ public class ChangeNotificationsCommandHandler : ICommandHandler<ChangeNotificat
 			serviceProxy.SetStatusEmailRecipients(command.WarningEmail1, command.WarningEmail2, command.WarningEmail3);
 			serviceProxy.SetCriticalEmailRecipients(command.CriticalEmail1, command.CriticalEmail2, command.CriticalEmail3);
 		}
-		catch (Exception ex)
+		catch (System.Exception ex)
 		{
 			logger.LogError($"Exception prevents changing notification emails: {ex}");
 		}

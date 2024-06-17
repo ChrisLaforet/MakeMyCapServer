@@ -18,7 +18,7 @@ export default function BaseLayout() {
                 <Outlet/>
             </div>
             <footer className="d-flex flex-wrap col-12">
-                <span className="col-6">Copyright <FontAwesomeIcon icon={faCopyright}/> 2024 Make My Cap</span>
+                <span className="col-6 footer-left">Copyright <FontAwesomeIcon icon={faCopyright}/> 2024 Make My Cap</span>
                 <span className="col-6 justify-content-end footer-right"><FontAwesomeIcon icon={faEnvelope}/> support@makemycap.com</span>
             </footer>
         </div>

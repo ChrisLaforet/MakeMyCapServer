@@ -2,11 +2,11 @@
 
 namespace MakeMyCapServer.Security;
 
-public class TokenValidationMiddleware
+public class ValidateAuthTokenMiddleware
 {
 	private readonly RequestDelegate nextDelegate;
 
-	public TokenValidationMiddleware(RequestDelegate nextDelegate)
+	public ValidateAuthTokenMiddleware(RequestDelegate nextDelegate)
 	{
 		this.nextDelegate = nextDelegate;
 	}

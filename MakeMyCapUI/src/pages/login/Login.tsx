@@ -66,7 +66,11 @@ export default function Login() {
 
                 <div className='row mmc-form-row mmc-form-options-row'>
                     <div>
-                        <div className="mmc-form-options-label">Did you forget your password? <Link to="/RequestPasswordChange">Request a password change</Link></div>
+                        <div className="mmc-form-options-label">Did you forget your password? <Link
+                            to="/RequestPasswordChange">Request a password change</Link></div>
+                        <div className="mmc-form-options-label">Need to complete a password reset? <Link
+                            to="/ChangePassword">Complete password change</Link></div>
+
                     </div>
                 </div>
             </form>

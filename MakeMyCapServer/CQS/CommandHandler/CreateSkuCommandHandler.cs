@@ -25,7 +25,7 @@ public class CreateSkuCommandHandler : ICommandHandler<CreateSkuCommand, Nothing
 											command.StyleCode, command.PartId, command.Color, command.ColorCode, command.SizeCode);
 			return new NothingnessResponse();
 		}
-		catch (Exception ex)
+		catch (System.Exception ex)
 		{
 			logger.LogError($"Caught exception creating a SKU mapping for {command.Sku}: {ex}");
 			throw ex;

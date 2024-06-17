@@ -15,7 +15,7 @@ public interface IUserProxy
 	void ValidateEmailForUser(string username, string password);
 	void UpdateUser(string userId, string userName, string email);
 
-	void SetPasswordFor(string username, string resetKey, string password);
+	void SetPasswordFor(string username, string confirmationCode, string password);
 	void SetPasswordFor(string userId, string password);
 	string HashPassword(string password);
 	void ChangePasswordFor(string email);

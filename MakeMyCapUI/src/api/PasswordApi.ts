@@ -2,9 +2,9 @@ import { ApiHelper } from './ApiHelper';
 
 export class PasswordApi {
 
-    public static async requestPasswordReset(username: string): Promise<null> {
+    public static async requestPasswordReset(username: string): Promise<boolean> {
         const body = {
-            username
+            identity: username
         };
 
         return fetch(ApiHelper.CreateApiUrl('User', 'request_password_reset'), {
@@ -18,16 +18,16 @@ export class PasswordApi {
             .then(() => {
                 console.log(`Password reset request completed for ${username}`)
                 Promise.resolve();
-                return null;
+                return true;
             })
             .catch(err => {
                 console.log(`Caught exception requesting password reset for ${username}, err`);
                 Promise.resolve();
-                return null;
+                return false;
             });
     }
 
-    public static async requestPasswordChange(username: string, confirmationCode: string, password: string): Promise<null> {
+    public static async requestPasswordChange(username: string, confirmationCode: string, password: string): Promise<boolean> {
         const body = {
             username,
             confirmationCode,
@@ -45,12 +45,12 @@ export class PasswordApi {
             .then(() => {
                 console.log(`Password change request completed for ${username}`)
                 Promise.resolve();
-                return null;
+                return true;
             })
             .catch(err => {
                 console.log(`Caught exception requesting password change for ${username}`, err);
                 Promise.resolve();
-                return null;
+                return false;
             });
     }
 }

@@ -18,15 +18,28 @@ public class PasswordRecoveryCommandHandler : ICommandHandler<PasswordRecoveryCo
 	
 	public NothingnessResponse Handle(PasswordRecoveryCommand command)
 	{
-		logger.LogInformation($"Request to change password for user with Email of {command.Email}");
+		logger.LogInformation($"Request to change password for user with identity of {command.UserIdentity}");
 
 		try
 		{
-			userProxy.ChangePasswordFor(command.Email);
+			var user = userProxy.GetUserByUsername(command.UserIdentity);
+			if (user == null)
+			{
+				user = userProxy.GetUserByEmail(command.UserIdentity);
+			}
+
+			if (user != null)
+			{
+				userProxy.ChangePasswordFor(user.Email);
+			}
+			else
+			{
+				logger.LogError($"Failure to change password for a user with identity of {command.UserIdentity} since no such identity exists as a username or an email.");
+			}
 		}
-		catch (Exception ex)
+		catch (System.Exception ex)
 		{
-			logger.LogError($"Failure to change password for a user with Email of {command.Email} with exception: {ex}");
+			logger.LogError($"Failure to change password for a user with identity of {command.UserIdentity} with exception: {ex}");
 		}
 
 		return new NothingnessResponse();

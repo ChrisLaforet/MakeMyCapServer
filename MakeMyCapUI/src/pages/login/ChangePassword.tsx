@@ -47,7 +47,7 @@ export default function ChangePassword() {
             <form className="container login-form-container" onSubmit={handleSubmit}>
                 <div className="row mmc-form-row top-heading">
                     <div>
-                        <h1 id="ScreenTitle" className="display-page-title">Change Your Password</h1>
+                        <h1 id="ScreenTitle" className="display-page-title"><span className="mmc-blue">Change Your Password</span></h1>
                     </div>
                 </div>
 
@@ -59,8 +59,8 @@ export default function ChangePassword() {
                 </div>
                 <div className='row mmc-form-row'>
                     <div>
-                        <label htmlFor="loginName" className="col-form-label">Username or Email</label>
-                        <input id="loginName" className="form-control" type="email" maxLength={100} required
+                        <label htmlFor="loginName" className="col-form-label">Username (not Email)</label>
+                        <input id="loginName" className="form-control" type="text" maxLength={20} required
                                onChange={e => setUsername(e.target.value)}/>
                     </div>
                 </div>

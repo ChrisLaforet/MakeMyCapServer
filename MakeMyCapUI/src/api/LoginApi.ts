@@ -11,6 +11,7 @@ export class LoginApi {
 // console.log(JSON.stringify(credentials))
         return fetch(ApiHelper.CreateApiUrl('User', 'login'), {
             method: 'POST',
+            //redirect: 'follow',
             headers: {
                 'Content-Type': 'application/json',
                 'X-Api-Key': ApiHelper.GetApiKey()

@@ -73,10 +73,16 @@ footer {
 	font-size: 13px;
 	opacity: 0.75;
 	margin-top: 3rem;
+	margin-bottom: 3rem;
+}
+
+.footer-left {
+	padding-left: 3rem;
 }
 
 .footer-right {
 	text-align: right;
+	padding-right: 3rem;
 }
 
 h1 {
@@ -102,7 +108,7 @@ h2 {
 }
 
 .login-form-container {
-	width:30rem !important;
+	width:40rem !important;
 }
 
 .settings-form-container {

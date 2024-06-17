@@ -153,7 +153,7 @@ public class UserProxy : IUserProxy
     }
 
     
-    public void SetPasswordFor(string username, string resetKey, string password)
+    public void SetPasswordFor(string username, string confirmationCode, string password)
     {
         var user = GetUserByUsername(username);
         if (user == null || user.ResetKey.IsNullOrEmpty())
@@ -161,7 +161,7 @@ public class UserProxy : IUserProxy
             throw new AuthenticationException();
         }
 
-        if (user.ResetKey != resetKey || user.ResetExpirationDatetime == null || user.ResetExpirationDatetime <= DateTime.Now)
+        if (user.ResetKey != confirmationCode || user.ResetExpirationDatetime == null || user.ResetExpirationDatetime <= DateTime.Now)
         {
             throw new AuthenticationException();
         }

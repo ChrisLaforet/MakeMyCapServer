@@ -1,4 +1,4 @@
-﻿namespace WellBalanced.Controllers.Model;
+﻿namespace MakeMyCapServer.Controllers.Model;
 
 public class JwtResponse
 {

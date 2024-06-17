@@ -19,6 +19,8 @@ using IOrderService = MakeMyCapServer.Shopify.Services.IOrderService;
 
 const string DB_CONNECTION_STRING_KEY = "MakeMyCapDatabase";
 
+const string ALLOW_SPECIFIC_ORIGINS = "AllowSpecificOrigins";
+
 var builder = WebApplication.CreateBuilder(args);
 
 var configurationPath = builder.Configuration.GetValue<string>("XmlConfiguration");
@@ -69,10 +71,24 @@ builder.Services.AddSingleton<ShopifyWebhookService>();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddCors(options =>
+{
+	options.AddPolicy(name: ALLOW_SPECIFIC_ORIGINS,
+		policy  =>
+		{
+			policy.WithOrigins("http://localhost:3000")
+				.AllowAnyHeader()
+				//.WithMethods("POST", "PUT", "GET", "OPTIONS")
+				.AllowAnyMethod()
+				.AllowCredentials();
+		});
+});
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
 	// app.UseExceptionHandler("/Home/Error");
 	// // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
@@ -80,20 +96,22 @@ if (!app.Environment.IsDevelopment())
 	app.UseDeveloperExceptionPage();
 }
 
+app.UseCors(ALLOW_SPECIFIC_ORIGINS);
+
 app.UseHttpsRedirection();
 
 app.UseRouting();
 
-app.UseCors(builder =>
-{
-	builder
-		.AllowAnyOrigin()
-		.AllowAnyMethod()
-		.AllowAnyHeader();
-});
+// app.UseCors(builder =>
+// {
+// 	builder
+// 		.AllowAnyOrigin()
+// 		.AllowAnyMethod()
+// 		.AllowAnyHeader();
+// });
 
-app.UseMiddleware<ValidateClientMiddleware>();
-app.UseMiddleware<TokenValidationMiddleware>();
+app.UseMiddleware<ValidateClientApiTokenMiddleware>();
+app.UseMiddleware<ValidateAuthTokenMiddleware>();
 
 app.MapControllerRoute(
 	name: "default",

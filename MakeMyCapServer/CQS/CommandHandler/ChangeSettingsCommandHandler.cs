@@ -25,7 +25,7 @@ public class ChangeSettingsCommandHandler : ICommandHandler<ChangeSettingsComman
 			serviceProxy.UpdateFulfillmentCheckHours(command.FulfillmentCheckHours);
 			serviceProxy.UpdateNextPoNumberSequence(command.NextPoSequence);
 		}
-		catch (Exception ex)
+		catch (System.Exception ex)
 		{
 			logger.LogError($"Exception prevents changing settings: {ex}");
 		}

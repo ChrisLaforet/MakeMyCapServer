@@ -4,10 +4,10 @@ namespace MakeMyCapServer.CQS.Command;
 
 public class PasswordRecoveryCommand : ICommand
 {
-	public string Email { get; }
+	public string UserIdentity { get; }
 
-	public PasswordRecoveryCommand(string email)
+	public PasswordRecoveryCommand(string userIdentity)
 	{
-		Email = email;
+		UserIdentity = userIdentity;
 	}
 }

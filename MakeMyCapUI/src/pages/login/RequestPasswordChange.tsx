@@ -27,7 +27,7 @@ export default function RequestPasswordChange() {
                 <div className="row da-form-row top-heading">
                     <div>
                         <h1 id="ScreenTitle" className="display-page-title">
-                            <span className="mmc-red">Request a</span> <span className="mmc-blue">Password Change</span>
+                            <span className="mmc-blue">Request a Password Change</span>
                         </h1>
                     </div>
                 </div>

@@ -23,11 +23,11 @@ public class ChangePasswordCommandHandler : ICommandHandler<ChangePasswordComman
 
 		try
 		{
-			userProxy.SetPasswordFor(command.UserName, command.ResetKey, command.NewPassword);
+			userProxy.SetPasswordFor(command.UserName, command.ConfirmationCode, command.NewPassword);
 			logger.LogInformation($"Successfully change password for user {command.UserName}");
 			return new NothingnessResponse();
 		}
-		catch (Exception ex)
+		catch (System.Exception ex)
 		{
 			logger.LogError($"Failure to log in {command.UserName} with exception: {ex}");
 			throw;
