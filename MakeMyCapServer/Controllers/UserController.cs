@@ -80,7 +80,7 @@ public class UserController : ControllerBase
 		return Ok(new {message = "Logged out"});
 	}
 
-	[HttpGet("validate-token")]
+	[HttpGet("validate_token")]
 	public IActionResult ValidateToken()
 	{
 		try

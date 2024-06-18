@@ -1,0 +1,31 @@
+.operation-header {
+	padding-bottom: 10px;
+}
+
+.status-block-row {
+	padding:4px;
+}
+
+.status-block-container {
+	padding: 4px;
+	margin: 4px;
+}
+
+.status-block-table {
+	margin-top: 8px;
+}
+
+.status-block-col0 {
+	width: 35%;
+}
+
+.status-block-col1 {
+	width: 25%;
+}
+
+.status-block-col2 {
+	width: 25%;
+}
+
+.status-block-col3 {
+}

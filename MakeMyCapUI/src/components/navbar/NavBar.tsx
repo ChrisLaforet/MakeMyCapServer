@@ -64,8 +64,13 @@ const NavBar = () => {
                 <Navbar.Collapse id="navbar-menu">
                     <Nav className="">
                         <Nav.Link as={NavLink} to="/" className="navbarLink">Home</Nav.Link>
-                        <Nav.Link as={NavLink} to="/RequestNewJob" className="navbarLink">New Job</Nav.Link>
-                        <Nav.Link as={NavLink} to="/MyJobs" className="navbarLink">My Jobs</Nav.Link>
+                        <Nav.Link as={NavLink} to="/Status" className="navbarLink">Status</Nav.Link>
+                        <Nav.Link as={NavLink} to="/Orders" className="navbarLink">Orders</Nav.Link>
+                        <Nav.Link as={NavLink} to="/SkuMapping" className="navbarLink">SKU mapping</Nav.Link>
+                        <Nav.Link as={NavLink} to="/Inventory" className="navbarLink">Inventory</Nav.Link>
+
+                        <Nav.Link as={NavLink} to="/Notifications" className="navbarLink">Notifications</Nav.Link>
+                        <Nav.Link as={NavLink} to="/Settings" className="navbarLink">Settings</Nav.Link>
                         <Nav.Link as={NavLink} to="/Users" className="navbarLink">Users</Nav.Link>
                     </Nav>
                     <Nav className="navbar-force-right">

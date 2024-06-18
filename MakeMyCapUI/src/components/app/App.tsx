@@ -12,13 +12,14 @@ import Login from '../../pages/login/Login';
 import Logoff from '../../pages/login/Logoff';
 import { LoginApi } from '../../api/LoginApi';
 import { SharedContextData } from '../../context/SharedContextData';
-import RootLayout from '../../layout/RootLayout';
 import { SharedContext } from '../../context/SharedContext';
 import PasswordChangeInstructions from '../../pages/login/PasswordChangeInstructions';
 import ChangePassword from '../../pages/login/ChangePassword';
 import RequestPasswordChange from '../../pages/login/RequestPasswordChange';
 import LayoutSelector from '../../layout/LayoutSelector';
 import HomeSelector from '../../pages/HomeSelector';
+import GuardedRoute from '../../security/route/GuardedRoute';
+import ShowStatus from '../../pages/operation/ShowStatus';
 
 
 // For Bootstrap: https://blog.logrocket.com/using-bootstrap-react-tutorial-examples/
@@ -33,15 +34,14 @@ const router = createBrowserRouter (
             <Route path="/PasswordChangeInstructions" element={<PasswordChangeInstructions />} />
             <Route path="/ChangePassword" element={<ChangePassword />} />
 
-            {/*<Route path="/RequestNewJob" element={<GuardedRoute />}>*/}
-            {/*    <Route path="/RequestNewJob" element={<RequestNewJob />} />*/}
-            {/*</Route>*/}
-            {/*<Route path="/MyJobs" element={<GuardedRoute />}>*/}
-            {/*    <Route path="/MyJobs" element={<MyJobs />} />*/}
-            {/*</Route>*/}
+            <Route path="/Status" element={<GuardedRoute />}>
+                <Route path="/Status" element={<ShowStatus />} />
+            </Route>
+
             {/*<Route path="/EditSettings" element={<GuardedRoute />}>*/}
             {/*    <Route path="/EditSettings" element={<EditSettings />} />*/}
             {/*</Route>*/}
+
 
             <Route path="/NotFound" element={<NotFound />} />
             <Route path="*" element={<Navigate to="/NotFound" />} />

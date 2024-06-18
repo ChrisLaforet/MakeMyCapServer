@@ -1,5 +1,4 @@
 import { Navigate, Outlet } from 'react-router-dom';
-import { JwtHelper } from '../jwt/JwtHelper';
 import { useSharedContext } from '../../context/SharedContext';
 
 // See: https://dev.to/iamandrewluca/private-route-in-react-router-v6-lg5
@@ -12,11 +11,7 @@ export default function GuardedRoute() {
     function isUserAuthenticated(): boolean {
 
         const user = sharedContextData.getAuthenticatedUser();
-        if (!user) {
-            return false;
-        }
-
-        return JwtHelper.validateTokenExpirationIsValid(user.token);
+        return user != null;
     }
 
     return (isUserAuthenticated() ? <Outlet /> : <Navigate to='/login' /> );
