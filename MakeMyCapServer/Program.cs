@@ -13,6 +13,7 @@ using MakeMyCapServer.Services.OrderPlacement;
 using MakeMyCapServer.Shopify.Services;
 using MakeMyCapServer.Shopify.Store;
 using MakeMyCapServer.Webhooks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using IInventoryService = MakeMyCapServer.Shopify.Services.IInventoryService;
 using IOrderService = MakeMyCapServer.Shopify.Services.IOrderService;
@@ -84,6 +85,33 @@ builder.Services.AddCors(options =>
 		});
 });
 
+builder.Services.AddAuthentication(options =>
+	{
+		// Set the default authentication scheme
+		options.DefaultAuthenticateScheme = "MakeMyCapScheme";
+		options.DefaultChallengeScheme = "MakeMyCapScheme";
+	})
+	.AddScheme<MakeMyCapAuthenticationOptions, MakeMyCapAuthenticationHandler>("MakeMyCapScheme", options =>
+	{
+		// Configure options for your custom scheme here
+	});
+
+builder.Services.AddAuthorization(options =>
+{
+	options.AddPolicy("LoggedIn", policy =>
+		policy.Requirements.Add(new LoggedInRequirement()));
+});
+
+builder.Services.AddSingleton<IAuthorizationHandler, IsUserLoggedInAuthorizationHandler>();
+
+// builder.Services
+// 	.AddAuthentication(LoginController.COOKIE_NAME)
+// 	.AddCookie(LoginController.COOKIE_NAME, options =>
+// 	{
+// 		options.Cookie.Name = LoginController.COOKIE_NAME;
+// 		options.LoginPath = "/Login";
+// 	});
+
 
 var app = builder.Build();
 
@@ -102,6 +130,14 @@ app.UseHttpsRedirection();
 
 app.UseRouting();
 
+app.UseMiddleware<ValidateClientApiTokenMiddleware>();
+
+app.UseAuthentication();
+//app.UseValidateClient();
+app.UseAuthorization();
+
+//app.UseMiddleware<ValidateClientMiddleware>();
+
 // app.UseCors(builder =>
 // {
 // 	builder
@@ -110,8 +146,6 @@ app.UseRouting();
 // 		.AllowAnyHeader();
 // });
 
-app.UseMiddleware<ValidateClientApiTokenMiddleware>();
-app.UseMiddleware<ValidateAuthTokenMiddleware>();
 
 app.MapControllerRoute(
 	name: "default",

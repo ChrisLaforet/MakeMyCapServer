@@ -1,5 +1,6 @@
 ﻿using MakeMyCapServer.CQS.CommandHandler;
 using MakeMyCapServer.CQS.QueryHandler;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MakeMyCapServer.Controllers;
@@ -33,5 +34,44 @@ public class SettingsController : ControllerBase
 		CreateSkuCommandHandler = ActivatorUtilities.CreateInstance<CreateSkuCommandHandler>(serviceProvider);
 		ChangeNotificationsCommandHandler = ActivatorUtilities.CreateInstance<ChangeNotificationsCommandHandler>(serviceProvider);
 	}
+	
+	// [Authorize]
+	// [HttpPost]
+	// public IActionResult Notifications(NotificationEmails notificationEmails)
+	// {
+	// 	if (!ModelState.IsValid)
+	// 	{
+	// 		return View("Notifications", notificationEmails);
+	// 	}
+	// 	
+	// 	ChangeNotificationsCommandHandler.Handle(new ChangeNotificationsCommand(notificationEmails));
+	// 	return RedirectToAction("Notifications", "Home");
+	// }
 
+	// [Authorize]
+	// public IActionResult Settings()
+	// {
+	// 	var settingResponse = SettingsQueryHandler.Handle(new SettingsQuery());
+	// 	var settings = new Settings()
+	// 	{
+	// 		InventoryCheckHours = settingResponse.InventoryCheckHours,
+	// 		FulfillmentCheckHours = settingResponse.FulfillmentCheckHours,
+	// 		NextPoSequence = settingResponse.NextPoSequence
+	// 	};
+	// 	
+	// 	return View("Settings", settings);
+	// }
+	//
+	// [Authorize]
+	// [HttpPost]
+	// public IActionResult Settings(Settings settings)
+	// {
+	// 	if (!ModelState.IsValid)
+	// 	{
+	// 		return View("Settings", settings);
+	// 	}
+	//
+	// 	ChangeSettingsCommandHandler.Handle(new ChangeSettingsCommand(settings.InventoryCheckHours, settings.FulfillmentCheckHours, settings.NextPoSequence));
+	// 	return RedirectToAction("Settings", "Home");
+	// }
 }

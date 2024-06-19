@@ -2,11 +2,11 @@
 
 namespace MakeMyCapServer.Security;
 
-public class ValidateAuthTokenMiddleware
+public class ValidateClientMiddleware
 {
 	private readonly RequestDelegate nextDelegate;
 
-	public ValidateAuthTokenMiddleware(RequestDelegate nextDelegate)
+	public ValidateClientMiddleware(RequestDelegate nextDelegate)
 	{
 		this.nextDelegate = nextDelegate;
 	}
@@ -25,5 +25,13 @@ public class ValidateAuthTokenMiddleware
 		}
 
 		await nextDelegate(context);
+	}
+}
+
+public static class ValidateClientMiddlewareExtensions
+{
+	public static IApplicationBuilder UseValidateClient(this IApplicationBuilder builder)
+	{
+		return builder.UseMiddleware<ValidateClientMiddleware>();
 	}
 }

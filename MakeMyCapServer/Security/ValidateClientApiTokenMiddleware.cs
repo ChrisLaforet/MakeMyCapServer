@@ -18,6 +18,13 @@ public class ValidateClientApiTokenMiddleware
 
 	public async Task InvokeAsync(HttpContext context)
 	{
+		if (context.Request.Path.ToString().StartsWith("/shopify/"))
+		{
+			// Shopify webhook call? Call the next delegate/middleware in the pipeline and move along.
+			await this.next(context);
+			return;
+		}
+		
 		if (!context.Request.Headers.ContainsKey(APIKEY_HEADER_KEY))
 		{
 			context.Response.StatusCode = 403; //forbidden 
@@ -38,11 +45,4 @@ public class ValidateClientApiTokenMiddleware
 	}
 }
 
-public static class ValidateClientMiddlewareExtensions
-{
-	public static IApplicationBuilder UseValidateClient(this IApplicationBuilder builder)
-	{
-		return builder.UseMiddleware<ValidateClientApiTokenMiddleware>();
-	}
-}
 

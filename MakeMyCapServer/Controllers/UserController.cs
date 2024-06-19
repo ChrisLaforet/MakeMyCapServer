@@ -81,6 +81,7 @@ public class UserController : ControllerBase
 	}
 
 	[HttpGet("validate_token")]
+	[Authorize]
 	public IActionResult ValidateToken()
 	{
 		try
