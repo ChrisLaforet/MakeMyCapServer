@@ -50,7 +50,7 @@ public class MakeMyCapAuthenticationHandler : AuthenticationHandler<MakeMyCapAut
 
 		var claims = new[]
 		{
-			new Claim(ClaimTypes.Name, user.Username)
+			new Claim(ClaimTypes.Name, user.Username),
 		};
 		var identity = new ClaimsIdentity(claims, Scheme.Name);
 		var principal = new ClaimsPrincipal(identity);

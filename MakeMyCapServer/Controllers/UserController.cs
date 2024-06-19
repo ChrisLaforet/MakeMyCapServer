@@ -65,11 +65,10 @@ public class UserController : ControllerBase
 	{
 		try
 		{
-			var possibleUser = this.Request.HttpContext.Items["User"];
-			if (possibleUser != null)
+			var userName = this.Request.HttpContext.User?.Identity?.Name;
+			if (userName != null)
 			{
-				User user = (User)possibleUser;
-				logoutCommandHandler.Handle(new LogoutCommand(user.Username));
+				logoutCommandHandler.Handle(new LogoutCommand(userName));
 			}
 		}
 		catch (Exception ex)
