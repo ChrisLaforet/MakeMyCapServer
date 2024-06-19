@@ -18,7 +18,7 @@ export class UserApi {
                 if (data.ok) {
                     const response = await data.json();
                     if (response) {
-                        return UserApi.decodeResponse(response);
+                        return UserApi.decodeUsersResponse(response);
                     }
                 }
                 console.log('Get users request failed')
@@ -31,7 +31,7 @@ export class UserApi {
             });
     }
 
-    private static decodeResponse(json: any): UserDto[] {
+    private static decodeUsersResponse(json: any): UserDto[] {
         const response: UserDto[] = [];
 
         const users = Object(json)["users"];
@@ -48,7 +48,6 @@ export class UserApi {
             const outputPath = user["outputPath"];
             response.push(new UserDto(login, code, name, email, nextSequence, admin, artboardPath, artifactPath, outputPath));
         }
-        console.log(response);
         return response;
     }
 

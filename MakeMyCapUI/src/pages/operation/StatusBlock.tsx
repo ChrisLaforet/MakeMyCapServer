@@ -1,9 +1,20 @@
 import "./Operation.css";
+import { ServiceStatusDto } from '../../api/dto/ServiceStatusDto';
+import { useEffect } from 'react';
 
-export default function StatusBlock() {
+interface StatusBlockProps {
+    serviceStatus: ServiceStatusDto[],
+    borderColor: string
+}
+
+export default function StatusBlock({serviceStatus, borderColor}: StatusBlockProps) {
+
+    useEffect(() => {
+        console.log("ServiceStatus", serviceStatus);
+    }, [serviceStatus]);
 
     return (
-        <div className="border border-success rounded col-lg-5 col-12 status-block-container">
+        <div className={"border rounded col-lg-5 col-12 status-block-container " + borderColor}>
             <table className="table table-striped table-sm status-block-table">
                 <thead className="table-dark">
                 <tr>
@@ -14,15 +25,26 @@ export default function StatusBlock() {
                 </tr>
                 </thead>
                 <tbody>
+                {
+                    (serviceStatus).map(function (status, key) {
+                        return (
+                            <tr key={key}>
+                                <td>{status.serviceName}</td>
+                                <td>{status.startDateTime}</td>
+                                <td>{status.endDateTime}</td>
+                                <td>{status.isFailed ? 'Yes' : ''}</td>
+                            </tr>
+                        );
+                    })
+                }
                 </tbody>
             </table>
 
         </div>
 
-)
+    )
 
 }
-
 
 
 //     @foreach (var log in @Model.InventoryServiceStatus)

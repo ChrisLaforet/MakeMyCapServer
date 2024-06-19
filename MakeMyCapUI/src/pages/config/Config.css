@@ -1,0 +1,18 @@
+.form-row {
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
+.form-instructions {
+	max-width: 600px;
+	padding-top: 1rem !important;
+	padding-bottom: 1.5rem !important;
+}
+
+.form-button-row {
+	padding-bottom: 2rem !important;
+}
+
+.form-section {
+	padding-bottom: 3rem !important;
+}

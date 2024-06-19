@@ -69,7 +69,6 @@ const NavBar = () => {
                         <Nav.Link as={NavLink} to="/SkuMapping" className="navbarLink">SKU mapping</Nav.Link>
                         <Nav.Link as={NavLink} to="/Inventory" className="navbarLink">Inventory</Nav.Link>
 
-                        <Nav.Link as={NavLink} to="/Notifications" className="navbarLink">Notifications</Nav.Link>
                         <Nav.Link as={NavLink} to="/Settings" className="navbarLink">Settings</Nav.Link>
                         <Nav.Link as={NavLink} to="/Users" className="navbarLink">Users</Nav.Link>
                     </Nav>

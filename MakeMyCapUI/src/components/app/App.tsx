@@ -20,6 +20,7 @@ import LayoutSelector from '../../layout/LayoutSelector';
 import HomeSelector from '../../pages/HomeSelector';
 import GuardedRoute from '../../security/route/GuardedRoute';
 import ShowStatus from '../../pages/operation/ShowStatus';
+import Settings from '../../pages/config/Settings';
 
 
 // For Bootstrap: https://blog.logrocket.com/using-bootstrap-react-tutorial-examples/
@@ -36,6 +37,9 @@ const router = createBrowserRouter (
 
             <Route path="/Status" element={<GuardedRoute />}>
                 <Route path="/Status" element={<ShowStatus />} />
+            </Route>
+            <Route path="/Settings" element={<GuardedRoute />}>
+                <Route path="/Settings" element={<Settings />} />
             </Route>
 
             {/*<Route path="/EditSettings" element={<GuardedRoute />}>*/}
