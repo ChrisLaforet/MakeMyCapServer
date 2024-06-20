@@ -1,4 +1,6 @@
-﻿using MakeMyCapServer.CQS.CommandHandler;
+﻿using MakeMyCapServer.Controllers.Model;
+using MakeMyCapServer.CQS.CommandHandler;
+using MakeMyCapServer.CQS.Query;
 using MakeMyCapServer.CQS.QueryHandler;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,30 +11,23 @@ namespace MakeMyCapServer.Controllers;
 [Route("[controller]")]
 public class SettingsController : ControllerBase
 {
-	private readonly SettingsQueryHandler SettingsQueryHandler;
-	private readonly DistributorsQueryHandler DistributorsQueryHandler;
-	private readonly DistributorSkusQueryHandler DistributorSkusQueryHandler;
-	private readonly SkuQueryHandler SkuQueryHandler;
-	private readonly NotificationsQueryHandler NotificationsQueryHandler;
+	private readonly SettingsQueryHandler settingsQueryHandler;
+	private readonly NotificationsQueryHandler notificationsQueryHandler;
 
-	private readonly ChangeSettingsCommandHandler ChangeSettingsCommandHandler;
-	private readonly CreateSkuCommandHandler CreateSkuCommandHandler;
-	private readonly ChangeNotificationsCommandHandler ChangeNotificationsCommandHandler;
+	private readonly ChangeSettingsCommandHandler changeSettingsCommandHandler;
+	private readonly ChangeNotificationsCommandHandler changeNotificationsCommandHandler;
+
 	private readonly ILogger<SettingsController> logger;
 
 	public SettingsController(IServiceProvider serviceProvider, ILogger<SettingsController> logger)
 	{
 		this.logger = logger;
 		
-		SettingsQueryHandler = ActivatorUtilities.CreateInstance<SettingsQueryHandler>(serviceProvider);
-		DistributorSkusQueryHandler = ActivatorUtilities.CreateInstance<DistributorSkusQueryHandler>(serviceProvider);
-		DistributorsQueryHandler = ActivatorUtilities.CreateInstance<DistributorsQueryHandler>(serviceProvider);
-		SkuQueryHandler = ActivatorUtilities.CreateInstance<SkuQueryHandler>(serviceProvider);
-		NotificationsQueryHandler = ActivatorUtilities.CreateInstance<NotificationsQueryHandler>(serviceProvider);
+		settingsQueryHandler = ActivatorUtilities.CreateInstance<SettingsQueryHandler>(serviceProvider);
+		notificationsQueryHandler = ActivatorUtilities.CreateInstance<NotificationsQueryHandler>(serviceProvider);
 
-		ChangeSettingsCommandHandler = ActivatorUtilities.CreateInstance<ChangeSettingsCommandHandler>(serviceProvider);
-		CreateSkuCommandHandler = ActivatorUtilities.CreateInstance<CreateSkuCommandHandler>(serviceProvider);
-		ChangeNotificationsCommandHandler = ActivatorUtilities.CreateInstance<ChangeNotificationsCommandHandler>(serviceProvider);
+		changeSettingsCommandHandler = ActivatorUtilities.CreateInstance<ChangeSettingsCommandHandler>(serviceProvider);
+		changeNotificationsCommandHandler = ActivatorUtilities.CreateInstance<ChangeNotificationsCommandHandler>(serviceProvider);
 	}
 	
 	// [Authorize]
@@ -48,20 +43,38 @@ public class SettingsController : ControllerBase
 	// 	return RedirectToAction("Notifications", "Home");
 	// }
 
-	// [Authorize]
-	// public IActionResult Settings()
-	// {
-	// 	var settingResponse = SettingsQueryHandler.Handle(new SettingsQuery());
-	// 	var settings = new Settings()
-	// 	{
-	// 		InventoryCheckHours = settingResponse.InventoryCheckHours,
-	// 		FulfillmentCheckHours = settingResponse.FulfillmentCheckHours,
-	// 		NextPoSequence = settingResponse.NextPoSequence
-	// 	};
-	// 	
-	// 	return View("Settings", settings);
-	// }
-	//
+	[Authorize]
+	[HttpGet("notifications")]
+	public IActionResult Notifications()
+	{
+		var notificationResponse = notificationsQueryHandler.Handle(new NotificationsQuery());
+		var notificationEmailValues = new NotificationEmails()
+		{
+			WarningEmail1 = notificationResponse.WarningEmail1,
+			WarningEmail2 = notificationResponse.WarningEmail2,
+			WarningEmail3 = notificationResponse.WarningEmail3,
+			CriticalEmail1 = notificationResponse.CriticalEmail1,
+			CriticalEmail2 = notificationResponse.CriticalEmail2,
+			CriticalEmail3 = notificationResponse.CriticalEmail3
+		};
+		return Ok(new {notificationEmails = notificationEmailValues});
+	}
+	
+	[Authorize]
+	[HttpGet("settings")]
+	public IActionResult GetSettings()
+	{
+		var settingResponse = settingsQueryHandler.Handle(new SettingsQuery());
+		var settingValues = new Settings()
+		{
+			InventoryCheckHours = settingResponse.InventoryCheckHours,
+			FulfillmentCheckHours = settingResponse.FulfillmentCheckHours,
+			NextPoSequence = settingResponse.NextPoSequence
+		};
+		
+		return Ok(new {settings = settingValues});
+	}
+	
 	// [Authorize]
 	// [HttpPost]
 	// public IActionResult Settings(Settings settings)

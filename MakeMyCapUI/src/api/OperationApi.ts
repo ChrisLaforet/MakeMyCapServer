@@ -22,7 +22,7 @@ export class OperationApi {
 
     private static async getServiceStatus(key: string, authenticatedUser: AuthenticatedUser): Promise<ServiceStatusDto[] | null> {
 
-        const url = ApiHelper.CreateApiUrl('Operation','get_service_status') + '?' +
+        const url = ApiHelper.CreateApiUrl('Operation','service_status') + '?' +
             new URLSearchParams({
                 service: key
             }).toString();

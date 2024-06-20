@@ -12,22 +12,27 @@ namespace MakeMyCapServer.Controllers;
 public class OperationController : ControllerBase
 {
 	private readonly ServiceStatusQueryHandler serviceStatusQueryHandler;
-	private readonly SkuQueryHandler skuQueryHandler;
 	private readonly CreateSkuCommandHandler createSkuCommandHandler;
-
+	
+	private readonly DistributorsQueryHandler distributorsQueryHandler;
+	private readonly DistributorSkusQueryHandler distributorSkusQueryHandler;
+	private readonly SkuQueryHandler skuQueryHandler;
+	
 	private readonly ILogger<OperationController> logger;
 
 	public OperationController(IServiceProvider serviceProvider, ILogger<OperationController> logger)
 	{
 		this.logger = logger;
 
+		distributorSkusQueryHandler = ActivatorUtilities.CreateInstance<DistributorSkusQueryHandler>(serviceProvider);
+		distributorsQueryHandler = ActivatorUtilities.CreateInstance<DistributorsQueryHandler>(serviceProvider);
 		serviceStatusQueryHandler = ActivatorUtilities.CreateInstance<ServiceStatusQueryHandler>(serviceProvider);
 		skuQueryHandler = ActivatorUtilities.CreateInstance<SkuQueryHandler>(serviceProvider);
 		createSkuCommandHandler = ActivatorUtilities.CreateInstance<CreateSkuCommandHandler>(serviceProvider);
 	}
 
 	[Authorize]
-	[HttpGet("get_service_status")]
+	[HttpGet("service_status")]
 	public IActionResult GetServiceStatus(string service)
 	{
 		if (string.Equals(service, "Email", StringComparison.OrdinalIgnoreCase) || 
