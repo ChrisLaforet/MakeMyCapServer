@@ -216,7 +216,7 @@ export default function Users() {
                                         <input type="text" id="userName" className="form-control"
                                                required={true}
                                                value={userName}
-                                               maxLength={100}
+                                               maxLength={20}
                                                readOnly={currentRecord != null}
                                                disabled={currentRecord != null}
                                                onChange={e => setUserName(e.target.value)}/>

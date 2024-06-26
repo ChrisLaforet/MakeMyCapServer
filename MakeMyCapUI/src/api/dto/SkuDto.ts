@@ -20,7 +20,7 @@ export class SkuDto {
         this.styleCode = styleCode;
         this.partId = partId;
         this.color = color;
-        this.colorCode = color;
+        this.colorCode = colorCode;
         this.sizeCode = sizeCode
         }
     }

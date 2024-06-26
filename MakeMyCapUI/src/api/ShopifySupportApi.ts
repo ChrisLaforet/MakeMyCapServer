@@ -3,6 +3,7 @@ import { AuthenticatedUser } from '../security/auth/AuthenticatedUser';
 import { DistributorDto } from './dto/DistributorDto';
 import { DistributorSkusDto } from './dto/DistributorSkusDto';
 import { SkuDto } from './dto/SkuDto';
+import { UserDto } from './dto/UserDto';
 
 
 export class ShopifySupportApi {
@@ -90,8 +91,68 @@ export class ShopifySupportApi {
             const color = item["color"];
             const colorCode = item["colorCode"];
             const sizeCode = item["sizeCode"];
-            distributorSkus.push(new SkuDto(sku, distributorCode, distributorSku, brand, styleCode, partId, color, sizeCode, color));
+            distributorSkus.push(new SkuDto(sku, distributorCode, distributorSku, brand, styleCode, partId, color, colorCode, sizeCode));
         }
         return new DistributorSkusDto(new DistributorDto(code, name), distributorSkus);
+    }
+
+    public static async createSku(skuDto: SkuDto, authenticatedUser: AuthenticatedUser): Promise<boolean> {
+        return fetch(ApiHelper.CreateApiUrl('ShopifySupport', 'create-sku'), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Api-Key': ApiHelper.GetApiKey(),
+                'Authorization': ApiHelper.GetBearer(authenticatedUser)
+            },
+            body: JSON.stringify(skuDto)
+        })
+            .then(async data => {
+                if (data.ok) {
+                    console.log(`New sku record created for ${skuDto.sku}`)
+                    return true;
+                }
+                console.log(`New sku record not created for ${skuDto.sku}`)
+                return false;
+            })
+            .catch(err => {
+                console.log(`Caught exception creating sku record for ${skuDto.sku}`);
+                console.log(err);
+                return false;
+            });
+    }
+
+    public static async updateSku(originalSku: string, skuDto: SkuDto, authenticatedUser: AuthenticatedUser): Promise<boolean> {
+        return fetch(ApiHelper.CreateApiUrl('ShopifySupport', 'update-sku'), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Api-Key': ApiHelper.GetApiKey(),
+                'Authorization': ApiHelper.GetBearer(authenticatedUser)
+            },
+            body: JSON.stringify({
+                originalSku: originalSku,
+                newSku: skuDto.sku,
+                distributorSku: skuDto.distributorSku,
+                brand: skuDto.brand,
+                styleCode: skuDto.styleCode,
+                partId: skuDto.partId,
+                color: skuDto.color,
+                colorCode: skuDto.colorCode,
+                sizeCode: skuDto.sizeCode
+            })
+        })
+            .then(async data => {
+                if (data.ok) {
+                    console.log(`Sku record updated for ${originalSku}`)
+                    return true;
+                }
+                console.log(`Sku record not updated for ${originalSku}`)
+                return false;
+            })
+            .catch(err => {
+                console.log(`Caught exception updating sku record for ${originalSku}`);
+                console.log(err);
+                return false;
+            });
     }
 }

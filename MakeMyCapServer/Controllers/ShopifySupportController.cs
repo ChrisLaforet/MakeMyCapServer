@@ -12,10 +12,12 @@ namespace MakeMyCapServer.Controllers;
 [Route("[controller]")]
 public class ShopifySupportController : ControllerBase
 {
+	private readonly CreateSkuCommandHandler createSkuCommandHandler;
+	private readonly UpdateSkuCommandHandler updateSkuCommandHandler;
+	
 	private readonly DistributorsQueryHandler distributorsQueryHandler;
 	private readonly DistributorSkusQueryHandler distributorSkusQueryHandler;
 	private readonly SkuQueryHandler skuQueryHandler;
-	private readonly CreateSkuCommandHandler createSkuCommandHandler;
 
 	private readonly ILogger<ShopifySupportController> logger;
 
@@ -23,10 +25,12 @@ public class ShopifySupportController : ControllerBase
 	{
 		this.logger = logger;
 
+		createSkuCommandHandler = ActivatorUtilities.CreateInstance<CreateSkuCommandHandler>(serviceProvider);
+		updateSkuCommandHandler = ActivatorUtilities.CreateInstance<UpdateSkuCommandHandler>(serviceProvider);
+
 		distributorsQueryHandler = ActivatorUtilities.CreateInstance<DistributorsQueryHandler>(serviceProvider);
 		distributorSkusQueryHandler = ActivatorUtilities.CreateInstance<DistributorSkusQueryHandler>(serviceProvider);
 		skuQueryHandler = ActivatorUtilities.CreateInstance<SkuQueryHandler>(serviceProvider);
-		createSkuCommandHandler = ActivatorUtilities.CreateInstance<CreateSkuCommandHandler>(serviceProvider);
 	}
 	
 	[Authorize]
@@ -45,49 +49,49 @@ public class ShopifySupportController : ControllerBase
 		return Ok(response);
 	}
 	
+	[Authorize]
+	[HttpPost("create-sku")]
+	public IActionResult CreateSku(CreateSku model)
+	{
+		var skuResponse = skuQueryHandler.Handle(new SkuQuery(model.Sku.Trim()));
+		if (skuResponse != null)
+		{
+			return BadRequest($"There is already an assigned record with SKU {model.Sku} for {skuResponse.DistributorCode}");
+		}
 	
-	//
-	// [Authorize]
-	// public IActionResult DistributorSkus(string id)
-	// {
-	// 	return PartialView("DistributorSkus", distributorSkusQueryHandler.Handle(new DistributorSkusQuery(id)));
-	// }
-	//
-	// [Authorize]
-	// public IActionResult AddSku()
-	// {
-	// 	var createSku = new CreateSku();
-	// 	createSku.Distributors = distributorsQueryHandler.Handle(new DistributorsQuery());
-	// 	return View("AddSku", createSku);
-	// }
+		try
+		{
+			createSkuCommandHandler.Handle(new CreateSkuCommand(model));
+			return Ok();
+		}
+		catch (Exception)
+		{
+			return BadRequest( $"There was an error while creating record with SKU {model.Sku}");
+		}
+	}
 	
-	// [Authorize]
-	// [HttpPost]
-	// public IActionResult AddSku(CreateSku model)
-	// {
-	// 	model.Distributors = distributorsQueryHandler.Handle(new DistributorsQuery());		 // prepopulate in case we send model back out
-	//
-	// 	if (!ModelState.IsValid)
-	// 	{
-	// 		return View("AddSku", model);
-	// 	}
-	//
-	// 	var skuResponse = skuQueryHandler.Handle(new SkuQuery(model.Sku.Trim()));
-	// 	if (skuResponse != null)
-	// 	{
-	// 		ModelState.AddModelError("Failed", $"There is already an assigned record with SKU {model.Sku} for {skuResponse.DistributorCode}");
-	// 		return View("AddSku", model);
-	// 	}
-	//
-	// 	try
-	// 	{
-	// 		createSkuCommandHandler.Handle(new CreateSkuCommand(model));
-	// 		return RedirectToAction("AddSku", "Home");
-	// 	}
-	// 	catch (Exception)
-	// 	{
-	// 		ModelState.AddModelError("Failed", $"There was an error while creating record with SKU {model.Sku}");
-	// 		return View("AddSku", model);
-	// 	}
-	// }
+	[Authorize]
+	[HttpPost("update-sku")]
+	public IActionResult UpdateSku(UpdateSku model)
+	{
+		if (!string.Equals(model.NewSku, model.OriginalSku, StringComparison.CurrentCultureIgnoreCase))
+		{
+			var skuResponse = skuQueryHandler.Handle(new SkuQuery(model.NewSku.Trim()));
+			if (skuResponse != null)
+			{
+				return BadRequest($"There is already an assigned record with SKU {model.NewSku} for {skuResponse.DistributorCode}");
+			}	
+		}
+	
+		try
+		{
+			updateSkuCommandHandler.Handle(new UpdateSkuCommand(model));
+			return Ok();
+		}
+		catch (Exception)
+		{
+			return BadRequest( $"There was an error while updating record with SKU {model.OriginalSku}");
+		}
+	}
+	
 }

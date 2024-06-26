@@ -1,16 +1,16 @@
 ﻿namespace MakeMyCapServer.Controllers.Model;
 
-public class CreateSku
+public class UpdateSku
 {
-	public string Sku { get; set; }
-
-	public string DistributorCode { get; set; }
+	public string OriginalSku { get; set; }
+	
+	public string NewSku { get; set; }
 
 	public string? DistributorSku { get; set; }
 
 	public string? Brand { get; set; }
 
-	public string StyleCode { get; set; }
+	public string? StyleCode { get; set; }
 
 	public string? PartId { get; set; }
 
