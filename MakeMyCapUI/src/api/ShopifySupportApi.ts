@@ -155,4 +155,32 @@ export class ShopifySupportApi {
                 return false;
             });
     }
+
+
+    public static async deleteSku(sku: string, authenticatedUser: AuthenticatedUser): Promise<boolean> {
+        return fetch(ApiHelper.CreateApiUrl('ShopifySupport', 'delete-sku'), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Api-Key': ApiHelper.GetApiKey(),
+                'Authorization': ApiHelper.GetBearer(authenticatedUser)
+            },
+            body: JSON.stringify({
+                sku: sku
+            })
+        })
+            .then(async data => {
+                if (data.ok) {
+                    console.log(`Sku record deleted for ${sku}`)
+                    return true;
+                }
+                console.log(`Sku record not deleted for ${sku}`)
+                return false;
+            })
+            .catch(err => {
+                console.log(`Caught exception deleting sku record for ${sku}`);
+                console.log(err);
+                return false;
+            });
+    }
 }

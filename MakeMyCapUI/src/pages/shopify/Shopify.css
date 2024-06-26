@@ -2,10 +2,43 @@
 	max-width: 20rem;
 }
 
-.customSkuModal {
+.editCustomSkuModal {
 	background: white;
 	max-width: 500px !important;
 	width: 100%;
 	max-height: 600px;
 	height: 100%;
+}
+
+.deleteCustomSkuModal {
+	background: white;
+	max-width: 620px !important;
+	width: 100%;
+	max-height: 260px;
+	height: 100%;
+}
+
+.mmc-label-header {
+	margin-top: 1.5rem;
+	display: flex;
+	flex-direction: row;
+	margin-bottom: 1rem;
+}
+
+.mmc-label-row {
+	display: flex;
+	flex-direction: row;
+	margin-bottom: 1rem;
+}
+
+.mmc-label {
+	font-weight: bold;
+	margin-right: 0.5rem;
+	min-width: 9rem;
+	text-align: end;
+}
+
+.mmc-value {
+	margin-right: 2rem;
+	min-width: 10rem;
 }

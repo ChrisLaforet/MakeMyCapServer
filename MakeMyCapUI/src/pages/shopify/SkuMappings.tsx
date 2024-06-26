@@ -6,10 +6,9 @@ import { ShopifySupportApi } from '../../api/ShopifySupportApi';
 import { DistributorDto } from '../../api/dto/DistributorDto';
 import { Modal } from 'react-responsive-modal';
 import { SkuDto } from '../../api/dto/SkuDto';
-import "./Shopify.css";
 import { Alerter } from '../../layout/Alerter';
-import { UserDto } from '../../api/dto/UserDto';
-import { AdminApi } from '../../api/AdminApi';
+import "./Shopify.css";
+
 
 export default function SkuMappings() {
 
@@ -20,6 +19,7 @@ export default function SkuMappings() {
     const [distributorSkus, setDistributorSkus] = useState<DistributorSkusDto[]>([]);
 
     const [createOrEditSkuOpen, setCreateOrEditSkuOpen] = useState<boolean>(false);
+    const [deleteSkuOpen, setDeleteSkuOpen] = useState<boolean>(false);
 
     const [selectedSku, setSelectedSku] = useState<SkuDto | null>(null);
     const [mmcSku, setMmcSku] = useState<string>("");
@@ -248,12 +248,61 @@ export default function SkuMappings() {
     }
 
     function requestDeleteSkuModal(sku: SkuDto) {
+        setSelectedSku(sku);
+        setDeleteSkuOpen(true);
+    }
 
+    function closeDeleteSkuModal() {
+        setDeleteSkuOpen(false);
+    }
+
+    function submitDeleteSku(event: any) {
+        event.preventDefault();
+
+        if (selectedDistributor.current == null) {
+            Alerter.showError("Something went wrong - A distributor must be selected before deleting a sku", Alerter.DEFAULT_TIMEOUT);
+            return;
+        }
+        const distributorCode = selectedDistributor.current.code;
+
+        const distributorSkuDto = distributorSkus.find((distributorSku) => distributorSku.distributor.code == distributorCode);
+        if (distributorSkuDto == null) {
+            Alerter.showWarning(`Cannot find the distributor's skus for ${distributorCode} - changes will not reflect in the listing until you reload the Skus`, Alerter.DEFAULT_TIMEOUT);
+        }
+
+        if (selectedSku == null) {
+            return
+        }
+
+        deleteSku(selectedSku.sku).then(response => {
+            if (response) {
+                Alerter.showSuccess("Sku was successfully deleted!", Alerter.DEFAULT_TIMEOUT);
+                if (distributorSkuDto != null) {
+                    const index = distributorSkuDto.skus.indexOf(selectedSku);
+                    if (index >= 0) {
+                        distributorSkuDto.skus.splice(index, 1);
+                    }
+                }
+                closeDeleteSkuModal();
+                setValueChanged(valueChanged + 1);
+            } else {
+                Alerter.showError("Deleted sku failed.  Try to save again.", Alerter.DEFAULT_TIMEOUT);
+            }
+        });
+    }
+
+    const deleteSku = async (sku: string): Promise<boolean> => {
+        const authenticatedUser = sharedContextData.getAuthenticatedUser();
+        if (authenticatedUser) {
+            return await ShopifySupportApi.deleteSku(sku, authenticatedUser);
+        }
+        console.log("Unable to find authenticated user to delete sku!");
+        return false;
     }
 
 
     useEffect(() => {
-
+        // for forcing redraw
     }, [valueChanged]);
 
     useEffect(() => {
@@ -358,7 +407,7 @@ export default function SkuMappings() {
                                showCloseIcon={false}
                                classNames={{
                                    overlay: 'customOverlay',
-                                   modal: 'customSkuModal',
+                                   modal: 'customEditSkuModal',
                                }}>
                             <form onSubmit={submitSku}>
                                 <div><h2>{`Create Sku for ${selectedDistributor.current!.name}`}</h2></div>
@@ -456,6 +505,60 @@ export default function SkuMappings() {
                             </form>
                         </Modal>
                     </div>
+
+                    <div>
+                        <Modal open={deleteSkuOpen}
+                               onClose={closeDeleteSkuModal}
+                               closeOnEsc={false}
+                               closeOnOverlayClick={false}
+                               showCloseIcon={false}
+                               classNames={{
+                                   overlay: 'customOverlay',
+                                   modal: 'deleteCustomSkuModal',
+                               }}>
+                            <form onSubmit={submitDeleteSku}>
+                                <div><h2>{`Delete Sku for ${selectedDistributor.current!.name}`}</h2></div>
+                                <div className='mmc-label-header'>
+                                    <div className="mmc-label">MMC Sku:</div>
+                                    <div className="mmc-value">{selectedSku?.sku}</div>
+                                </div>
+                                <div className='mmc-label-row'>
+                                    <div className="mmc-label">Distributor Sku:</div>
+                                    <div className="mmc-value">{selectedSku?.distributorSku}</div>
+                                </div>
+                                <div className='mmc-label-row'>
+                                    <div className="mmc-label">Brand:</div>
+                                    <div className="mmc-value">{selectedSku?.brand}</div>
+                                    <div className="mmc-label">Style Code:</div>
+                                    <div className="mmc-value">{selectedSku?.styleCode}</div>
+                                </div>
+                                <div className='mmc-label-row'>
+                                    <div className="mmc-label">Part Id:</div>
+                                    <div className="mmc-value">{selectedSku?.partId}</div>
+                                    <div className="mmc-label">Color:</div>
+                                    <div className="mmc-value">{selectedSku?.color}</div>
+                                </div>
+                                <div className='mmc-label-row'>
+                                    <div className="mmc-label">Color Code:</div>
+                                    <div className="mmc-value">{selectedSku?.colorCode}</div>
+                                    <div className="mmc-label">Size Code:</div>
+                                    <div className="mmc-value">{selectedSku?.sizeCode}</div>
+                                </div>
+
+                                <div className="row mmc-form-button-row">
+                                    <div className='modal-navigation-row justify-content-end'>
+                                        <button className="btn btn-outline-danger" type="submit">Yes, Delete This!</button>
+                                        &nbsp;
+                                        <button className="btn btn-outline-secondary"
+                                                type="button"
+                                                onClick={closeDeleteSkuModal}>Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </Modal>
+                    </div>
+
                 </div>
             }
         </div>

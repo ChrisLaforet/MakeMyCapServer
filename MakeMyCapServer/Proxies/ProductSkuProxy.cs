@@ -66,6 +66,17 @@ public class ProductSkuProxy : IProductSkuProxy
 		return map;
 	}
 
+	public void UpdateSkuMap(DistributorSkuMap record)
+	{
+		context.SaveChanges();
+	}
+	
+	public void DeleteSkuMap(DistributorSkuMap record)
+	{
+		context.DistributorSkuMaps.Remove(record);
+		context.SaveChanges();
+	}
+
 	public List<InHouseInventory> GetInHouseInventories()
 	{
 		return context.InHouseInventories.ToList();

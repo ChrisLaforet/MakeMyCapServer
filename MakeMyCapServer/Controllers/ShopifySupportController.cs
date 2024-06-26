@@ -14,6 +14,7 @@ public class ShopifySupportController : ControllerBase
 {
 	private readonly CreateSkuCommandHandler createSkuCommandHandler;
 	private readonly UpdateSkuCommandHandler updateSkuCommandHandler;
+	private readonly DeleteSkuCommandHandler deleteSkuCommandHandler;
 	
 	private readonly DistributorsQueryHandler distributorsQueryHandler;
 	private readonly DistributorSkusQueryHandler distributorSkusQueryHandler;
@@ -27,6 +28,7 @@ public class ShopifySupportController : ControllerBase
 
 		createSkuCommandHandler = ActivatorUtilities.CreateInstance<CreateSkuCommandHandler>(serviceProvider);
 		updateSkuCommandHandler = ActivatorUtilities.CreateInstance<UpdateSkuCommandHandler>(serviceProvider);
+		deleteSkuCommandHandler = ActivatorUtilities.CreateInstance<DeleteSkuCommandHandler>(serviceProvider);
 
 		distributorsQueryHandler = ActivatorUtilities.CreateInstance<DistributorsQueryHandler>(serviceProvider);
 		distributorSkusQueryHandler = ActivatorUtilities.CreateInstance<DistributorSkusQueryHandler>(serviceProvider);
@@ -94,4 +96,18 @@ public class ShopifySupportController : ControllerBase
 		}
 	}
 	
+	[Authorize]
+	[HttpPost("delete-sku")]
+	public IActionResult DeleteSku(DeleteSku model)
+	{
+		try
+		{
+			deleteSkuCommandHandler.Handle(new DeleteSkuCommand(model.Sku));
+			return Ok();
+		}
+		catch (Exception)
+		{
+			return BadRequest( $"There was an error while deleting record with SKU {model.Sku}");
+		}
+	}
 }
