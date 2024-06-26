@@ -1,7 +1,7 @@
 import { useSharedContext } from '../../context/SharedContext';
 import React, { useEffect, useState } from 'react';
 import { Modal } from 'react-responsive-modal';
-import { UserApi } from '../../api/UserApi';
+import { AdminApi } from '../../api/AdminApi';
 import { UserDto } from '../../api/dto/UserDto';
 import { Alerter } from '../../layout/Alerter';
 import 'react-responsive-modal/styles.css';
@@ -114,7 +114,7 @@ export default function Users() {
     const saveNewUser = async (user: UserDto): Promise<boolean> => {
         const authenticatedUser = sharedContextData.getAuthenticatedUser();
         if (authenticatedUser) {
-            return await UserApi.createNewUser(user, authenticatedUser);
+            return await AdminApi.createNewUser(user, authenticatedUser);
         }
         console.log("Unable to find authenticated user to save new user!");
         return false;
@@ -123,7 +123,7 @@ export default function Users() {
     const updateUser = async (user: UserDto): Promise<boolean> => {
         const authenticatedUser = sharedContextData.getAuthenticatedUser();
         if (authenticatedUser) {
-            return await UserApi.updateUser(user, authenticatedUser);
+            return await AdminApi.updateUser(user, authenticatedUser);
         }
         console.log("Unable to find authenticated user to update user!");
         return false;
@@ -162,7 +162,7 @@ export default function Users() {
     const resetPassword = async (login: string, password: string): Promise<boolean> => {
         const authenticatedUser = sharedContextData.getAuthenticatedUser();
         if (authenticatedUser) {
-            return await UserApi.setPassword(login, password, authenticatedUser);
+            return await AdminApi.setPassword(login, password, authenticatedUser);
         }
         console.log("Unable to find authenticated user to set user password!");
         return false;
@@ -171,7 +171,7 @@ export default function Users() {
     const loadUsers = async () => {
         const authenticatedUser = sharedContextData.getAuthenticatedUser();
         if (authenticatedUser) {
-            const lookup = await UserApi.loadUsers(authenticatedUser);
+            const lookup = await AdminApi.loadUsers(authenticatedUser);
             if (lookup) {
                 setUsers(lookup)
             } else {

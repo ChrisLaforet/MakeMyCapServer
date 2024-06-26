@@ -1,0 +1,11 @@
+.distributor-selection {
+	max-width: 20rem;
+}
+
+.customSkuModal {
+	background: white;
+	max-width: 800px;
+	width: 100%;
+	max-height: 450px;
+	height: 100%;
+}

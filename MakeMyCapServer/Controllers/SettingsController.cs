@@ -1,4 +1,5 @@
 ﻿using MakeMyCapServer.Controllers.Model;
+using MakeMyCapServer.CQS.Command;
 using MakeMyCapServer.CQS.CommandHandler;
 using MakeMyCapServer.CQS.Query;
 using MakeMyCapServer.CQS.QueryHandler;
@@ -30,18 +31,13 @@ public class SettingsController : ControllerBase
 		changeNotificationsCommandHandler = ActivatorUtilities.CreateInstance<ChangeNotificationsCommandHandler>(serviceProvider);
 	}
 	
-	// [Authorize]
-	// [HttpPost]
-	// public IActionResult Notifications(NotificationEmails notificationEmails)
-	// {
-	// 	if (!ModelState.IsValid)
-	// 	{
-	// 		return View("Notifications", notificationEmails);
-	// 	}
-	// 	
-	// 	ChangeNotificationsCommandHandler.Handle(new ChangeNotificationsCommand(notificationEmails));
-	// 	return RedirectToAction("Notifications", "Home");
-	// }
+	[Authorize]
+	[HttpPost("save_notifications")]
+	public IActionResult Notifications(NotificationEmails notificationEmails)
+	{
+		changeNotificationsCommandHandler.Handle(new ChangeNotificationsCommand(notificationEmails));
+		return Ok(new { message = "Saved"});
+	}
 
 	[Authorize]
 	[HttpGet("notifications")]
@@ -75,16 +71,11 @@ public class SettingsController : ControllerBase
 		return Ok(new {settings = settingValues});
 	}
 	
-	// [Authorize]
-	// [HttpPost]
-	// public IActionResult Settings(Settings settings)
-	// {
-	// 	if (!ModelState.IsValid)
-	// 	{
-	// 		return View("Settings", settings);
-	// 	}
-	//
-	// 	ChangeSettingsCommandHandler.Handle(new ChangeSettingsCommand(settings.InventoryCheckHours, settings.FulfillmentCheckHours, settings.NextPoSequence));
-	// 	return RedirectToAction("Settings", "Home");
-	// }
+	[Authorize]
+	[HttpPost("save_settings")]
+	public IActionResult Settings(Settings settings)
+	{
+		changeSettingsCommandHandler.Handle(new ChangeSettingsCommand(settings.InventoryCheckHours, settings.FulfillmentCheckHours, settings.NextPoSequence));
+		return Ok(new { message = "Saved"});
+	}
 }

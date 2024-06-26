@@ -1,7 +1,7 @@
 import React, { CSSProperties, useContext, useEffect, useRef, useState } from "react";
 import { Navbar, Nav, Container, Dropdown } from 'react-bootstrap';
 import { NavLink } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap/dist/css/bootstrap.min.css';
 import './NavBar.css';
 import { useSharedContext } from '../../context/SharedContext';
 import { UserChangeEndpoint } from '../../context/SharedContextData';

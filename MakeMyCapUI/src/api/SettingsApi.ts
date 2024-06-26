@@ -42,6 +42,27 @@ export class SettingsApi {
         return new SettingsDto(inventoryCheckHours, fulfillmentCheckHours, nextPoSequence);
     }
 
+    public static async saveSettings(settings: SettingsDto, authenticatedUser: AuthenticatedUser): Promise<boolean> {
+
+        return fetch(ApiHelper.CreateApiUrl('Settings', 'save_settings'), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Api-Key': ApiHelper.GetApiKey(),
+                'Authorization': ApiHelper.GetBearer(authenticatedUser)
+            },
+            body: JSON.stringify(settings)
+        })
+            .then(() => {
+                console.log('Save settings request completed')
+                return true;
+            })
+            .catch(err => {
+                console.log('Caught exception requesting saving settings', err);
+                return false;
+            });
+    }
+
     public static async getNotifications(authenticatedUser: AuthenticatedUser): Promise<NotificationEmailsDto | null> {
 
         return fetch(ApiHelper.CreateApiUrl('Settings','notifications'), {
@@ -80,5 +101,26 @@ export class SettingsApi {
         const criticalEmail3 = values["criticalEmail3"];
 
         return new NotificationEmailsDto(warningEmail1, warningEmail2, warningEmail3, criticalEmail1, criticalEmail2, criticalEmail3);
+    }
+
+    public static async saveNotifications(notifications: NotificationEmailsDto, authenticatedUser: AuthenticatedUser): Promise<boolean> {
+
+        return fetch(ApiHelper.CreateApiUrl('Settings', 'save_notifications'), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Api-Key': ApiHelper.GetApiKey(),
+                'Authorization': ApiHelper.GetBearer(authenticatedUser)
+            },
+            body: JSON.stringify(notifications)
+        })
+            .then(() => {
+                console.log('Save notifications request completed')
+                return true;
+            })
+            .catch(err => {
+                console.log('Caught exception requesting notifications settings', err);
+                return false;
+            });
     }
 }

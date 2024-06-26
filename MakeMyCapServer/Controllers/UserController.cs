@@ -2,18 +2,14 @@ using MakeMyCapServer.Controllers.Model;
 using Microsoft.AspNetCore.Authorization;
 using MakeMyCapServer.CQS.Command;
 using MakeMyCapServer.CQS.CommandHandler;
-using MakeMyCapServer.Model;
 using MakeMyCapServer.Proxies;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using MakeMyCapServer.Controllers.Model;
 using MakeMyCapServer.CQS.Exception;
 
 namespace MakeMyCapServer.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-//[EnableCors("AllowSpecificOrigins")]
 public class UserController : ControllerBase
 {
 	private readonly IUserProxy userProxy;

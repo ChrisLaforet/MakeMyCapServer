@@ -21,6 +21,8 @@ import HomeSelector from '../../pages/HomeSelector';
 import GuardedRoute from '../../security/route/GuardedRoute';
 import ShowStatus from '../../pages/operation/ShowStatus';
 import Settings from '../../pages/config/Settings';
+import SkuMappings from '../../pages/shopify/SkuMappings';
+import Users from '../../pages/admin/Users';
 
 
 // For Bootstrap: https://blog.logrocket.com/using-bootstrap-react-tutorial-examples/
@@ -38,8 +40,14 @@ const router = createBrowserRouter (
             <Route path="/Status" element={<GuardedRoute />}>
                 <Route path="/Status" element={<ShowStatus />} />
             </Route>
+            <Route path="/SkuMapping" element={<GuardedRoute />}>
+                <Route path="/SkuMapping" element={<SkuMappings />} />
+            </Route>
             <Route path="/Settings" element={<GuardedRoute />}>
                 <Route path="/Settings" element={<Settings />} />
+            </Route>
+            <Route path="/Users" element={<GuardedRoute />}>
+                <Route path="/Users" element={<Users />} />
             </Route>
 
             {/*<Route path="/EditSettings" element={<GuardedRoute />}>*/}

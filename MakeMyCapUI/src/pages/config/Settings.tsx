@@ -1,11 +1,11 @@
-
 import "./Config.css";
 import { useEffect, useRef, useState } from 'react';
 import { AuthenticatedUser } from '../../security/auth/AuthenticatedUser';
-import { OperationApi } from '../../api/OperationApi';
 import { useSharedContext } from '../../context/SharedContext';
 import { SettingsApi } from '../../api/SettingsApi';
-import { number } from 'prop-types';
+import { Alerter } from '../../layout/Alerter';
+import { NotificationEmailsDto } from '../../api/dto/NotificationEmailsDto';
+import { SettingsDto } from '../../api/dto/SettingsDto';
 
 
 export default function Settings() {
@@ -76,6 +76,104 @@ export default function Settings() {
             }
         }
     }
+    
+    function setEmailFor(fieldName: string, value: string) {
+        if (fieldName == 'warningEmail1') {
+            warningEmail1.current = value;
+        }
+        else if (fieldName == 'warningEmail2') {
+            warningEmail2.current = value;
+        }
+        else if (fieldName == 'warningEmail3') {
+            warningEmail3.current = value;
+        }
+        else if (fieldName == 'criticalEmail1') {
+            criticalEmail1.current = value;
+        }
+        else if (fieldName == 'criticalEmail2') {
+            criticalEmail2.current = value;
+        }
+        else if (fieldName == 'criticalEmail3') {
+            criticalEmail3.current = value;
+        }
+        setValue2Changed(value2Changed + 1);
+    }
+
+    function saveSettings(event: any) {
+        event.preventDefault();
+
+        if (inventoryCheckHours.current < 1 || inventoryCheckHours.current > 23) {
+            Alerter.showInfo("Inventory check time must be between 1 and 23 hours inclusive", Alerter.DEFAULT_TIMEOUT);
+            return;
+        }
+        if (fulfillmentCheckHours.current < 1 || fulfillmentCheckHours.current > 23) {
+            Alerter.showInfo("Fulfillment time must be between 1 and 23 hours inclusive", Alerter.DEFAULT_TIMEOUT);
+            return;
+        }
+        if (nextPoSequence.current < 1 || nextPoSequence.current > 99_999) {
+            Alerter.showInfo("Next PO value must be between 1 and 99999 inclusive", Alerter.DEFAULT_TIMEOUT);
+            return;
+        }
+
+        const dto = new SettingsDto(inventoryCheckHours.current,
+            fulfillmentCheckHours.current, nextPoSequence.current);
+
+        Alerter.showInfo("Attempting to save settings...", Alerter.DEFAULT_TIMEOUT)
+        updateSettings(dto).then(response => {
+            if (response) {
+                Alerter.showSuccess("Updating settings was successful!", Alerter.DEFAULT_TIMEOUT)
+            } else {
+                Alerter.showError("Updating settings failed.  Try to save again.", Alerter.DEFAULT_TIMEOUT)
+            }
+        });
+    }
+
+    const updateSettings = async (settingsDto: SettingsDto): Promise<boolean> => {
+        const authenticatedUser = sharedContextData.getAuthenticatedUser();
+        if (authenticatedUser) {
+            return await SettingsApi.saveSettings(settingsDto, authenticatedUser);
+        }
+        console.log("Unable to find authenticated user to update settings!");
+        return false;
+    }
+
+    function saveEmailNotifications(event: any) {
+        event.preventDefault();
+
+        if (warningEmail1.current == null || warningEmail1.current.trim().length == 0) {
+            Alerter.showInfo("Warning notification Email 1 must be set", Alerter.DEFAULT_TIMEOUT);
+            return;
+        }
+        if (criticalEmail1.current == null || criticalEmail1.current.trim().length == 0) {
+            Alerter.showInfo("Critical notification Email 1 must be set", Alerter.DEFAULT_TIMEOUT);
+            return;
+        }
+
+        const dto = new NotificationEmailsDto(warningEmail1.current.trim(),
+            warningEmail2.current == null ? null : warningEmail2.current.trim(),
+            warningEmail3.current == null ? null : warningEmail3.current.trim(),
+            criticalEmail1.current.trim(),
+            criticalEmail2.current == null ? null : criticalEmail2.current.trim(),
+            criticalEmail3.current == null ? null : criticalEmail3.current.trim());
+
+        Alerter.showInfo("Attempting to save notification emails...", Alerter.DEFAULT_TIMEOUT)
+        updateNotifications(dto).then(response => {
+            if (response) {
+                Alerter.showSuccess("Updating notification emails was successful!", Alerter.DEFAULT_TIMEOUT)
+            } else {
+                Alerter.showError("Updating notification emails failed.  Try to save again.", Alerter.DEFAULT_TIMEOUT)
+            }
+        });
+    }
+
+    const updateNotifications = async (notificationsDto: NotificationEmailsDto): Promise<boolean> => {
+        const authenticatedUser = sharedContextData.getAuthenticatedUser();
+        if (authenticatedUser) {
+            return await SettingsApi.saveNotifications(notificationsDto, authenticatedUser);
+        }
+        console.log("Unable to find authenticated user to update notifications!");
+        return false;
+    }
 
     useEffect(() => {
         // dummy to refresh values
@@ -98,7 +196,7 @@ export default function Settings() {
             <h1 className="display-page-title operation-header">Make My Cap Server Settings</h1>
 
             <div className="row status-block-row form-section">
-                <form className="col-md-9 col-lg-7 col-xl-6 col-12 border rounded border-info">
+                <form className="col-md-9 col-lg-7 col-xl-6 col-12 border rounded border-info" onSubmit={saveSettings}>
                     <div className="row mmc-form-row">
                         <div>
                             <label htmlFor="InventoryCheckHours" className="col-form-label">Inventory check
@@ -148,7 +246,7 @@ export default function Settings() {
 
 
             <div className="row status-block-row form-section">
-                <form className="col-md-9 col-lg-7 col-xl-6 col-12 border rounded border-warning">
+                <form className="col-md-9 col-lg-7 col-xl-6 col-12 border rounded border-warning" onSubmit={saveEmailNotifications}>
                     <div className="row mmc-form-row form-instructions">
                         These first Email addresses are sent WARNING/STATUS Emails with information from the server that
                         may be of interest. The system is not too "chatty" but there may be a few messages sent
@@ -162,6 +260,7 @@ export default function Settings() {
                             <input type="email" id="WarningEmail1" maxLength={120} className="form-control"
                                    required
                                    value={warningEmail1.current == null ? '' : warningEmail1.current}
+                                   onChange={(e) => setEmailFor("warningEmail1", e.target.value)}
                             />
                         </div>
                     </div>
@@ -171,6 +270,7 @@ export default function Settings() {
                             <label htmlFor="WarningEmail2" className="col-form-label">Warning Email #2</label>
                             <input type="email" id="WarningEmail2" maxLength={120} className="form-control"
                                    value={warningEmail2.current == null ? '' : warningEmail2.current}
+                                   onChange={(e) => setEmailFor("warningEmail2", e.target.value)}
                             />
                         </div>
                     </div>
@@ -180,6 +280,7 @@ export default function Settings() {
                             <label htmlFor="WarningEmail3" className="col-form-label">Warning Email #3</label>
                             <input type="email" id="WarningEmail3" maxLength={120} className="form-control"
                                    value={warningEmail3.current == null ? '' : warningEmail3.current}
+                                   onChange={(e) => setEmailFor("warningEmail3", e.target.value)}
                             />
                         </div>
                     </div>
@@ -199,6 +300,7 @@ export default function Settings() {
                             <input type="email" id="CriticalEmail1" maxLength={120} className="form-control"
                                    required
                                    value={criticalEmail1.current == null ? '' : criticalEmail1.current}
+                                   onChange={(e) => setEmailFor("criticalEmail1", e.target.value)}
                             />
                         </div>
                     </div>
@@ -208,6 +310,7 @@ export default function Settings() {
                             <label htmlFor="CriticalEmail2" className="col-form-label">Critical Error Email #2</label>
                             <input type="email" id="CriticalEmail2" maxLength={120} className="form-control"
                                    value={criticalEmail2.current == null ? '' : criticalEmail2.current}
+                                   onChange={(e) => setEmailFor("criticalEmail2", e.target.value)}
                             />
                         </div>
                     </div>
@@ -217,6 +320,7 @@ export default function Settings() {
                             <label htmlFor="CriticalEmail3" className="col-form-label">Critical Error Email #3</label>
                             <input type="email" id="CriticalEmail3" maxLength={120} className="form-control"
                                    value={criticalEmail3.current == null ? '' : criticalEmail3.current}
+                                   onChange={(e) => setEmailFor("criticalEmail3", e.target.value)}
                             />
                         </div>
                     </div>
