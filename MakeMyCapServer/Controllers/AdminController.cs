@@ -38,7 +38,7 @@ public class AdminController : ControllerBase
 	
 	[Authorize]
 	[HttpGet("users")]
-	public IActionResult Users(string id)
+	public IActionResult Users()
 	{
 		var users = usersQueryHandler.Handle(new UsersQuery());
 		return Ok(new {users = users});

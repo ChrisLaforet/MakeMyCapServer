@@ -19,41 +19,17 @@ export default function Users() {
 
     const [currentRecord, setCurrentRecord] = useState<UserDto | null>(null);
     const [title, setTitle] = useState<string>('');
-    const [login, setLogin] = useState<string>('');
-    const [code, setCode] = useState<string>('');
+    const [userName, setUserName] = useState<string>('');
     const [email, setEmail] = useState<string>('');
-    const [name, setName] = useState<string>('');
-    const [nextSequence, setNextSequence] = useState<number>(1);
-    const [admin, setAdmin] = useState<boolean>(false);
     const [password, setPassword] = useState<string>('');
-    const [artboardPath, setArtboardPath] = useState<string>('');
-    const [artifactPath, setArtifactPath] = useState<string>('');
-    const [outputPath, setOutputPath] = useState<string>('');
 
     function openEditUserModal(toEdit: UserDto | null) {
         setCurrentRecord(toEdit);
-        setTitle("Artwork Generator: " + (toEdit ? "Edit User" : "Add New User"));
-        setLogin(toEdit ? toEdit.login : '');
-        setCode(toEdit ? toEdit.code : '');
+        setTitle("Make My Cap: " + (toEdit ? "Edit User" : "Add New User"));
+        setUserName(toEdit ? toEdit.userName : '');
         setEmail(toEdit ? toEdit.email : '');
-        setName(toEdit ? toEdit.name : '');
-        setNextSequence(toEdit ? toEdit.nextSequence : 1);
-        setAdmin(toEdit? toEdit.admin : false);
-        setArtboardPath(toEdit? toEdit.artboardPath : '~/Desktop');
-        setArtifactPath(toEdit? toEdit.artifactPath : '~/Desktop');
-        setOutputPath(toEdit? toEdit.outputPath : '~/Desktop');
 
         setEditUserOpen(true);
-    }
-
-    function updateSequence(value: string) {
-        try {
-            setNextSequence(parseInt(value, 10));
-        } catch (e) {}
-    }
-
-    function toggleAdmin() {
-        setAdmin(admin => !admin);
     }
 
     function closeEditUserModal() {
@@ -64,16 +40,8 @@ export default function Users() {
         e.preventDefault();
 
         let isValid = true;
-        if (!currentRecord && login.length == 0) {
-            Alerter.showWarning("Login must be provided before saving a user");
-            isValid = false;
-        }
-        if (code.length == 0) {
-            Alerter.showWarning("Code/Initials must be provided before saving a user");
-            isValid = false;
-        }
-        if (name.length == 0) {
-            Alerter.showWarning("Name must be provided before saving a user");
+        if (!currentRecord && userName.length == 0) {
+            Alerter.showWarning("User name must be provided before saving a user");
             isValid = false;
         }
         if (email.length == 0) {
@@ -84,54 +52,56 @@ export default function Users() {
             return;
         }
 
-        const loginForDto = currentRecord ? currentRecord.login : login;
-        const dto = new UserDto(loginForDto, code, name, email, nextSequence, admin, artboardPath, artifactPath, outputPath);
+        const loginForDto = currentRecord ? currentRecord.userName : userName;
+        const dto = new UserDto(loginForDto, email, "");
 
-        Alerter.showInfo("Attempting to save user...", Alerter.DEFAULT_TIMEOUT)
+        Alerter.showInfo("Attempting to save user...", Alerter.DEFAULT_TIMEOUT);
         if (currentRecord) {
             updateUser(dto).then(response => {
                 if (response) {
-                    Alerter.showSuccess("Updating user was successful!", Alerter.DEFAULT_TIMEOUT)
+                    Alerter.showSuccess("Updating user was successful!", Alerter.DEFAULT_TIMEOUT);
                     setUsersChanged(usersChanged => usersChanged + 1);
                     closeEditUserModal();
                 } else {
-                    Alerter.showError("Updating user failed.  Try to save again.", Alerter.DEFAULT_TIMEOUT)
+                    Alerter.showError("Updating user failed.  Try to save again.", Alerter.DEFAULT_TIMEOUT);
                 }
             });
         } else {
             saveNewUser(dto).then(response => {
                 if (response) {
-                    Alerter.showSuccess("Saving new user was successful!", Alerter.DEFAULT_TIMEOUT)
+                    Alerter.showSuccess("Saving new user was successful!", Alerter.DEFAULT_TIMEOUT);
+                    users!.push(response);
                     setUsersChanged(usersChanged => usersChanged + 1);
                     closeEditUserModal();
                 } else {
-                    Alerter.showError("Saving new user failed.  Try to save again.", Alerter.DEFAULT_TIMEOUT)
+                    Alerter.showError("Saving new user failed.  Try to save again.", Alerter.DEFAULT_TIMEOUT);
                 }
             });
         }
     }
 
-    const saveNewUser = async (user: UserDto): Promise<boolean> => {
+    const saveNewUser = async (user: UserDto): Promise<UserDto | null> => {
         const authenticatedUser = sharedContextData.getAuthenticatedUser();
         if (authenticatedUser) {
             return await AdminApi.createNewUser(user, authenticatedUser);
         }
         console.log("Unable to find authenticated user to save new user!");
-        return false;
+        return null;
     }
 
     const updateUser = async (user: UserDto): Promise<boolean> => {
-        const authenticatedUser = sharedContextData.getAuthenticatedUser();
-        if (authenticatedUser) {
-            return await AdminApi.updateUser(user, authenticatedUser);
-        }
-        console.log("Unable to find authenticated user to update user!");
+        // TODO: CML - later possible implementation
+        // const authenticatedUser = sharedContextData.getAuthenticatedUser();
+        // if (authenticatedUser) {
+        //     return await AdminApi.updateUser(user, authenticatedUser);
+        // }
+        // console.log("Unable to find authenticated user to update user!");
         return false;
     }
 
     function openPasswordModal(user: UserDto) {
         setCurrentRecord(user);
-        setTitle("Artwork Generator: Set password for " + user.login)
+        setTitle("Artwork Generator: Set password for " + user.userName)
         setPasswordOpen(true);
     }
 
@@ -140,31 +110,33 @@ export default function Users() {
     }
 
     function submitPassword(e: any) {
+        // TODO: CML - later possible implementation
         e.preventDefault()
-        if (!currentRecord || password.length < 8) {
-            Alerter.showWarning("Password cannot be shorter than 8 characters for a user");
-            return;
-        }
-
-        Alerter.showInfo("Attempting to set password for " + currentRecord.login + "...", Alerter.DEFAULT_TIMEOUT)
-        if (currentRecord) {
-            resetPassword(currentRecord.login, password).then(response => {
-                if (response) {
-                    Alerter.showSuccess("Password reset was successful!", Alerter.DEFAULT_TIMEOUT)
-                    closePasswordModal();
-                } else {
-                    Alerter.showError("Updating user password failed.  Try to save again.", Alerter.DEFAULT_TIMEOUT)
-                }
-            });
-        }
+        // if (!currentRecord || password.length < 8) {
+        //     Alerter.showWarning("Password cannot be shorter than 8 characters for a user");
+        //     return;
+        // }
+        //
+        // Alerter.showInfo("Attempting to set password for " + currentRecord.login + "...", Alerter.DEFAULT_TIMEOUT)
+        // if (currentRecord) {
+        //     resetPassword(currentRecord.login, password).then(response => {
+        //         if (response) {
+        //             Alerter.showSuccess("Password reset was successful!", Alerter.DEFAULT_TIMEOUT)
+        //             closePasswordModal();
+        //         } else {
+        //             Alerter.showError("Updating user password failed.  Try to save again.", Alerter.DEFAULT_TIMEOUT)
+        //         }
+        //     });
+        // }
     }
 
     const resetPassword = async (login: string, password: string): Promise<boolean> => {
-        const authenticatedUser = sharedContextData.getAuthenticatedUser();
-        if (authenticatedUser) {
-            return await AdminApi.setPassword(login, password, authenticatedUser);
-        }
-        console.log("Unable to find authenticated user to set user password!");
+        // TODO: CML - later possible implementation
+        // const authenticatedUser = sharedContextData.getAuthenticatedUser();
+        // if (authenticatedUser) {
+        //     return await AdminApi.setPassword(login, password, authenticatedUser);
+        // }
+        // console.log("Unable to find authenticated user to set user password!");
         return false;
     }
 
@@ -181,12 +153,12 @@ export default function Users() {
     }
 
     useEffect(() => {
-        loadUsers();
+        loadUsers().catch((error) => console.log(error));
     }, [usersChanged]);
 
     return (
         <div>
-            <h2><span className="mmc-red">All</span> <span className="mmc-blue">Users</span></h2>
+            <h2><span className="mmc-red">All Users</span></h2>
             {!users &&
                 <div className="mmc-spinner-box spinner-border text-primary"><span className="sr-only"></span></div>}
             {users &&
@@ -198,25 +170,19 @@ export default function Users() {
                         <table className="table table-striped table-hover">
                             <thead>
                             <tr>
-                                <th scope="col">Login</th>
-                                <th scope="col">Code</th>
-                                <th scope="col">Name</th>
+                                <th scope="col">User Name</th>
                                 <th scope="col">Email</th>
-                                <th scope="col">Sequence #</th>
-                                <th scope="col">Is admin?</th>
+                                <th scope="col">Create Date?</th>
                                 <th scope="col">Operations</th>
                             </tr>
                             </thead>
                             <tbody>
                             {(users).map(function (user, key) {
                                 return (
-                                    <tr key={user.login}>
-                                        <th>{user.login}</th>
-                                        <td>{user.code}</td>
-                                        <td>{user.name}</td>
+                                    <tr key={user.userName}>
+                                        <th>{user.userName}</th>
                                         <td>{user.email}</td>
-                                        <td>{user.nextSequence}</td>
-                                        <td>{user.admin ? "Y" : ""}</td>
+                                        <td>{user.createDate.slice(0,10)}</td>
                                         <td>
                                             <button className="btn btn-sm btn-outline-primary" onClick={() => openEditUserModal(user)}>Edit user</button>
                                             <button className="btn btn-sm btn-outline-primary mmc-operation-buttons" onClick={() => openPasswordModal(user)}>
@@ -246,34 +212,14 @@ export default function Users() {
                                 <div><h2>{title}</h2></div>
                                 <div className='row mmc-form-row'>
                                     <div>
-                                        <label htmlFor="login" className="col-form-label">Login:</label>
-                                        <input type="text" id="login" className="form-control" name="login"
+                                        <label htmlFor="userName" className="col-form-label">Login:</label>
+                                        <input type="text" id="userName" className="form-control"
                                                required={true}
-                                               value={login}
-                                               maxLength={30}
+                                               value={userName}
+                                               maxLength={100}
                                                readOnly={currentRecord != null}
                                                disabled={currentRecord != null}
-                                               onChange={e => setLogin(e.target.value)}/>
-                                    </div>
-                                </div>
-                                <div className='row mmc-form-row'>
-                                    <div>
-                                        <label htmlFor="code" className="col-form-label">Code/Initials:</label>
-                                        <input type="text" id="code" className="form-control" name="code"
-                                               required={true}
-                                               value={code}
-                                               maxLength={5}
-                                               onChange={e => setCode(e.target.value)}/>
-                                    </div>
-                                </div>
-                                <div className='row mmc-form-row'>
-                                    <div>
-                                        <label htmlFor="name" className="col-form-label">Name:</label>
-                                        <input type="text" id="name" className="form-control" name="name"
-                                               required={true}
-                                               value={name}
-                                               maxLength={100}
-                                               onChange={e => setName(e.target.value)}/>
+                                               onChange={e => setUserName(e.target.value)}/>
                                     </div>
                                 </div>
                                 <div className='row mmc-form-row'>
@@ -284,54 +230,6 @@ export default function Users() {
                                                value={email}
                                                maxLength={100}
                                                onChange={e => setEmail(e.target.value)}/>
-                                    </div>
-                                </div>
-                                <div className='row mmc-form-row'>
-                                    <div>
-                                        <label htmlFor="sequence" className="col-form-label">Next Sequence #:</label>
-                                        <input type="number" id="sequence" className="form-control" name="sequence"
-                                               required={true}
-                                               value={nextSequence}
-                                               onChange={e => updateSequence(e.target.value)}/>
-                                    </div>
-                                </div>
-                                <div className='row mmc-form-row'>
-                                    <div>
-                                        <label htmlFor="artworkpath" className="col-form-label">Default artwork path:</label>
-                                        <input type="artworkpath" id="artworkpath" className="form-control" name="artworkpath"
-                                               required={true}
-                                               value={artboardPath}
-                                               maxLength={100}
-                                               onChange={e => setArtboardPath(e.target.value)}/>
-                                    </div>
-                                </div>
-                                <div className='row mmc-form-row'>
-                                    <div>
-                                        <label htmlFor="artifactpath" className="col-form-label">Default artifact path:</label>
-                                        <input type="artifactpath" id="artifactpath" className="form-control" name="artifactpath"
-                                               required={true}
-                                               value={artifactPath}
-                                               maxLength={100}
-                                               onChange={e => setArtifactPath(e.target.value)}/>
-                                    </div>
-                                </div>
-                                <div className='row mmc-form-row'>
-                                    <div>
-                                        <label htmlFor="outputpath" className="col-form-label">Default output path:</label>
-                                        <input type="outputpath" id="outputpath" className="form-control" name="outputpath"
-                                               required={true}
-                                               value={outputPath}
-                                               maxLength={100}
-                                               onChange={e => setOutputPath(e.target.value)}/>
-                                    </div>
-                                </div>
-                                <div className='row mmc-form-row'>
-                                    <div>
-                                        <br />
-                                        <input type="checkbox" id="admin" name="admin" value="Admin"
-                                               checked={admin} onChange={() => toggleAdmin()}/>
-                                        <label htmlFor="admin" className="col-form-checkbox-label">&nbsp;Is
-                                            administrator?</label>
                                     </div>
                                 </div>
                                 <div className="row mmc-form-button-row">

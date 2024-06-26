@@ -51,7 +51,7 @@ export class AdminApi {
     }
 
     public static async createNewUser(user: UserDto, authenticatedUser: AuthenticatedUser): Promise<UserDto | null> {
-        return fetch(ApiHelper.CreateApiUrl('Admin', 'create_user'), {
+        return fetch(ApiHelper.CreateApiUrl('Admin', 'create-user'), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
