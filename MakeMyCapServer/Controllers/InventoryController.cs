@@ -13,8 +13,8 @@ namespace MakeMyCapServer.Controllers;
 public class InventoryController : ControllerBase
 {
 	private readonly CreateInventoryCommandHandler createInventoryCommandHandler;
-	// private readonly UpdateInventoryCommandHandler updateInventoryCommandHandler;
-	//
+	private readonly UpdateInventoryCommandHandler updateInventoryCommandHandler;
+	
 	private readonly InventoryQueryHandler inventoryQueryHandler;
 	private readonly AvailableSkusQueryHandler availableSkusQueryHandler;
 	private readonly SkuQueryHandler skuQueryHandler;
@@ -26,8 +26,8 @@ public class InventoryController : ControllerBase
 		this.logger = logger;
 	
 		createInventoryCommandHandler = ActivatorUtilities.CreateInstance<CreateInventoryCommandHandler>(serviceProvider);
-	// 	updateInventoryCommandHandler = ActivatorUtilities.CreateInstance<UpdateInventoryCommandHandler>(serviceProvider);
-	//
+		updateInventoryCommandHandler = ActivatorUtilities.CreateInstance<UpdateInventoryCommandHandler>(serviceProvider);
+	
 		inventoryQueryHandler = ActivatorUtilities.CreateInstance<InventoryQueryHandler>(serviceProvider);
 		availableSkusQueryHandler = ActivatorUtilities.CreateInstance<AvailableSkusQueryHandler>(serviceProvider);
 		skuQueryHandler = ActivatorUtilities.CreateInstance<SkuQueryHandler>(serviceProvider);
@@ -61,6 +61,21 @@ public class InventoryController : ControllerBase
 		catch (Exception)
 		{
 			return BadRequest( $"There was an error while creating inventory for SKU {model.Sku}");
+		}
+	}
+	
+	[Authorize]
+	[HttpPost("update-in-house-inventory")]
+	public IActionResult UpdateInHouseInventory(UpdateInventory model)
+	{
+		try
+		{
+			updateInventoryCommandHandler.Handle(new UpdateInventoryCommand(model));
+			return Ok();
+		}
+		catch (Exception)
+		{
+			return BadRequest( $"There was an error while updating inventory for SKU {model.Sku}");
 		}
 	}
 }

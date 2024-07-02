@@ -2,7 +2,7 @@ export class InventoryDto {
 
     public readonly sku: string;
     public readonly description: string;
-    public readonly onHand: number;
+    public onHand: number;
     public readonly lastUsage: number;
     public readonly distributorCode: string;
     public readonly distributorName: string;

@@ -10,3 +10,11 @@
 	max-width: 8rem;
 }
 
+.customUpdateInventoryModal {
+	background: white;
+	max-width: 600px !important;
+	width: 100%;
+	max-height: 300px;
+	height: 100%;
+}
+

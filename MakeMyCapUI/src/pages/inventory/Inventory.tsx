@@ -7,9 +7,6 @@ import { Modal } from 'react-responsive-modal';
 import { Alerter } from '../../layout/Alerter';
 import { AvailableSkuDto } from '../../api/dto/AvailableSkuDto';
 import "./Inventory.css";
-import { DistributorDto } from '../../api/dto/DistributorDto';
-import { SkuDto } from '../../api/dto/SkuDto';
-import { ShopifySupportApi } from '../../api/ShopifySupportApi';
 
 
 export default function Inventory() {
@@ -20,7 +17,9 @@ export default function Inventory() {
     const [availableSkus, setAvailableSkus] = useState<AvailableSkuDto[] | null>(null);
 
     const [createInventoryOpen, setCreateInventoryOpen] = useState<boolean>(false);
+    const [updateInventoryOpen, setUpdateInventoryOpen] = useState<boolean>(false);
     const selectedSku = useRef<string | null>(null);
+    const description = useRef<string | null>(null);
     const [onHand, setOnHand] = useState<number>(0);
     const [valueChanged, setValueChanged] = useState(0);
 
@@ -50,8 +49,16 @@ export default function Inventory() {
         setCreateInventoryOpen(true);
     }
 
+    function openUpdateInventoryModal(item: InventoryDto) {
+        selectedSku.current = item.sku;
+        description.current = item.description;
+        setOnHand(item.onHand);
+        setUpdateInventoryOpen(true);
+    }
+
     function closeInventoryModal() {
         setCreateInventoryOpen(false);
+        setUpdateInventoryOpen(false);
     }
 
     function setOnHandValue(value: string) {
@@ -106,6 +113,42 @@ export default function Inventory() {
             return await InventoryApi.createInHouseInventory(sku, onHand, authenticatedUser);
         }
         console.log("Unable to find authenticated user to save new in-house inventory!");
+        return false;
+    }
+
+    function submitUpdatedInventory(event: any) {
+        event.preventDefault();
+
+        if (selectedSku.current == null || selectedSku.current == '') {
+            Alerter.showInfo("The Sku cannot be empty - it must be a unique value", Alerter.DEFAULT_TIMEOUT);
+            return;
+        }
+        const inventoryDto = inHouseItems?.find((inHouse) => inHouse.sku == selectedSku.current);
+        if (inventoryDto == null) {
+            Alerter.showError("The Sku cannot be found in the inventory list so it cannot be saved", Alerter.DEFAULT_TIMEOUT);
+            return;
+        }
+
+        const quantityOnHand = onHand >= 0 ? onHand : 0;
+
+        updateInventory(inventoryDto.sku, quantityOnHand).then(response => {
+            if (response) {
+                Alerter.showSuccess("Updating in-house inventory was successful!", Alerter.DEFAULT_TIMEOUT);
+                inventoryDto.onHand = quantityOnHand;
+                closeInventoryModal();
+                setValueChanged(valueChanged + 1);
+            } else {
+                Alerter.showError("Updating in-house inventory failed.  Try to save again.", Alerter.DEFAULT_TIMEOUT);
+            }
+        });
+    }
+
+    const updateInventory = async (sku: string, onHand: number): Promise<boolean> => {
+        const authenticatedUser = sharedContextData.getAuthenticatedUser();
+        if (authenticatedUser) {
+            return await InventoryApi.updateInHouseInventory(sku, onHand, authenticatedUser);
+        }
+        console.log("Unable to find authenticated user to update in-house inventory!");
         return false;
     }
 
@@ -173,7 +216,9 @@ export default function Inventory() {
                                             <td>{item.onHand}</td>
                                             <td>{item.lastUsage}</td>
                                             <td>
-                                                <button className="btn btn-sm btn-outline-primary">Update</button>
+                                                <button className="btn btn-sm btn-outline-primary"
+                                                        onClick={() => openUpdateInventoryModal(item)}
+                                                >Update</button>
                                             </td>
                                         </tr>
                                     );
@@ -212,6 +257,65 @@ export default function Inventory() {
                                                 })
                                             }
                                         </select>
+                                    </div>
+                                </div>
+                                <div className='row ca-form-row'>
+                                    <div>
+                                        <label htmlFor="onHand" className="col-form-label">Quantity on hand:</label>
+                                        <input type="number" id="onHand" className="form-control onhand-control"
+                                               required
+                                               value={onHand}
+                                               onChange={e => setOnHandValue(e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="row mmc-form-button-row">
+                                    <div className='modal-navigation-row justify-content-end'>
+                                        <button className="btn btn-outline-primary" type="submit">Save inventory
+                                        </button>
+                                        &nbsp;
+                                        <button className="btn btn-outline-secondary"
+                                                type="button"
+                                                onClick={closeInventoryModal}>Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </Modal>
+                    </div>
+
+                    <div>
+                        <Modal open={updateInventoryOpen}
+                               onClose={closeInventoryModal}
+                               closeOnEsc={false}
+                               closeOnOverlayClick={false}
+                               showCloseIcon={false}
+                               classNames={{
+                                   overlay: 'customOverlay',
+                                   modal: 'customUpdateInventoryModal',
+                               }}>
+                            <form onSubmit={submitUpdatedInventory}>
+                                <div><h2>Update In-House Inventory</h2></div>
+                                <div className='row ca-form-row'>
+                                    <div>
+                                        <div>
+                                            <label htmlFor="sku" className="col-form-label">Sku:</label>
+                                            <input type="text" id="sku" className="form-control"
+                                                   readOnly={true}
+                                                   value={selectedSku.current == null ? '' : selectedSku.current}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className='row ca-form-row'>
+                                    <div>
+                                        <div>
+                                            <label htmlFor="description" className="col-form-label">Description:</label>
+                                            <input type="text" id="description" className="form-control"
+                                                   readOnly={true}
+                                                   value={description.current == null ? '' : description.current}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                                 <div className='row ca-form-row'>

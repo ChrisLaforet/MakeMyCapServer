@@ -122,4 +122,33 @@ export class InventoryApi {
                 return false;
             });
     }
+
+    public static async updateInHouseInventory(sku: string, onHand: number, authenticatedUser: AuthenticatedUser): Promise<boolean> {
+
+        return fetch(ApiHelper.CreateApiUrl('Inventory', 'update-in-house-inventory'), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Api-Key': ApiHelper.GetApiKey(),
+                'Authorization': ApiHelper.GetBearer(authenticatedUser)
+            },
+            body: JSON.stringify({
+                sku: sku,
+                onHand: onHand,
+            })
+        })
+            .then(async data => {
+                if (data.ok) {
+                    console.log(`In-house inventory record updated for ${sku}`)
+                    return true;
+                }
+                console.log(`In-house inventory record not updated for ${sku}`)
+                return false;
+            })
+            .catch(err => {
+                console.log(`Caught exception updating in-house inventory record for ${sku}`);
+                console.log(err);
+                return false;
+            });
+    }
 }

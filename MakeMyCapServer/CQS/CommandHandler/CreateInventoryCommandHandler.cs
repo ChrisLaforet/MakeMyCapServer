@@ -9,13 +9,11 @@ namespace MakeMyCapServer.CQS.CommandHandler;
 
 public class CreateInventoryCommandHandler : ICommandHandler<CreateInventoryCommand, NothingnessResponse>
 {
-	private readonly IOrderingProxy orderingProxy;
 	private readonly IProductSkuProxy productSkuProxy;
 	private readonly ILogger<CreateInventoryCommandHandler> logger;
 	
-	public CreateInventoryCommandHandler(IOrderingProxy orderingProxy, IProductSkuProxy productSkuProxy, ILogger<CreateInventoryCommandHandler> logger)
+	public CreateInventoryCommandHandler(IProductSkuProxy productSkuProxy, ILogger<CreateInventoryCommandHandler> logger)
 	{
-		this.orderingProxy = orderingProxy;
 		this.productSkuProxy = productSkuProxy;
 		this.logger = logger;
 	}
