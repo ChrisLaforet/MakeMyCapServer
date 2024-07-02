@@ -23,6 +23,7 @@ import ShowStatus from '../../pages/operation/ShowStatus';
 import Settings from '../../pages/config/Settings';
 import SkuMappings from '../../pages/shopify/SkuMappings';
 import Users from '../../pages/admin/Users';
+import Inventory from '../../pages/inventory/Inventory';
 
 
 // For Bootstrap: https://blog.logrocket.com/using-bootstrap-react-tutorial-examples/
@@ -49,11 +50,9 @@ const router = createBrowserRouter (
             <Route path="/Users" element={<GuardedRoute />}>
                 <Route path="/Users" element={<Users />} />
             </Route>
-
-            {/*<Route path="/EditSettings" element={<GuardedRoute />}>*/}
-            {/*    <Route path="/EditSettings" element={<EditSettings />} />*/}
-            {/*</Route>*/}
-
+            <Route path="/Inventory" element={<GuardedRoute />}>
+                <Route path="/Inventory" element={<Inventory />} />
+            </Route>
 
             <Route path="/NotFound" element={<NotFound />} />
             <Route path="*" element={<Navigate to="/NotFound" />} />

@@ -323,9 +323,12 @@ export default function SkuMappings() {
     return (
         <div>
             <h2><span className="ca-blue">Sku Mappings</span></h2>
-            {distributorSkus.length == 0 &&
-                <div className="mmc-spinner-box spinner-border text-primary"><span className="sr-only"></span></div>}
-            {distributorSkus.length > 0 &&
+            {
+                distributorSkus.length == 0 &&
+                <div className="mmc-spinner-box spinner-border text-primary"><span className="sr-only"></span></div>
+            }
+            {
+                distributorSkus.length > 0 &&
                 <div>
                     <div>
                         <div className="distributor-selection">
@@ -423,7 +426,8 @@ export default function SkuMappings() {
                                 </div>
                                 <div className='row ca-form-row'>
                                     <div>
-                                        <label htmlFor="distributorSku" className="col-form-label">Distributor's Sku:</label>
+                                        <label htmlFor="distributorSku" className="col-form-label">Distributor's
+                                            Sku:</label>
                                         <input type="text" id="distributorSku" className="form-control"
                                                required={isFieldRequired("distributorSku")}
                                                value={distributorSku}
@@ -547,7 +551,8 @@ export default function SkuMappings() {
 
                                 <div className="row mmc-form-button-row">
                                     <div className='modal-navigation-row justify-content-end'>
-                                        <button className="btn btn-outline-danger" type="submit">Yes, Delete This!</button>
+                                        <button className="btn btn-outline-danger" type="submit">Yes, Delete This!
+                                        </button>
                                         &nbsp;
                                         <button className="btn btn-outline-secondary"
                                                 type="button"

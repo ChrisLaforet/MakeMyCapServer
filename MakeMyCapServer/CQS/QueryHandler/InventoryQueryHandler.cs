@@ -50,7 +50,7 @@ public class InventoryQueryHandler : IQueryHandler<InventoryQuery, List<Inventor
 		return response;
 	}
 
-	private string FormatDescription(DistributorSkuMap skuMap)
+	public static string FormatDescription(DistributorSkuMap skuMap)
 	{
 		var description = new StringBuilder();
 		if (!string.IsNullOrEmpty(skuMap.Brand))

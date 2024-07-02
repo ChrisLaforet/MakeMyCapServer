@@ -1,0 +1,12 @@
+.customCreateInventoryModal {
+	background: white;
+	max-width: 600px !important;
+	width: 100%;
+	max-height: 250px;
+	height: 100%;
+}
+
+.onhand-control {
+	max-width: 8rem;
+}
+
